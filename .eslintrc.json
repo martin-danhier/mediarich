@@ -1,9 +1,10 @@
 {
     "env": {
         "browser": true,
-        "es2021": true
+        "es2020": true
     },
     "extends": [
+        "react-app",
         "eslint:recommended",
         "plugin:react/recommended",
         "plugin:@typescript-eslint/recommended"
@@ -36,6 +37,13 @@
         "semi": [
             "error",
             "always"
+        ],
+        "prefer-const": [
+            "warn"
+        ],
+        "no-use-before-define": "off",
+        "@typescript-eslint/no-use-before-define": [
+            "error"
         ]
     }
 }

@@ -1,0 +1,33 @@
+{
+    "eslint.enable": true,
+    "coverage-gutters.showLineCoverage": true,
+    "coverage-gutters.customizable.context-menu": false,
+    "eslint.workingDirectories": [
+        "src"
+    ],
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "html",
+        "typescriptreact",
+        "typescript"
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "node_modules": true,
+        "coverage": true,
+        "package-lock.json": true,
+        ".eslintrc.json": true,
+        "tsconfig.json": true,
+        "**/react-app-env.d.ts": true,
+        ".gitignore": true,
+        ".vscode": true,
+        ".idea": true,
+        "package.json": true
+    },
+    "explorerExclude.backup": null,
+}

@@ -1,14 +1,12 @@
 import React from 'react';
-import Home from '../../routes/home/Home';
-import logo from '../assets/logo.svg';
 import './App.css';
+import Home from 'routes/home/Home';
 
-function App() : JSX.Element {
-    console.log('hello');
+
+function App(): JSX.Element {
     return (
         <div className="App">
             <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
                 <p>
                     Edit <code>src/App.tsx</code> and save to reload.
                 </p>
