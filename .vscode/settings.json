@@ -21,7 +21,7 @@
         "node_modules": true,
         "coverage": true,
         "package-lock.json": true,
-        ".eslintrc.json": true,
+        ".eslintrc.json": false,
         "tsconfig.json": true,
         "**/react-app-env.d.ts": true,
         ".gitignore": true,
