@@ -14,49 +14,49 @@ type Message = string | Error | undefined;
 
 export function ok<T>(value: T, message?: Message): asserts value {
     // Disable in production
-    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION) {
+    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION === 'true') {
         assert.ok(value, message);
     }
 }
 
 export function strictEqual<T>(actual: T, expected: T, message?: Message): asserts actual is T {
     // Disable in production
-    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION) {
+    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION === 'true') {
         assert.strictEqual<T>(actual, expected, message);
     }
 }
 
 export function deepStrictEqual<T>(actual: T, expected: T, message?: Message): asserts actual is T {
     // Disable in production
-    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION) {
+    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION === 'true') {
         assert.deepStrictEqual<T>(actual, expected, message);
     }
 }
 
 export function notStrictEqual<T>(actual: T, expected: T, message: Message): void {
     // Disable in production
-    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION) {
+    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION === 'true') {
         assert.notStrictEqual(actual, expected, message);
     }
 }
 
 export function notDeepStrictEqual<T>(actual: T, expected: T, message?: Message): asserts actual is T {
     // Disable in production
-    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION) {
+    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION === 'true') {
         assert.notDeepStrictEqual(actual, expected, message);
     }
 }
 
 export function ifError<T>(value: T | null | undefined): asserts value is null | undefined {
     // Disable in production
-    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION) {
+    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION === 'true') {
         assert.ifError(value);
     }
 }
 
 export function throws<T>(block: () => T, error?: object | Function | RegExp | Error, message?: Message): void {
     // Disable in production
-    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION) {
+    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION === 'true') {
         // Original function has two overloads depending on the value of error
         if (error === undefined) {
             assert.throws(block, message);
@@ -70,7 +70,7 @@ export function throws<T>(block: () => T, error?: object | Function | RegExp | E
 
 export function doesNotThrow<T>(block: () => T, error?: Function | RegExp, message?: Message): void {
     // Disable in production
-    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION) {
+    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION === 'true') {
         // Original function has two overloads depending on the value of error
         if (error === undefined) {
             assert.doesNotThrow(block, message);
@@ -83,7 +83,7 @@ export function doesNotThrow<T>(block: () => T, error?: Function | RegExp, messa
 
 export async function rejects<T>(block: () => Promise<T> | Promise<T>, error?: object | Function | RegExp | Error, message?: Message): Promise<void> {
     // Disable in production
-    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION) {
+    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION === 'true') {
         // Original function has two overloads depending on the value of error
         if (error === undefined) {
             await assert.rejects(block, message);
@@ -95,7 +95,7 @@ export async function rejects<T>(block: () => Promise<T> | Promise<T>, error?: o
 
 export async function doesNotReject<T>(block: () => Promise<T> | Promise<T>, error?: Function | RegExp, message?: Message): Promise<void> {
     // Disable in production
-    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION) {
+    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION === 'true') {
         // Original function has two overloads depending on the value of error
         if (error === undefined) {
             await assert.doesNotReject(block, message);
@@ -107,7 +107,7 @@ export async function doesNotReject<T>(block: () => Promise<T> | Promise<T>, err
 
 export function fail(message?: Message): never | void {
     // Disable in production
-    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION) { 
+    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION === 'true') { 
         assert.fail(message);
     }
 }
