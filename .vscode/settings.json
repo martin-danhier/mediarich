@@ -27,7 +27,7 @@
         ".gitignore": true,
         ".vscode": true,
         ".idea": true,
-        "package.json": true
+        "package.json": false
     },
     "explorerExclude.backup": null,
 }

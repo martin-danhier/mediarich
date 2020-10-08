@@ -45,6 +45,7 @@
         "@typescript-eslint/no-use-before-define": [
             "error"
         ],
-        "@typescript-eslint/type-annotation-spacing": ["warn"]
+        "@typescript-eslint/type-annotation-spacing": ["warn"],
+        "no-empty": ["warn"]
     }
 }

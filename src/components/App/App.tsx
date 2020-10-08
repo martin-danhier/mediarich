@@ -19,7 +19,7 @@ function App(): JSX.Element {
                     Learn React
                 </a>
             </header>
-            <Home name="" />
+            <Home name="Hey" />
         </div>
     );
 }
