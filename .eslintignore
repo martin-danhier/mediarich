@@ -1,0 +1,4 @@
+# Don't enable linting for these directories
+build/*
+config/*
+scripts/*

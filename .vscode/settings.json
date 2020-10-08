@@ -22,12 +22,13 @@
         "coverage": true,
         "package-lock.json": true,
         ".eslintrc.json": false,
-        "tsconfig.json": true,
-        "**/react-app-env.d.ts": true,
+        "tsconfig.json": false,
+        "**/react-app-env.d.ts": false,
         ".gitignore": true,
         ".vscode": true,
         ".idea": true,
-        "package.json": false
+        "package.json": false,
+        ".eslintignore": true
     },
     "explorerExclude.backup": null,
 }
