@@ -1,6 +1,6 @@
 import React from 'react';
-import './style.css';
-import Home from 'routes/home';
+import './app.style.css';
+import Home from 'routes/home/home';
 
 
 function App(): JSX.Element {

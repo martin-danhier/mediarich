@@ -6,11 +6,14 @@
  */
 
 import assert from 'assert';
+// Re export assertion error which doesn't change
+export { AssertionError } from 'assert';
 
 /**
  * A message for an ``AssertionError``.
  */
 type Message = string | Error | undefined;
+
 
 export function ok<T>(value: T, message?: Message): asserts value {
     // Disable in production
@@ -107,7 +110,7 @@ export async function doesNotReject<T>(block: () => Promise<T> | Promise<T>, err
 
 export function fail(message?: Message): never | void {
     // Disable in production
-    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION === 'true') { 
+    if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_ENABLE_ASSERTIONS_IN_PRODUCTION === 'true') {
         assert.fail(message);
     }
 }

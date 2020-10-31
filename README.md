@@ -1,5 +1,7 @@
 # Mediarich
 
+![Tests](https://github.com/UNamurCSFaculty/2021_INFOB318_mediarich/workflows/Tests/badge.svg)
+
 > Enhanced media management platform for medias.unamur.be
 
 ## Installing
@@ -21,10 +23,12 @@ You can install these extensions for an optimal IDE:
 - [Test Explorer UI](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer): Required to make Jest Test Explorer work
 - [Visual Studio IntelliCode](https://marketplace.visualstudio.com/items?itemName=VisualStudioExptTeam.vscodeintellicode): Use AI to assist development
 
+Since the configuration of these extensions can be cumbersome, the .vscode directory is included in this repository, that way the editor is optimized for the IDE as soon as the repo is cloned.
+
 ## Run in debug mode
 
 1. Simply run ``npm start``.
-2. The website will be accessible from http://localhost:3000/ .
+2. The website will be accessible from [http://localhost:3000/](http://localhost:3000/) .
 
 ## Build for production
 
@@ -35,3 +39,10 @@ Optional: use a node server
 
 1. ``npm install -g serve``
 2. ``serve -s build``
+
+## Test
+
+- Run ``npm test`` to launch test watcher
+- Alternatively, tests can be launched with the Test Explorer extension
+- Tests automatically run at every commit
+- Run ``npm run coverage`` to collect coverage from the code (readable from Coverage Gutters extension)
