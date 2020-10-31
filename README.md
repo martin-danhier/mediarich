@@ -1,6 +1,6 @@
 # Mediarich
 
-![Tests](https://github.com/UNamurCSFaculty/2021_INFOB318_mediarich/workflows/Tests/badge.svg)
+![Tests](https://github.com/martin-danhier/mediarich/workflows/Tests/badge.svg)
 
 > Enhanced media management platform for medias.unamur.be
 
