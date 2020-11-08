@@ -5,7 +5,7 @@
  */
 
 import './types';
-import { APIResponseHandlingSpecification, HTTPStatusCodes as hs } from './types';
+import { APIResponseHandlingSpecification, ErrorHandlingSpecification, HTTPStatusCodes as hs } from './types';
 
 /**
  * Default values for response handling.
@@ -15,7 +15,7 @@ import { APIResponseHandlingSpecification, HTTPStatusCodes as hs } from './types
  * 
  * The values are based on the conventions of HTTP status codes.
  */
-const defaultResponseHandling: APIResponseHandlingSpecification = {
+export const defaultResponseHandling: APIResponseHandlingSpecification = {
     // Errors 200+
     [hs.OK]: {
         isSuccess: true,
@@ -47,18 +47,29 @@ const defaultResponseHandling: APIResponseHandlingSpecification = {
     // Errors 300+
     [hs.MultipleChoices]: {
         isSuccess: true,
+        // Since there are multiple choices, leave the choice to the user
     },
     [hs.MovedPermanently]: {
         isSuccess: true,
         shouldRedirectTo: 'header-location',
+        // In theory, it is preserved.
+        // In practice, it is adviced to only use 301 to respond to GET or HEAD.
+        // 308 is used to respond to POST
+        shouldPreserveRequest: true,
     },
     [hs.Found]: {
         isSuccess: true,
         shouldRedirectTo: 'header-location',
+        // In theory, it is preserved.
+        // In practice, it is adviced to only use 302 to respond to GET or HEAD.
+        // 307 is used to respond to POST
+        shouldPreserveRequest: true,
     },
     [hs.SeeOther]: {
         isSuccess: true,
         shouldRedirectTo: 'header-location',
+        // 303 should use GET in the new request
+        shouldPreserveRequest: false,
     },
     [hs.NotModified]: {
         isSuccess: true,
@@ -69,10 +80,14 @@ const defaultResponseHandling: APIResponseHandlingSpecification = {
     [hs.TemporaryRedirect]: {
         isSuccess: true,
         shouldRedirectTo: 'header-location',
+        // 307 should preserve request. Use 303 if you need to switch to GET
+        shouldPreserveRequest: true,
     },
     [hs.PermanentRedirect]: {
         isSuccess: true,
         shouldRedirectTo: 'header-location',
+        // 308 should preserve request. Use 303 if you need to switch to GET
+        shouldPreserveRequest: true,
     },
     // Errors 400+
     [hs.BadRequest] : {
@@ -206,4 +221,7 @@ const defaultResponseHandling: APIResponseHandlingSpecification = {
     },
 };
 
-export default defaultResponseHandling;
+export const defaultErrorHandling: ErrorHandlingSpecification = {
+    shouldLogError: true,
+    shouldRethrow: false,
+};

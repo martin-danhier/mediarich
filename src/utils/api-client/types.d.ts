@@ -43,6 +43,8 @@ export enum MIMETypes {
     EOT = 'application/vnd.ms-fontobject',
     /** Electronic publication file (EPUB) */
     EPUB = 'application/epub+zip',
+    /** Form Data */
+    FormData = 'multipart/form-data',
     /** Graphics Interchange Format file (GIF) */
     GIF = 'image/gif',
     /** HyperText Markup Language file (HTML) */
@@ -129,6 +131,8 @@ export enum MIMETypes {
     XML = 'application/xml',
     /** Mozilla Firefox self-contained application or extension */
     XUL = 'application/vnd.mozilla.xul+xml',
+    /** x-www-form-urlencoded */
+    XWWWFormUrlencoded = 'application/x-www-form-urlencoded',
     /** ZIP archive */
     ZIP = 'application/zip',
     /** 7-zip archive */
@@ -341,7 +345,7 @@ export interface APIResponseSpecification {
      * 
      * If not specified, all content types will be accepted.
      */
-    readonly expectedContentTypes?: [MIMETypes];
+    readonly expectedContentTypes?: MIMETypes[];
     /**
      * Route to which the client should redirect after receiving this response.
      * - If not specified, the client won't redirect.
@@ -350,6 +354,20 @@ export interface APIResponseSpecification {
      * follow the "Location" field of the response header, if it exists.
      */
     readonly shouldRedirectTo?: string | undefined;
+    /**
+     * In case of a 'header-location' redirect, should the client use the same request (only change the URL),
+     * or use a simple GET ?
+     * - `true` : the request is preserved
+     * - `false` or `undefined` : the request is not preserved. GET will be used.
+     * 
+     * In case of a redirect to another route of the API, should the client use the same body (recalculate headers using api specification),
+     * or don't include body and only use the specification ?
+     * - `true` : the body is preserved
+     * - `false` or `undefined` : the body is not preserved
+     * 
+     * If `shouldRedirectTo` is undefined, this property is ignored.
+     */
+    readonly shouldPreserveRequest?: boolean;
 
 }
 
@@ -372,6 +390,22 @@ export interface APIRouteSpecification {
     readonly requestContentType?: MIMETypes;
     /** Specification of all expected responses, according to the API documentation. */
     readonly expectedResponses?: APIResponseHandlingSpecification;
+    /** How should a fetch error be handled for this route ? */
+    readonly errorHandling?: ErrorHandlingSpecification;
+}
+
+/**
+ * Specification of the way the client should handle an error.
+ * It concerns fetch errors (when "fetch" throws), not bad status codes.
+ */
+export interface ErrorHandlingSpecification {
+    /** Should the error be thrown again ?
+     * (e.g. the "call" method will throw the error for you to catch it and handle it yourself) */
+    readonly shouldRethrow: boolean;
+    /** Should the error be logged to the console ? */
+    readonly shouldLogError: boolean;
+    /** Callback to call on error. Alternative way of handling the error yourself. */
+    readonly callback?: (error: string | Error) => void;
 }
 
 /**
@@ -388,12 +422,41 @@ export interface APISpecification {
         readonly [propName: string]: APIRouteSpecification;
     };
 
-    /** Default way to handle status codes in response */
+    /** Default way to handle status codes in internal responses.
+     * 
+     * "Internal responses" are the responses received when calling an URL that is inside the specifie API.
+     * 
+     * That doesn't include the responses of requests to URL outside of the API, like redirects to a "Location" header.
+     * 
+     * To specify the external responses, see `defaultExternalResponses`.
+     */
     readonly defaultResponses?: APIResponseHandlingSpecification;
+
+    /** Default way of handling fetch errors in calls */
+    readonly defaultErrorHandling?: ErrorHandlingSpecification;
+
+    /** 
+     * Default way of handling status codes in external responses.
+     * 
+     * "External responses" are the responses received when calling an URL that is outside of the specified API.
+     * 
+     * For example, when redirecting to an URL indicated in the "Location" header of another response.
+     * 
+     * If none are provided, the HTTP conventions will be used (not the `defaultResponses` values !)
+     */
+    readonly defaultExternalResponses?: APIResponseHandlingSpecification;
 }
 
 /**
  * Body of an HTTP request. Be sure to provide a value compatible with the Content-Type given to the specification.
  */
-export type HTTPRequestBody = string | Blob | ArrayBufferView | ArrayBuffer | FormData | URLSearchParams | ReadableStream<Uint8Array> | null | undefined;
+export type HTTPRequestBody = string | Blob | ArrayBufferView | ArrayBuffer | FormData | URLSearchParams | null | undefined;
 
+export interface HTTPRequestResult {
+    /** Was the request successful ? `true` if it was, `false` if there was an error. */
+    ok: boolean;
+    /** In case of an error, this property contains the error message. */
+    message?: string;
+    /** Response of the HTTP request. Can be undefined if the request didn't work. */
+    response?: Response;
+}
