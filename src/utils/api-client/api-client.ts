@@ -1,6 +1,19 @@
 import * as assert from 'utils/assert/assert';
 import { defaultErrorHandling, defaultResponseHandling } from './defaults';
-import { APIResponseSpecification, APIRouteSpecification, APISpecification, ErrorHandlingSpecification, HTTPRequestBody, HTTPRequestResult, HTTPStatusCodes, MIMETypes } from './types';
+import {
+    APIResponseSpecification,
+    APIRouteSpecification,
+    APISpecification,
+    ErrorHandlingSpecification,
+    FetchInit,
+    HTTPRequestBody,
+    HTTPRequestResult,
+    HTTPStatusCodes,
+    JSONObject,
+    MIMETypes,
+    ObjectMap,
+} from './types';
+import Cookies from 'js-cookie';
 
 class APIClient {
     private readonly api: APISpecification;
@@ -16,63 +29,135 @@ class APIClient {
     /**
      * Sends an http request to the given route. Handle it according to the specification.
      * @param routeName Name of the route to call. Must be defined in the API specification.
-     * @param body Body to send with the request. Must be coherent with the API specification. 
-     *    It can only be a generic object if the content type is JSON in the API specification.
+     * @param data Data used for the request. Its content depends on the request.
+     *  - In methods that support a body (like POST), `data` contains the body of the request.\
+     *      If the content type is `JSON` in the specification, it can be a generic object 
+     *      that will be stringified automatically. This object will be merged (and override identical keys) 
+     *      with the `baseJSONBody` provided to the request specification. If the generic object is not a list, the syntax
+     *      `#{name}` will be replaced by the value of the cookie named 'name' (only in values and in the first level)
+     * 
+     *  - In GET method, `data` contains the query parameters to give
+     *      to the request. Its type can thus be either an object of type ``{[key: string]: string}`` or a `URLSearchParams`. In case of a generic
+     *      object, it will be merged with the `baseQueryParams` provided to the request specification.
      * @async
      */
-    public async call(routeName: string, body?: HTTPRequestBody | object): Promise<HTTPRequestResult> {
+    public async call(routeName: string, data?: HTTPRequestBody | JSONObject): Promise<HTTPRequestResult> {
         // Don't allow unexisting routes
         assert.ok(routeName in this.api.routes, `'routeName' must be defined in the API specification. Found: '${routeName}'.`);
 
         // Get the specification of the route
         const route = this.api.routes[routeName];
 
-        // Allow an object in body only if the content type is JSON. If it is the case, parse it in a string
-        // If the body is a generic object (i.e. not one of the possible types)
-        if (typeof body === 'object' && !(
-            body === null
-            || body instanceof Blob
-            || body instanceof ArrayBuffer
-            || body instanceof FormData
-            || body instanceof URLSearchParams
-            // body instanceof ArrayBufferView
-            || ('buffer' in body && 'byteLength' in body && 'byteOffset' in body
-                && body.buffer instanceof ArrayBuffer
-                && typeof body.byteLength === 'number'
-                && typeof body.byteOffset === 'number')
-        )) {
-            // And the content type is json
-            if (route.requestContentType === MIMETypes.JSON) {
-                // Parse the body into a string
-                body = JSON.stringify(body);
-            }
-            // Else, we have a generic object that is not json, so there is a problem.
-            else {
 
-                console.error(body);
-                return { ok: false, message: 'If body is a generic object, the content-type must be set to JSON.' };
-                // throw new Error('If body is a generic object, the content-type must be set to JSON.');
-
-            }
-        }
-
-
-        // === Prepare HTTP Request Headers ===
-        const headers = this.getHeaders(route.requestContentType, body);
-
-        // === Send HTTP Request ===
-        let response: Response;
-        // Create params outside of the try-catch, so that we can use it later for redirections
-        const fetchParams = {
+        // Get the URL of the route
+        const url = new URL(this.getURL(route));
+        const fetchInit: FetchInit = {
             mode: route.mode,
             method: route.method,
-            headers: headers,
-            body: body,
         };
 
+        // Prepare fetch init and url
+        // In GET methods, data contains the search params
+        if (route.method === 'GET') {
+            // make some assertions on data to protect from programming errors
+            // Type can only be URLSearchParams or {[key: string]: string} or undefined
+            // All of this is specified in the documentation, so we can use assertions and remove them in production, where the code using this
+            // function is supposed to be compliant with the specification
+            assert.ok(typeof data !== 'string', 'In GET requests, \'data\' can be either a URLSearchParams or a object of type {[key:string] : string}. Received string');
+            assert.ok(!(data instanceof ArrayBuffer), 'In GET requests, \'data\' can be either a URLSearchParams or a object of type {[key:string] : string}. Received ArrayBuffer');
+            assert.ok(!(data instanceof Blob), 'In GET requests, \'data\' can be either a URLSearchParams or a object of type {[key:string] : string}. Received Blob');
+            assert.ok(!(data instanceof FormData), 'In GET requests, \'data\' can be either a URLSearchParams or a object of type {[key:string] : string}. Received FormData');
+            assert.ok(!Array.isArray(data), `In GET requests, 'data' can be either a URLSearchParams or a object of type {[key:string] : string}. Received: '${JSON.stringify(data)}'`);
+
+            // Get the query parameters
+            let params: URLSearchParams;
+
+            // Convert {[key: string]: string} to URLSearchParams
+            if (!(data instanceof URLSearchParams)) {
+                // Check if it is {[key: string]: string} or undefined
+                if (data) {
+                    assert.ok(Object.values(data).every((value) => typeof value === 'string'),
+                        `In GET requests, 'data' can be either a URLSearchParams or a object of type {[key:string] : string}. Received: '${JSON.stringify(data)}'`);
+                    assert.ok(Object.keys(data).every((value) => typeof value === 'string'),
+                        `In GET requests, 'data' can be either a URLSearchParams or a object of type {[key:string] : string}. Received: '${JSON.stringify(data)}'`);
+                }
+                // Process Cookies syntax
+                const processedData = APIClient.processObjectWithCookieSyntax(data as (ObjectMap<string> | undefined));
+                const processedBaseParams = APIClient.processObjectWithCookieSyntax(route.baseQueryParams);
+                // Convert data to URLSearchParams
+                params = new URLSearchParams({ ...processedBaseParams, ...processedData });
+            } else {
+                params = data;
+            }
+            // add the query parameters to the URL
+            url.search = params.toString();
+
+            // Get headers if there are some in the specification
+            if (route.headers) {
+                const headers = new Headers(APIClient.processObjectWithCookieSyntax(route.headers));
+                fetchInit.headers = headers;
+            }
+        }
+        // other methods
+        else {
+            // Allow an object in body only if the content type is JSON. If it is the case, parse it in a string
+            // If the body is a generic object (i.e. not one of the possible types)
+            if (typeof data === 'object' && !(
+                data === null
+                || data instanceof Blob
+                || data instanceof ArrayBuffer
+                || data instanceof FormData
+                || data instanceof URLSearchParams
+            )) {
+                // And the content type is json
+                if (route.requestContentType === MIMETypes.JSON) {
+                    // If the JSON is not an array
+                    if (!Array.isArray(data)) {
+
+                        // Preprocess the JSON data to use the cookie syntax
+                        const processedData = APIClient.processObjectWithCookieSyntax(data);
+
+                        // Preprocess the base JSON body to use the cookie syntax
+                        const processedBaseJSONBody = APIClient.processObjectWithCookieSyntax(route.baseJSONBody);
+
+                        // Parse the body into a string and merge with the base JSON body
+                        data = JSON.stringify({
+                            ...processedBaseJSONBody,
+                            ...processedData,
+                        });
+                    }
+                    else {
+                        // If the JSON object is an array, but some default data has been provided to the route
+                        // it is an error : how are we supposed to merge them ?
+                        assert.ok(route.baseJSONBody === undefined, 'An array was given to the call function, but the route specification is not undefined. Unable to merge.');
+
+                        data = JSON.stringify(data);
+
+                    }
+                }
+                // Else, we have a generic object that is not json, so there is a problem.
+                else {
+                    console.error(data);
+                    return { ok: false, message: 'If body is a generic object, the content-type must be set to JSON.' };
+                    // throw new Error('If body is a generic object, the content-type must be set to JSON.');
+                }
+            }
+            // Save body
+            fetchInit.body = data;
+
+            // Get headers
+            const headers = this.getHeaders(route, data);
+            fetchInit.headers = headers;
+
+        }
+
+        
+        // === Send HTTP Request ===
+        
+        let response: Response;
         try {
             // Send the request !
-            response = await fetch(this.getURL(route), fetchParams);
+            response = await fetch(url.toString(), fetchInit);
 
         } catch (e) {
             return this.handleInternalError(routeName, e);
@@ -107,20 +192,19 @@ class APIClient {
             const response = this.handleInternalError(routeName, e);
             response.response = r;
             return response;
-        }, fetchParams);
+        }, fetchInit);
     }
 
     /**
      * Call fetch with the given parameters and handles the response according to the specification
      * @param url URL to call with fetch
-     * @param params Params to give to the fetch function as is
+     * @param fetchInit fetch init to give to the fetch function as is
      */
-    public async externalCall(url: string, params?: RequestInit): Promise<HTTPRequestResult> {
+    public async externalCall(url: string, fetchInit?: FetchInit): Promise<HTTPRequestResult> {
         let response: Response;
         try {
             // Send the request !
-            response = await fetch(url, params);
-
+            response = await fetch(url, fetchInit);
         } catch (e) {
             return this.handleExternalError(url, e);
         }
@@ -153,10 +237,10 @@ class APIClient {
             const response = this.handleExternalError(url, e);
             response.response = r;
             return response;
-        }, params);
+        }, fetchInit);
     }
 
-    async handleResponse(response: Response, responseHandling: APIResponseSpecification, onError: (error: Error | string, response: Response) => HTTPRequestResult, fetchParams?: RequestInit): Promise<HTTPRequestResult> {
+    async handleResponse(response: Response, responseHandling: APIResponseSpecification, onError: (error: Error | string, response: Response) => HTTPRequestResult, fetchInit?: FetchInit): Promise<HTTPRequestResult> {
         // Check content type of the response if one is provided. Don't check if none is provided
         if (responseHandling.expectedContentTypes) {
             const responseContentType = response.headers.get('Content-Type');
@@ -203,10 +287,10 @@ class APIClient {
                     // All we can do is use the HTTP conventions (given through default values), make a valid request, and hope
                     if (responseHandling.shouldPreserveRequest) {
                         // Preserve request : fetch with the same parameters
-                        return this.externalCall(location, fetchParams);
+                        return this.externalCall(location, fetchInit);
                     } else {
                         // Don't preserve request : fetch without the same parameters, with GET
-                        return this.externalCall(location, {method: 'GET'});
+                        return this.externalCall(location, { method: 'GET' });
                     }
                 }
                 // If no Location header was found, return the response but tell that something went wrong
@@ -224,7 +308,7 @@ class APIClient {
                 // It is not a normal HTTP redirection
                 // Thus, we don't need to keep the fetch params, only the body
                 if (responseHandling.shouldPreserveRequest) {
-                    return this.call(responseHandling.shouldRedirectTo, fetchParams?.body);
+                    return this.call(responseHandling.shouldRedirectTo, fetchInit?.body);
                 } else {
                     // Don't include body if preserve request is not true
                     return this.call(responseHandling.shouldRedirectTo);
@@ -245,30 +329,39 @@ class APIClient {
      * @param targetContentType Expected content type of the body. It is simply added to the headers, without checks.
      * @param body body of the request. Not modified by the method.
      */
-    private getHeaders(targetContentType?: MIMETypes, body?: HTTPRequestBody): Headers {
-        const headers = new Headers();
+    private getHeaders(route: APIRouteSpecification, body?: HTTPRequestBody): Headers {
+        // Use the syntax #{cookie-name} to fetch the value of a cookie
+        const formattedHeaders = APIClient.processObjectWithCookieSyntax(route.headers);
 
-        // Content length, when possible
-        if (typeof body === 'string') {
-            headers.append('Content-Length', body.length.toString());
-        } else if (body instanceof Blob) {
-            headers.append('Content-Length', body.size.toString());
-        } else if (body instanceof ArrayBuffer) {
-            headers.append('Content-Length', body.byteLength.toString());
-        }
+        const headers = new Headers(formattedHeaders);
 
-        // Content Type : check if provided in route
-        // Only add a string content type (it might be null)
-        if (typeof targetContentType === 'string') {
-            // Consider that we only use utf-8 for strings
+        // Check content length if it is not already provided
+        if (!headers.has('Content-Length')) {
+            // Content length, when possible
             if (typeof body === 'string') {
-                headers.append('Content-Type', targetContentType + '; charset=utf-8');
-            }
-            else {
-                headers.append('Content-Type', targetContentType);
+                headers.append('Content-Length', body.length.toString());
+            } else if (body instanceof Blob) {
+                headers.append('Content-Length', body.size.toString());
+            } else if (body instanceof ArrayBuffer) {
+                headers.append('Content-Length', body.byteLength.toString());
             }
         }
 
+        // Check content type if it is not already provided
+        if (!headers.has('Content-Type')) {
+            // Content Type : check if provided in route
+            // Only add a string content type (it might be null)
+            if (typeof route.requestContentType === 'string') {
+                // Consider that we only use utf-8 for strings
+                if (typeof body === 'string') {
+                    headers.append('Content-Type', route.requestContentType + '; charset=utf-8');
+                }
+                else {
+                    headers.append('Content-Type', route.requestContentType);
+                }
+            }
+
+        }
         return headers;
     }
 
@@ -294,7 +387,7 @@ class APIClient {
         const errorHandling = this.api.routes[routeName].errorHandling ?? this.api.defaultErrorHandling ?? defaultErrorHandling;
 
         // Handle the error
-        return this.handleError(errorHandling, error, `[APIClient] The following error was thrown during a call to '${routeName}':`);
+        return APIClient.handleError(errorHandling, error, `[APIClient] The following error was thrown during a call to '${routeName}':`);
     }
 
     /**
@@ -307,7 +400,7 @@ class APIClient {
         const errorHandling = this.api.defaultErrorHandling ?? defaultErrorHandling;
 
         // Handle the error
-        return this.handleError(errorHandling, error, `[APIClient] The following error was thrown during an external call to '${url}':`);
+        return APIClient.handleError(errorHandling, error, `[APIClient] The following error was thrown during an external call to '${url}':`);
     }
 
     /**
@@ -316,7 +409,7 @@ class APIClient {
      * @param error Error to handle. Can be a string (message) ou an Error object
      * @param logMessage Message to log before the error. For example "The following error was thrown:"
      */
-    private handleError(errorHandling: ErrorHandlingSpecification, error: string | Error, logMessage: string): HTTPRequestResult {
+    private static handleError(errorHandling: ErrorHandlingSpecification, error: string | Error, logMessage: string): HTTPRequestResult {
 
         // Should the error be logged ?
         if (errorHandling.shouldLogError) {
@@ -349,6 +442,40 @@ class APIClient {
                 message
             };
         }
+    }
+
+    /**
+     * Replaces the occurences of the `#{cookie-name}` syntax in a string
+     * with the value of the Cookie named `cookie-name`.
+     * If the Cookie is undefined, replace with empty string instead. // TODO maybe handle that case
+     * @param raw The raw string to process
+     * @return the processed string
+     */
+    private static processCookieSyntax(raw: string): string {
+        return raw.replace(/#{(?<name>\w+)}/g, (src, name) => {
+            return Cookies.get(name) ?? '';
+        });
+    }
+
+    /**
+     * Process the cookie syntax in each value of the object. See `processCookieSyntax` for more infos.
+     * @param raw An object with string keys and values of type T or string. The values can support the `#{cookie}` cookie syntax.
+     */
+    private static processObjectWithCookieSyntax<T>(raw: ObjectMap<T | string> | undefined): ObjectMap<T | string> {
+        const processed: ObjectMap<T | string> = {};
+        for (const key in raw) {
+            // Get the value to process
+            const unprocessedValue = raw[key];
+            // Process it if its a string
+            if (typeof unprocessedValue === 'string') {
+                processed[key] = APIClient.processCookieSyntax(unprocessedValue);
+            }
+            // Else add it as is
+            else {
+                processed[key] = unprocessedValue;
+            }
+        }
+        return processed;
     }
 }
 

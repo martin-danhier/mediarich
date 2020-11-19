@@ -4,6 +4,26 @@
  * @version 0.1
  */
 
+/** Shorthand for a commonly used object type.
+ * 
+ * Equivalent of 
+ * ```ts
+ * {[key: string] : T}
+ * ```
+*/
+export interface ObjectMap<T> {
+    [key: string]: T;
+}
+
+/** Valid JSON object. Can safely be stringified to JSON. */
+export type JSONObject = JSONInnerObject | JSONInnerArray;
+/** JSON Object (key: value) */
+type JSONInnerObject = {
+    [key: string]: string | number | boolean | JSONInnerObject | JSONInnerArray;
+}
+/** JSON array */
+type JSONInnerArray = string[] | number[] | boolean[] | JSONInnerObject[] | JSONInnerArray[];
+
 /** Enum of the different MIME type usable in the 'content-type' header.
  * @see https://developer.mozilla.org/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
  */
@@ -386,12 +406,39 @@ export interface APIRouteSpecification {
     readonly method: 'GET' | 'POST' | 'HEAD' | 'PUT' | 'DELETE' | 'PATCH';
     /** Mode used for the request */
     readonly mode?: 'cors' | 'no-cors' | 'navigate' | 'same-origin';
+    /** JSON body that is merged with the body passed to the call function.
+     * 
+     * The content type must be JSON. The syntax `#{name}` will be replaced by the value of
+     * the cookie named 'name' (only in values and in the first level)
+     */
+    readonly baseJSONBody?: JSONInnerObject;
+    /** Query parameters that are merged with the ones passed to the call function.
+     * 
+     * In values, the syntax `#{name}` will be replaced by the value of
+     * the cookie named 'name'.
+     * 
+     * The method must be GET.
+    */
+    readonly baseQueryParams?: ObjectMap<string>;
     /** Content type used for the request. */
     readonly requestContentType?: MIMETypes;
     /** Specification of all expected responses, according to the API documentation. */
     readonly expectedResponses?: APIResponseHandlingSpecification;
     /** How should a fetch error be handled for this route ? */
     readonly errorHandling?: ErrorHandlingSpecification;
+    /** Object used for headers. The keys given here override the ones computed in the client.
+     * You can use the syntax ``#{}`` to get the value of a cookie.
+     * 
+     * Example:
+     * ```ts
+     * headers: {
+     *  "Authorization": "Bearer #{token}"
+     * }
+     * ```
+     * This example will replace `#{token}` with the value of the Cookie named "token".
+     * If such cookie does not exist, it will be replaced by an empty string. //TODO handle that error correctly
+     */
+    readonly headers?: ObjectMap<string>;
 }
 
 /**
@@ -450,7 +497,7 @@ export interface APISpecification {
 /**
  * Body of an HTTP request. Be sure to provide a value compatible with the Content-Type given to the specification.
  */
-export type HTTPRequestBody = string | Blob | ArrayBufferView | ArrayBuffer | FormData | URLSearchParams | null | undefined;
+export type HTTPRequestBody = string | Blob | ArrayBuffer | FormData | URLSearchParams | null | undefined;
 
 export interface HTTPRequestResult {
     /** Was the request successful ? `true` if it was, `false` if there was an error. */
@@ -459,4 +506,8 @@ export interface HTTPRequestResult {
     message?: string;
     /** Response of the HTTP request. Can be undefined if the request didn't work. */
     response?: Response;
+}
+
+export interface FetchInit extends RequestInit {
+    body?: HTTPRequestBody;
 }

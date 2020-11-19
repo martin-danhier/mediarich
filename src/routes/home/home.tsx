@@ -8,6 +8,7 @@ interface HomeProps {
 
 class Home extends React.Component<HomeProps> {
 
+
     render(): JSX.Element {
         assert.strictEqual(this.props.name, 'Hey');
         return <span> Bonjour {this.props.title}</span>;

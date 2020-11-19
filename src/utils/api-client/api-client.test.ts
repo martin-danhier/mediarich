@@ -3,7 +3,7 @@ import { AssertionError } from 'utils/assert/assert';
 import fetch from 'jest-fetch-mock';
 import { HTTPStatusCodes, MIMETypes } from './types';
 import { strictEqual } from 'assert';
-import { promises } from 'dns';
+import Cookies from 'js-cookie';
 
 
 let client: APIClient;
@@ -30,7 +30,23 @@ beforeAll(() => {
                         isSuccess: true,
                         expectedContentTypes: [MIMETypes.HTML],
                     },
+                },
+                headers: {
+                    'Authorization': 'Bearer #{token}'
                 }
+            },
+            // Existing route, but in post
+            existingPost: {
+                method: 'POST',
+                url: '/API_testing',
+                requestContentType: MIMETypes.None,
+                expectedResponses: {
+                    // OK : return page in html
+                    [HTTPStatusCodes.OK]: {
+                        isSuccess: true,
+                        expectedContentTypes: [MIMETypes.HTML],
+                    },
+                },
             },
             // Existing route, but the URL is not valid
             wrongSpec: {
@@ -166,6 +182,39 @@ beforeAll(() => {
                         shouldPreserveRequest: true,
                     }
                 }
+            },
+            // Header override
+            headerOverride: {
+                method: 'POST',
+                url: '/API_testing',
+                requestContentType: MIMETypes.None,
+                expectedResponses: {
+                    // OK : return page in html
+                    [HTTPStatusCodes.OK]: {
+                        isSuccess: true,
+                        expectedContentTypes: [MIMETypes.HTML],
+                    },
+                },
+                headers: {
+                    'Content-Type': 'application/xml',
+                    'Content-Length': '7',
+                }
+            },
+            // JSON input with body
+            jsonInputDefault: {
+                method: 'POST',
+                url: '/JSON',
+                requestContentType: MIMETypes.JSON,
+                expectedResponses: {
+                    // OK : return data in JSON
+                    [HTTPStatusCodes.InternalServerError]: {
+                        isSuccess: false,
+                        expectedContentTypes: [MIMETypes.JSON],
+                    },
+                },
+                baseJSONBody: {
+                    token: '#{token}'
+                }
             }
         }
     });
@@ -173,134 +222,174 @@ beforeAll(() => {
     beforeEach(() => {
         // Reset the call count of fetch between each mock
         jest.clearAllMocks();
+        // Clear cookies
+        Cookies.remove('token');
     });
 
     // Setup mocks
     fetch.mockResponse(async req => {
 
-        switch (req.url) {
-            // "existing" route
-            case 'https://en.wikipedia.org/wiki/API_testing':
-                // Return a fake response
-                return Promise.resolve({
-                    body: '<!DOCTYPE html><html><body><h1>Titre</h1></body></html>',
-                    init: {
-                        headers: {
-                            'Content-Type': 'text/html; charset=UTF-8',
-                            'Content-Length': '55',
-                        },
-                        status: 200,
-                        statusText: 'OK',
-                    }
-                });
-            // "JSON" route
-            case 'https://en.wikipedia.org/wiki/JSON':
+        // "existing" route
+        if (req.url === 'https://en.wikipedia.org/wiki/API_testing') {
+            const headers: { [key: string]: string } = {
+                'Content-Type': 'text/html; charset=UTF-8',
+                'Content-Length': '55',
+            };
 
-                // Do some checks on the request as well
-                // expect(await req.json()).toBe('{number: 4}');
-                // expect(req.headers.get('Content-Type')).toBe('application/json; charset=UTF8');
-                // expect(req.headers.get('Content-Length')).toBe('11');
+            // If cookie is valid, return a sesskey
+            if (req.headers.get('Authorization') === 'Bearer my-very-secure-token') {
+                headers['Set-Cookie'] = 'sesskey=ok';
+            }
 
-                // Return a fake response
-                return Promise.resolve({
-                    body: '{"value": 12, "list": ["item", "item2"]}',
-                    init: {
-                        headers: {
-                            'Content-Type': 'application/json; charset=UTF-8',
-                            'Content-Length': '55',
-                        },
-                        status: 500,
-                        statusText: 'Internal Server Error',
-                    }
-                });
-            // "Blob" route
-            case 'https://en.wikipedia.org/wiki/blob':
-                // Length is 37 in blob test
-                strictEqual(req.headers.get('Content-Length'), '37');
-                return Promise.resolve({
-                    init: {
-                        status: 200,
-                        statusText: 'OK',
-                    }
-                });
-            case 'https://en.wikipedia.org/wiki/buffer':
-                // Length is 20 in buffer test
-                strictEqual(req.headers.get('Content-Length'), '20');
-                return Promise.resolve({
-                    body: req.headers.get('Content-Length'),
-                    init: {
-                        status: 200,
-                        statusText: 'OK',
-                    }
-                });
-            // Unexpected empty response
-            case 'https://en.wikipedia.org/wiki/no-content':
-                return Promise.resolve({
-                    init: {
-                        status: 200,
-                        statusText: 'OK',
-                    }
-                });
-            // Invalid status
-            case 'https://en.wikipedia.org/wiki/teapot':
-                return Promise.resolve({
-                    init: {
-                        status: 418,
-                        statusText: 'I\'m a teapot',
-                    }
-                });
-            // Redirection to external site
-            case 'https://en.wikipedia.org/wiki/redirect':
-                return Promise.resolve({
-                    init: {
-                        status: 303,
-                        statusText: 'See Other',
-                        headers: {
-                            'Location': 'https://www.unamur.be/',
-                        }
-                    }
-                });
-            // External request
-            case 'https://www.unamur.be/':
-                if (await req.text() === 'request content') {
-                    return Promise.resolve({
-                        body: '{"page": "UNamur", "preserved": true}',
-                        init: {
-                            status: 200,
-                            statusText: 'OK',
-                            headers: {
-                                'Content-Type': 'application/json; charset=utf-8',
-                                'Content-Length': '37',
-                            }
-                        }
-                    });
+            // Return some of headers for verification
+            headers['Request-Content-Type'] = req.headers.get('Content-Type') ?? 'null';
+            headers['Request-Content-Length'] = req.headers.get('Content-Length') ?? 'null';
+
+            // Return a fake response
+            return Promise.resolve({
+                body: '<!DOCTYPE html><html><body><h1>Titre</h1></body></html>',
+                init: {
+                    headers,
+                    status: 200,
+                    statusText: 'OK',
                 }
-                else {
-                    return Promise.resolve({
-                        body: '{"page": "UNamur"}',
-                        init: {
-                            status: 200,
-                            statusText: 'OK',
-                            headers: {
-                                'Content-Type': 'application/json; charset=utf-8',
-                                'Content-Length': '18',
-                            }
-                        }
-                    });
-                }
-            // External request expected to return something else
-            case 'https://www.unamur.be/xml/':
-                return Promise.resolve({
-                    init: {
-                        status: 201,
-                        statusText: 'Created',
-                    }
-                });
-
-            // URL not supported in mock
-            default:
-                return Promise.reject(new Error('Bad URL: ' + req.url));
+            });
         }
+        // Existing with query params
+        else if (req.url === 'https://en.wikipedia.org/wiki/API_testing?param=value'){
+            return Promise.resolve({
+                init: {
+                    status: HTTPStatusCodes.Created,
+                    statusText: 'Created',
+                }
+            });
+        }
+        // "JSON" route
+        else if (req.url === 'https://en.wikipedia.org/wiki/JSON') {
+
+            // Do some checks on the request as well
+            const json = await req.json();
+            if (Array.isArray(json)) {
+                expect(json).toStrictEqual([4,5,6]);
+            } else {
+                expect(json.number).toBe(4);
+                if (json.token) {
+                    expect(json.token).toBe('my-very-secure-token');
+                }
+            }
+            expect(req.headers.get('Content-Type')).toBe('application/json; charset=utf-8');
+
+            // Return a fake response
+            return Promise.resolve({
+                body: '{"value": 12, "list": ["item", "item2"]}',
+                init: {
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8',
+                        'Content-Length': '55',
+                    },
+                    status: 500,
+                    statusText: 'Internal Server Error',
+                }
+            });
+        }
+        // "Blob" route
+        else if (req.url === 'https://en.wikipedia.org/wiki/blob') {
+
+            // Length is 37 in blob test
+            strictEqual(req.headers.get('Content-Length'), '37');
+            return Promise.resolve({
+                init: {
+                    status: 200,
+                    statusText: 'OK',
+                }
+            });
+        }
+        else if (req.url === 'https://en.wikipedia.org/wiki/buffer') {
+            // Length is 20 in buffer test
+            strictEqual(req.headers.get('Content-Length'), '20');
+            return Promise.resolve({
+                body: req.headers.get('Content-Length'),
+                init: {
+                    status: 200,
+                    statusText: 'OK',
+                }
+            });
+        }
+        // Unexpected empty response
+        else if (req.url === 'https://en.wikipedia.org/wiki/no-content') {
+            return Promise.resolve({
+                init: {
+                    status: 200,
+                    statusText: 'OK',
+                }
+            });
+        }
+        // Invalid status
+        else if (req.url === 'https://en.wikipedia.org/wiki/teapot') {
+            return Promise.resolve({
+                init: {
+                    status: 418,
+                    statusText: 'I\'m a teapot',
+                }
+            });
+        }
+        // Redirection to external site
+        else if (req.url === 'https://en.wikipedia.org/wiki/redirect') {
+            return Promise.resolve({
+                init: {
+                    status: 303,
+                    statusText: 'See Other',
+                    headers: {
+                        'Location': 'https://www.unamur.be/',
+                    }
+                }
+            });
+        }
+        // External request
+        else if (req.url === 'https://www.unamur.be/') {
+            if (await req.text() === 'request content') {
+                return Promise.resolve({
+                    body: '{"page": "UNamur", "preserved": true}',
+                    init: {
+                        status: 200,
+                        statusText: 'OK',
+                        headers: {
+                            'Content-Type': 'application/json; charset=utf-8',
+                            'Content-Length': '37',
+                        }
+                    }
+                });
+            }
+            else {
+                return Promise.resolve({
+                    body: '{"page": "UNamur"}',
+                    init: {
+                        status: 200,
+                        statusText: 'OK',
+                        headers: {
+                            'Content-Type': 'application/json; charset=utf-8',
+                            'Content-Length': '18',
+                        }
+                    }
+                });
+            }
+        }
+        // External request expected to return something else
+        else if (req.url === 'https://www.unamur.be/xml/') {
+
+            return Promise.resolve({
+                init: {
+                    status: 201,
+                    statusText: 'Created',
+                }
+            });
+        }
+
+        // URL not supported in mock
+        else {
+            return Promise.reject(new Error('Bad URL: ' + req.url));
+        }
+
     });
 });
 
@@ -449,7 +538,7 @@ test('ArrayBuffer in request', async () => {
 
 test('Generic object but no JSON content type', async () => {
     // It is not allowed to give a generic object to the call function with a route that doesn't send JSON
-    const result = await client.call('existing', { number: 4 });
+    const result = await client.call('existingPost', { number: 4 });
 
     expect(result.ok).not.toBeTruthy();
     expect(result.message).toBe('If body is a generic object, the content-type must be set to JSON.');
@@ -607,4 +696,96 @@ test('External call body preserved', async () => {
     }
     // check mock
     expect(fetch).toHaveBeenCalledTimes(2);
+});
+
+test('Header with Cookie', async () => {
+    // Set a Cookie
+    Cookies.set('token', 'my-very-secure-token');
+
+    const result = await client.call('existing');
+    expect(result.ok).toBeTruthy();
+    expect(result.message).toBeUndefined();
+    expect(result.response).toBeDefined();
+    if (result.response) {
+        // Check if the response contains a Set-Cookie
+        // It is returned by the mock if the cookie was correctly replaced
+        expect(result.response.headers.get('Set-Cookie')).toBe('sesskey=ok');
+    }
+});
+
+test('Header override', async () => {
+    const result = await client.call('headerOverride');
+    expect(result.ok).toBeTruthy();
+    expect(result.message).toBeUndefined();
+    expect(result.response).toBeDefined();
+    if (result.response) {
+        // The mock is programmed to return the received content type and content length
+        // Check if the values are the overriden ones
+        expect(result.response.headers.get('Request-Content-Type')).toBe('application/xml');
+        expect(result.response.headers.get('Request-Content-Length')).toBe('7');
+    }
+});
+
+test('JSON input with default body', async () => {
+    // Set a Cookie
+    Cookies.set('token', 'my-very-secure-token');
+
+    const result = await client.call('jsonInputDefault', { number: 4 });
+
+    // Check that the response is the same as in the mock
+    expect(result.ok).not.toBeTruthy();
+    expect(result.message).toBe('Internal server error');
+    expect(result.response).toBeDefined();
+    if (result.response) {
+        // The status is the same as in the mock
+        expect(result.response.status).toBe(500);
+        // The status text is the same as in the mock
+        expect(result.response.statusText).toBe('Internal Server Error');
+        // The body is the same as in the mock
+        expect(await result.response.json()).toStrictEqual({ value: 12, list: ['item', 'item2'] });
+    }
+});
+
+test('JSON array input with default body', async () => {
+    // Set a Cookie
+    Cookies.set('token', 'my-very-secure-token');
+
+    expect(client.call('jsonInputDefault', [4, 5, 6])).rejects.toThrow(AssertionError);
+
+});
+
+test('JSON input without default body', async () => {
+
+    const result = await client.call('jsonInput', [4, 5, 6]);
+
+    // Check that the response is the same as in the mock
+    expect(result.ok).not.toBeTruthy();
+    expect(result.message).toBe('Internal server error');
+    expect(result.response).toBeDefined();
+});
+
+test('GET with query parameters', async () => {
+    const result = await client.call('existing', {param: 'value'});
+    // Check that the response is the same as in the mock
+    expect(result.ok).toBeTruthy();
+    expect(result.message).toBeUndefined();
+    expect(result.response).toBeDefined();
+    if (result.response) {
+        // It will return 201 if the query params were successful
+        // it will return 200 if there were no params
+        expect(result.response.status).toBe(201);
+    }
+});
+
+test('GET with url search params', async () => {
+    const result = await client.call('existing', new URLSearchParams({param: 'value'}));
+    // Check that the response is the same as in the mock
+    expect(result.ok).toBeTruthy();
+    expect(result.message).toBeUndefined();
+    expect(result.response).toBeDefined();
+    if (result.response) {
+        // It will return 201 if the query params were successful
+        // it will return 200 if there were no params
+        expect(result.response.status).toBe(201);
+    }
 });

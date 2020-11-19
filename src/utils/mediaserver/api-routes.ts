@@ -1,10 +1,11 @@
-import { APISpecification } from "utils/api-client/types";
+import { APISpecification, HTTPStatusCodes, MIMETypes } from 'utils/api-client/types';
 
 
 const mediaserverRoutes: APISpecification = {
-    baseURL: '<TODO>',
+    baseURL: 'http://localhost:8000',
     routes: {
         ping: {
+            mode: 'cors',
             method: 'GET',
             url: '/api/v2/',
         },
