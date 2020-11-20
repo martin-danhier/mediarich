@@ -5,7 +5,7 @@
  */
 
 import './types';
-import { APIResponseHandlingSpecification, ErrorHandlingSpecification, HTTPStatusCodes as hs } from './types';
+import { APIResponseHandlingSpecification, APIResponseSpecification, APIRoutesSpecification, ErrorHandlingSpecification, HTTPStatusCodes as hs } from './types';
 
 /**
  * Default values for response handling.
@@ -15,211 +15,211 @@ import { APIResponseHandlingSpecification, ErrorHandlingSpecification, HTTPStatu
  * 
  * The values are based on the conventions of HTTP status codes.
  */
-export const defaultResponseHandling: APIResponseHandlingSpecification = {
+export class DefaultResponseHandling<R extends APIRoutesSpecification<R>> implements APIResponseHandlingSpecification<R> {
     // Errors 200+
-    [hs.OK]: {
+    [hs.OK] = {
         isSuccess: true,
-    },
-    [hs.Created]: {
+    };
+    [hs.Created] = {
         isSuccess: true,
-    },
-    [hs.Accepted] : {
+    };
+    [hs.Accepted] = {
         isSuccess: true,
-    },
-    [hs.NonAuthoritativeInformation] : {
+    };
+    [hs.NonAuthoritativeInformation] = {
         isSuccess: true,
-    },
-    [hs.NoContent] : {
+    };
+    [hs.NoContent] = {
         isSuccess: true,
-    },
-    [hs.ResetContent] : {
+    };
+    [hs.ResetContent] = {
         isSuccess: true,
-    },
-    [hs.PartialContent] : {
+    };
+    [hs.PartialContent] = {
         isSuccess: true,
-    },
-    [hs.MultiStatus] : {
+    };
+    [hs.MultiStatus] = {
         isSuccess: true,
-    },
-    [hs.AlreadyReported] : {
+    };
+    [hs.AlreadyReported] = {
         isSuccess: true,
-    },
+    };
     // Errors 300+
-    [hs.MultipleChoices]: {
+    [hs.MultipleChoices] = {
         isSuccess: true,
         // Since there are multiple choices, leave the choice to the user
-    },
-    [hs.MovedPermanently]: {
+    };
+    [hs.MovedPermanently]: APIResponseSpecification<R> = {
         isSuccess: true,
         shouldRedirectTo: 'header-location',
         // In theory, it is preserved.
         // In practice, it is adviced to only use 301 to respond to GET or HEAD.
         // 308 is used to respond to POST
         shouldPreserveRequest: true,
-    },
-    [hs.Found]: {
+    };
+    [hs.Found]: APIResponseSpecification<R> = {
         isSuccess: true,
         shouldRedirectTo: 'header-location',
         // In theory, it is preserved.
         // In practice, it is adviced to only use 302 to respond to GET or HEAD.
         // 307 is used to respond to POST
         shouldPreserveRequest: true,
-    },
-    [hs.SeeOther]: {
+    };
+    [hs.SeeOther]: APIResponseSpecification<R> = {
         isSuccess: true,
         shouldRedirectTo: 'header-location',
         // 303 should use GET in the new request
         shouldPreserveRequest: false,
-    },
-    [hs.NotModified]: {
+    };
+    [hs.NotModified] = {
         isSuccess: true,
-    },
-    [hs.UseProxy]: {
+    };
+    [hs.UseProxy] = {
         isSuccess: true,
-    },
-    [hs.TemporaryRedirect]: {
+    };
+    [hs.TemporaryRedirect]: APIResponseSpecification<R> = {
         isSuccess: true,
         shouldRedirectTo: 'header-location',
         // 307 should preserve request. Use 303 if you need to switch to GET
         shouldPreserveRequest: true,
-    },
-    [hs.PermanentRedirect]: {
+    };
+    [hs.PermanentRedirect]: APIResponseSpecification<R> = {
         isSuccess: true,
         shouldRedirectTo: 'header-location',
         // 308 should preserve request. Use 303 if you need to switch to GET
         shouldPreserveRequest: true,
-    },
+    };
     // Errors 400+
-    [hs.BadRequest] : {
+    [hs.BadRequest] = {
         isSuccess: false,
         message: 'Bad request',
-    },
-    [hs.Unauthorized] : {
+    };
+    [hs.Unauthorized] = {
         isSuccess: false,
         message: 'Unauthorized',
-    },
-    [hs.Forbidden] : {
+    };
+    [hs.Forbidden] = {
         isSuccess: false,
         message: 'Forbidden',
-    },
-    [hs.NotFound] : {
+    };
+    [hs.NotFound] = {
         isSuccess: false,
         message: 'Not found',
-    },
-    [hs.MethodNotAllowed] : {
+    };
+    [hs.MethodNotAllowed] = {
         isSuccess: false,
         message: 'Method not allowed',
-    },
-    [hs.NotAcceptable] : {
+    };
+    [hs.NotAcceptable] = {
         isSuccess: false,
         message: 'Not acceptable',
-    },
-    [hs.ProxyAuthenticationRequired] : {
+    };
+    [hs.ProxyAuthenticationRequired] = {
         isSuccess: false,
         message: 'Proxy authentication required',
-    },
-    [hs.RequestTimeout] : {
+    };
+    [hs.RequestTimeout] = {
         isSuccess: false,
         message: 'Request timeout',
-    },
-    [hs.Conflict] : {
+    };
+    [hs.Conflict] = {
         isSuccess: false,
         message: 'Conflict',
-    },
-    [hs.LengthRequired] : {
+    };
+    [hs.LengthRequired] = {
         isSuccess: false,
         message: 'Content-Length required',
-    },
-    [hs.PreconditionFailed] : {
+    };
+    [hs.PreconditionFailed] = {
         isSuccess: false,
         message: 'Precondition failed',
-    },
-    [hs.PayloadTooLarge] : {
+    };
+    [hs.PayloadTooLarge] = {
         isSuccess: false,
         message: 'Payload is too large',
-    },
-    [hs.URITooLong] : {
+    };
+    [hs.URITooLong] = {
         isSuccess: false,
         message: 'URI too long (try to use POST)',
-    },
-    [hs.UnsupportedMediaType] : {
+    };
+    [hs.UnsupportedMediaType] = {
         isSuccess: false,
         message: 'The provided media type is not supported',
-    },
-    [hs.RangeNotSatisfiable] : {
+    };
+    [hs.RangeNotSatisfiable] = {
         isSuccess: false,
         message: 'Range not satisfiable',
-    },
-    [hs.ExpectationFailed] : {
+    };
+    [hs.ExpectationFailed] = {
         isSuccess: false,
         message: 'Expectation failed',
-    },
-    [hs.Locked] : {
+    };
+    [hs.Locked] = {
         isSuccess: false,
         message: 'The requested resource is locked',
-    },
-    [hs.UpgradeRequired] : {
+    };
+    [hs.UpgradeRequired] = {
         isSuccess: false,
         message: 'Upgrade required',
-    },
-    [hs.TooManyRequests] : {
+    };
+    [hs.TooManyRequests] = {
         isSuccess: false,
         message: 'Too many requests',
-    },
-    [hs.RequestHeaderFieldsTooLarge] : {
+    };
+    [hs.RequestHeaderFieldsTooLarge] = {
         isSuccess: false,
         message: 'Request header fields too large',
-    },
-    [hs.UnavailableForLegalReasons] : {
+    };
+    [hs.UnavailableForLegalReasons] = {
         isSuccess: false,
         message: 'Unavailable for legal reasons',
-    },
+    };
     // Errors 500+
-    [hs.InternalServerError] : {
+    [hs.InternalServerError] = {
         isSuccess: false,
         message: 'Internal server error',
-    },
-    [hs.NotImplemented] : {
+    };
+    [hs.NotImplemented] = {
         isSuccess: false,
         message: 'This route is not implemented',
-    },
-    [hs.BadGateway] : {
+    };
+    [hs.BadGateway] = {
         isSuccess: false,
         message: 'Bad gateway',
-    },
-    [hs.ServiceUnavailable] : {
+    };
+    [hs.ServiceUnavailable] = {
         isSuccess: false,
         message: 'Service unavailable',
-    },
-    [hs.GatewayTimeout] : {
+    };
+    [hs.GatewayTimeout] = {
         isSuccess: false,
         message: 'Gateway timeout',
-    },
-    [hs.HTTPVersionNotSupported] : {
+    };
+    [hs.HTTPVersionNotSupported] = {
         isSuccess: false,
         message: 'HTTP version not supported',
-    },
-    [hs.VariantAlsoNegotiates] : {
+    };
+    [hs.VariantAlsoNegotiates] = {
         isSuccess: false,
         message: 'Variant also negotiates',
-    },
-    [hs.InsufficientStorage] : {
+    };
+    [hs.InsufficientStorage] = {
         isSuccess: false,
         message: 'Insufficient storage',
-    },
-    [hs.LoopDetected] : {
+    };
+    [hs.LoopDetected] = {
         isSuccess: false,
         message: 'Loop detected',
-    },
-    [hs.NotExtended] : {
+    };
+    [hs.NotExtended] = {
         isSuccess: false,
         message: 'Not extended',
-    },
-    [hs.NetworkAuthenticationRequired] : {
+    };
+    [hs.NetworkAuthenticationRequired] = {
         isSuccess: false,
         message: 'Network authentication required',
-    },
-};
+    };
+}
 
 export const defaultErrorHandling: ErrorHandlingSpecification = {
     shouldLogError: true,

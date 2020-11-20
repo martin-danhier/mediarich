@@ -1,223 +1,228 @@
 import APIClient from './api-client';
 import { AssertionError } from 'utils/assert/assert';
 import fetch from 'jest-fetch-mock';
-import { HTTPStatusCodes, MIMETypes } from './types';
+import { APIRouteSpecification, APIRoutesSpecification, APISpecification, HTTPStatusCodes, MIMETypes } from './types';
 import { strictEqual } from 'assert';
 import Cookies from 'js-cookie';
 
+/** Routes of the test API. Use a 'implements , so the autocompletion will know the names of the routes*/
+class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
+    // Existing route
+    existing: APIRouteSpecification<TestApiRoutes> = {
+        method: 'GET',
+        url: '/API_testing',
+        requestContentType: MIMETypes.None,
+        expectedResponses: {
+            // OK : return page in html
+            [HTTPStatusCodes.OK]: {
+                isSuccess: true,
+                expectedContentTypes: [MIMETypes.HTML],
+            },
+        },
+        headers: {
+            'Authorization': 'Bearer #{token}'
+        }
+    };
+    // Existing route, but in post
+    existingPost: APIRouteSpecification<TestApiRoutes> = {
+        method: 'POST',
+        url: '/API_testing',
+        requestContentType: MIMETypes.None,
+        expectedResponses: {
+            // OK : return page in html
+            [HTTPStatusCodes.OK]: {
+                isSuccess: true,
+                expectedContentTypes: [MIMETypes.HTML],
+            },
+        },
+    };
+    // Existing route, but the URL is not valid
+    wrongSpec: APIRouteSpecification<TestApiRoutes> = {
+        method: 'POST',
+        url: '/Error_404',
+        errorHandling: {
+            shouldLogError: true,
+            shouldRethrow: true,
+        }
+    };
+    // Other wrong spec, with handler
+    otherWrongSpec: APIRouteSpecification<TestApiRoutes> = {
+        method: 'POST',
+        url: '/Error_404',
+        errorHandling: {
+            shouldLogError: false,
+            shouldRethrow: false,
+            callback: otherWrongSpecErrorCallback,
+        }
+    };
+    // JSON input
+    jsonInput: APIRouteSpecification<TestApiRoutes> = {
+        method: 'POST',
+        url: '/JSON',
+        requestContentType: MIMETypes.JSON,
+        expectedResponses: {
+            // OK : return data in JSON
+            [HTTPStatusCodes.InternalServerError]: {
+                isSuccess: false,
+                expectedContentTypes: [MIMETypes.JSON],
+            },
+        }
+    };
+    // Blob input
+    blobInput: APIRouteSpecification<TestApiRoutes> = {
+        method: 'POST',
+        url: '/blob',
+        expectedResponses: {
+            [HTTPStatusCodes.OK]: {
+                isSuccess: true,
+                expectedContentTypes: [MIMETypes.None],
+            }
+        },
+        requestContentType: MIMETypes.JSON,
+    };
+    // Buffer input
+    bufferInput: APIRouteSpecification<TestApiRoutes> = {
+        method: 'POST',
+        url: '/buffer',
+        expectedResponses: {
+            [HTTPStatusCodes.OK]: {
+                isSuccess: true,
+            }
+        },
+    };
+    // API returns other type than expected
+    unexpectedContentType: APIRouteSpecification<TestApiRoutes> = {
+        method: 'POST',
+        url: '/API_testing',
+        expectedResponses: {
+            [HTTPStatusCodes.OK]: {
+                isSuccess: true,
+                expectedContentTypes: [MIMETypes.JSON, MIMETypes.AAC],
+            }
+        }
+    };
+    // API returns nothing, but expected something
+    expectedContentTypesInResponse: APIRouteSpecification<TestApiRoutes> = {
+        method: 'GET',
+        url: '/no-content',
+        expectedResponses: {
+            [HTTPStatusCodes.OK]: {
+                isSuccess: true,
+                expectedContentTypes: [MIMETypes.JSON],
+            }
+        }
+    };
+    // API returns an invalid status code
+    unknownStatusCode: APIRouteSpecification<TestApiRoutes> = {
+        method: 'GET',
+        url: '/teapot',
+        expectedResponses: {
+            [HTTPStatusCodes.OK]: {
+                isSuccess: true,
+            }
+        }
+    };
+    // redirection with get
+    redirection: APIRouteSpecification<TestApiRoutes> = {
+        method: 'GET',
+        url: '/redirect',
+    };
+    // redirection, but override it
+    redirectionOverride: APIRouteSpecification<TestApiRoutes> = {
+        method: 'GET',
+        url: '/redirect',
+        expectedResponses: {
+            [HTTPStatusCodes.SeeOther]: {
+                isSuccess: true,
+                shouldRedirectTo: 'existing',
+            }
+        }
+    };
+    // Redirection to header location, but no location provided by response
+    redirectionUndefinedLocation: APIRouteSpecification<TestApiRoutes> = {
+        method: 'GET',
+        url: '/no-content',
+        expectedResponses: {
+            [HTTPStatusCodes.OK]: {
+                isSuccess: true,
+                shouldRedirectTo: 'header-location',
+            }
+        }
+    };
+    // Redirection and preserve body
+    redirectionPreserveBody: APIRouteSpecification<TestApiRoutes> = {
+        method: 'POST',
+        url: '/redirect',
+        expectedResponses: {
+            [HTTPStatusCodes.SeeOther]: {
+                shouldRedirectTo: 'blobInput',
+                shouldPreserveRequest: true,
+            }
+        }
+    };
+    // Redirection to header location and preserve request
+    redirectionHeaderPreserveRequest: APIRouteSpecification<TestApiRoutes> = {
+        method: 'POST',
+        url: '/redirect',
+        expectedResponses: {
+            [HTTPStatusCodes.SeeOther]: {
+                shouldRedirectTo: 'header-location',
+                shouldPreserveRequest: true,
+            }
+        }
+    };
+    // Header override
+    headerOverride: APIRouteSpecification<TestApiRoutes> = {
+        method: 'POST',
+        url: '/API_testing',
+        requestContentType: MIMETypes.None,
+        expectedResponses: {
+            // OK : return page in html
+            [HTTPStatusCodes.OK]: {
+                isSuccess: true,
+                expectedContentTypes: [MIMETypes.HTML],
+            },
+        },
+        headers: {
+            'Content-Type': 'application/xml',
+            'Content-Length': '7',
+        }
+    };
+    // JSON input with body
+    jsonInputDefault: APIRouteSpecification<TestApiRoutes> = {
+        method: 'POST',
+        url: '/JSON',
+        requestContentType: MIMETypes.JSON,
+        expectedResponses: {
+            // OK : return data in JSON
+            [HTTPStatusCodes.InternalServerError]: {
+                isSuccess: false,
+                expectedContentTypes: [MIMETypes.JSON],
+            },
+        },
+        baseJSONBody: {
+            token: '#{token}'
+        }
+    };
+}
 
-let client: APIClient;
+/** API Specification used for testing */
+class TestAPISpecification implements APISpecification<TestApiRoutes> {
+    baseURL = 'https://en.wikipedia.org/wiki';
+    defaultExternalResponses = {
+        201: {
+            isSuccess: true,
+            expectedContentTypes: [MIMETypes.XML],
+        }
+    };
+    routes = new TestApiRoutes();
+}
+
+let client: APIClient<TestAPISpecification, TestApiRoutes>;
 
 beforeAll(() => {
     // Create API Client (the class we want to test)
-    client = new APIClient({
-        baseURL: 'https://en.wikipedia.org/wiki',
-        defaultExternalResponses: {
-            201: {
-                isSuccess: true,
-                expectedContentTypes: [MIMETypes.XML],
-            }
-        },
-        routes: {
-            // Existing route
-            existing: {
-                method: 'GET',
-                url: '/API_testing',
-                requestContentType: MIMETypes.None,
-                expectedResponses: {
-                    // OK : return page in html
-                    [HTTPStatusCodes.OK]: {
-                        isSuccess: true,
-                        expectedContentTypes: [MIMETypes.HTML],
-                    },
-                },
-                headers: {
-                    'Authorization': 'Bearer #{token}'
-                }
-            },
-            // Existing route, but in post
-            existingPost: {
-                method: 'POST',
-                url: '/API_testing',
-                requestContentType: MIMETypes.None,
-                expectedResponses: {
-                    // OK : return page in html
-                    [HTTPStatusCodes.OK]: {
-                        isSuccess: true,
-                        expectedContentTypes: [MIMETypes.HTML],
-                    },
-                },
-            },
-            // Existing route, but the URL is not valid
-            wrongSpec: {
-                method: 'POST',
-                url: '/Error_404',
-                errorHandling: {
-                    shouldLogError: true,
-                    shouldRethrow: true,
-                }
-            },
-            // Other wrong spec, with handler
-            otherWrongSpec: {
-                method: 'POST',
-                url: '/Error_404',
-                errorHandling: {
-                    shouldLogError: false,
-                    shouldRethrow: false,
-                    callback: otherWrongSpecErrorCallback,
-                }
-            },
-            // JSON input
-            jsonInput: {
-                method: 'POST',
-                url: '/JSON',
-                requestContentType: MIMETypes.JSON,
-                expectedResponses: {
-                    // OK : return data in JSON
-                    [HTTPStatusCodes.InternalServerError]: {
-                        isSuccess: false,
-                        expectedContentTypes: [MIMETypes.JSON],
-                    },
-                }
-            },
-            // Blob input
-            blobInput: {
-                method: 'POST',
-                url: '/blob',
-                expectedResponses: {
-                    [HTTPStatusCodes.OK]: {
-                        isSuccess: true,
-                        expectedContentTypes: [MIMETypes.None],
-                    }
-                },
-                requestContentType: MIMETypes.JSON,
-            },
-            // Buffer input
-            bufferInput: {
-                method: 'POST',
-                url: '/buffer',
-                expectedResponses: {
-                    [HTTPStatusCodes.OK]: {
-                        isSuccess: true,
-                    }
-                },
-            },
-            // API returns other type than expected
-            unexpectedContentType: {
-                method: 'POST',
-                url: '/API_testing',
-                expectedResponses: {
-                    [HTTPStatusCodes.OK]: {
-                        isSuccess: true,
-                        expectedContentTypes: [MIMETypes.JSON, MIMETypes.AAC],
-                    }
-                }
-            },
-            // API returns nothing, but expected something
-            expectedContentTypesInResponse: {
-                method: 'GET',
-                url: '/no-content',
-                expectedResponses: {
-                    [HTTPStatusCodes.OK]: {
-                        isSuccess: true,
-                        expectedContentTypes: [MIMETypes.JSON],
-                    }
-                }
-            },
-            // API returns an invalid status code
-            unknownStatusCode: {
-                method: 'GET',
-                url: '/teapot',
-                expectedResponses: {
-                    [HTTPStatusCodes.OK]: {
-                        isSuccess: true,
-                    }
-                }
-            },
-            // redirection with get
-            redirection: {
-                method: 'GET',
-                url: '/redirect',
-            },
-            // redirection, but override it
-            redirectionOverride: {
-                method: 'GET',
-                url: '/redirect',
-                expectedResponses: {
-                    [HTTPStatusCodes.SeeOther]: {
-                        isSuccess: true,
-                        shouldRedirectTo: 'existing',
-                    }
-                }
-            },
-            // Redirection to header location, but no location provided by response
-            redirectionUndefinedLocation: {
-                method: 'GET',
-                url: '/no-content',
-                expectedResponses: {
-                    [HTTPStatusCodes.OK]: {
-                        isSuccess: true,
-                        shouldRedirectTo: 'header-location',
-                    }
-                }
-            },
-            // Redirection and preserve body
-            redirectionPreserveBody: {
-                method: 'POST',
-                url: '/redirect',
-                expectedResponses: {
-                    [HTTPStatusCodes.SeeOther]: {
-                        shouldRedirectTo: 'blobInput',
-                        shouldPreserveRequest: true,
-                    }
-                }
-            },
-            // Redirection to header location and preserve request
-            redirectionHeaderPreserveRequest: {
-                method: 'POST',
-                url: '/redirect',
-                expectedResponses: {
-                    [HTTPStatusCodes.SeeOther]: {
-                        shouldRedirectTo: 'header-location',
-                        shouldPreserveRequest: true,
-                    }
-                }
-            },
-            // Header override
-            headerOverride: {
-                method: 'POST',
-                url: '/API_testing',
-                requestContentType: MIMETypes.None,
-                expectedResponses: {
-                    // OK : return page in html
-                    [HTTPStatusCodes.OK]: {
-                        isSuccess: true,
-                        expectedContentTypes: [MIMETypes.HTML],
-                    },
-                },
-                headers: {
-                    'Content-Type': 'application/xml',
-                    'Content-Length': '7',
-                }
-            },
-            // JSON input with body
-            jsonInputDefault: {
-                method: 'POST',
-                url: '/JSON',
-                requestContentType: MIMETypes.JSON,
-                expectedResponses: {
-                    // OK : return data in JSON
-                    [HTTPStatusCodes.InternalServerError]: {
-                        isSuccess: false,
-                        expectedContentTypes: [MIMETypes.JSON],
-                    },
-                },
-                baseJSONBody: {
-                    token: '#{token}'
-                }
-            }
-        }
-    });
+    client = new APIClient(new TestAPISpecification());
 
     beforeEach(() => {
         // Reset the call count of fetch between each mock
@@ -256,7 +261,7 @@ beforeAll(() => {
             });
         }
         // Existing with query params
-        else if (req.url === 'https://en.wikipedia.org/wiki/API_testing?param=value'){
+        else if (req.url === 'https://en.wikipedia.org/wiki/API_testing?param=value') {
             return Promise.resolve({
                 init: {
                     status: HTTPStatusCodes.Created,
@@ -270,7 +275,7 @@ beforeAll(() => {
             // Do some checks on the request as well
             const json = await req.json();
             if (Array.isArray(json)) {
-                expect(json).toStrictEqual([4,5,6]);
+                expect(json).toStrictEqual([4, 5, 6]);
             } else {
                 expect(json.number).toBe(4);
                 if (json.token) {
@@ -424,11 +429,6 @@ async function checkMockResponse(response: Response | null): Promise<void> {
 function otherWrongSpecErrorCallback(e: Error | string): void {
     expect(e instanceof Error || typeof e === 'string').toBeTruthy();
 }
-
-
-test('can\'t call undefined routes', async () => {
-    await expect(client.call('unexisting')).rejects.toThrow(AssertionError);
-});
 
 test('can call existing routes', async () => {
     const result = await client.call('existing');
@@ -765,7 +765,7 @@ test('JSON input without default body', async () => {
 });
 
 test('GET with query parameters', async () => {
-    const result = await client.call('existing', {param: 'value'});
+    const result = await client.call('existing', { param: 'value' });
     // Check that the response is the same as in the mock
     expect(result.ok).toBeTruthy();
     expect(result.message).toBeUndefined();
@@ -778,7 +778,7 @@ test('GET with query parameters', async () => {
 });
 
 test('GET with url search params', async () => {
-    const result = await client.call('existing', new URLSearchParams({param: 'value'}));
+    const result = await client.call('existing', new URLSearchParams({ param: 'value' }));
     // Check that the response is the same as in the mock
     expect(result.ok).toBeTruthy();
     expect(result.message).toBeUndefined();

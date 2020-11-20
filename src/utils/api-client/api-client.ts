@@ -1,8 +1,9 @@
 import * as assert from 'utils/assert/assert';
-import { defaultErrorHandling, defaultResponseHandling } from './defaults';
+import { defaultErrorHandling, DefaultResponseHandling } from './defaults';
 import {
     APIResponseSpecification,
     APIRouteSpecification,
+    APIRoutesSpecification,
     APISpecification,
     ErrorHandlingSpecification,
     FetchInit,
@@ -15,20 +16,25 @@ import {
 } from './types';
 import Cookies from 'js-cookie';
 
-class APIClient {
-    private readonly api: APISpecification;
+class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<R>> {
+    private readonly _api: T;
+    private readonly _defaultResponseHandling = new DefaultResponseHandling<R>();
+
+    public get api(): T {
+        return this._api;
+    }
 
     /**
      * Creates an APICLient.
      * @param api Specification of the API to use with the client.
      */
-    constructor(api: APISpecification) {
-        this.api = api;
+    constructor(api: T) {
+        this._api = api;
     }
 
     /**
      * Sends an http request to the given route. Handle it according to the specification.
-     * @param routeName Name of the route to call. Must be defined in the API specification.
+     * @param routeName Either: Name of the route to call. Must be defined in the API specification. If it isn't, a compilation error will be thrown.
      * @param data Data used for the request. Its content depends on the request.
      *  - In methods that support a body (like POST), `data` contains the body of the request.\
      *      If the content type is `JSON` in the specification, it can be a generic object 
@@ -41,12 +47,22 @@ class APIClient {
      *      object, it will be merged with the `baseQueryParams` provided to the request specification.
      * @async
      */
-    public async call(routeName: string, data?: HTTPRequestBody | JSONObject): Promise<HTTPRequestResult> {
-        // Don't allow unexisting routes
-        assert.ok(routeName in this.api.routes, `'routeName' must be defined in the API specification. Found: '${routeName}'.`);
-
-        // Get the specification of the route
-        const route = this.api.routes[routeName];
+    public async call(routeName: keyof R, data?: HTTPRequestBody | JSONObject): Promise<HTTPRequestResult> {
+        // let routeName: string;
+        // // if the route is a string (name of route in the specification)
+        // if (typeof route === 'string') {
+        //     // Save the name in routeName
+        //     routeName = route;
+        //     // Don't allow unexisting routes
+        //     assert.ok(route in this._api.routes, `'routeName' must be defined in the API specification. Found: '${route}'.`);
+        //     // Get the specification of the route and place it in 'route'
+        //     route = this._api.routes[routeName];
+        // } 
+        // // Else, just get the url for a name
+        // else {
+        //     routeName = route.url;
+        // }
+        const route = this._api.routes[routeName];
 
 
         // Get the URL of the route
@@ -164,7 +180,7 @@ class APIClient {
         }
 
         // Get the response handling specification
-        let responseHandling: APIResponseSpecification;
+        let responseHandling: APIResponseSpecification<R>;
 
         // Is the status code supported ?
         // = is the status code in the enum of status codes
@@ -173,9 +189,9 @@ class APIClient {
 
             responseHandling = {
                 // Get default values
-                ...defaultResponseHandling[status],
+                ...this._defaultResponseHandling[status],
                 // Override with api values
-                ...this.api.defaultResponses?.[status],
+                ...this._api.defaultResponses?.[status],
                 // Override with route values
                 ...route.expectedResponses?.[status]
             };
@@ -211,7 +227,7 @@ class APIClient {
 
 
         // Get the response handling specification
-        let responseHandling: APIResponseSpecification;
+        let responseHandling: APIResponseSpecification<R>;
 
         // Is the status code supported ?
         // = is the status code in the enum of status codes
@@ -220,9 +236,9 @@ class APIClient {
 
             responseHandling = {
                 // Get default values
-                ...defaultResponseHandling[status],
+                ...this._defaultResponseHandling[status],
                 // Override with api values
-                ...this.api.defaultExternalResponses?.[status],
+                ...this._api.defaultExternalResponses?.[status],
             };
         }
         // The status code is not supported (not in the enum)
@@ -240,7 +256,7 @@ class APIClient {
         }, fetchInit);
     }
 
-    async handleResponse(response: Response, responseHandling: APIResponseSpecification, onError: (error: Error | string, response: Response) => HTTPRequestResult, fetchInit?: FetchInit): Promise<HTTPRequestResult> {
+    async handleResponse(response: Response, responseHandling: APIResponseSpecification<R>, onError: (error: Error | string, response: Response) => HTTPRequestResult, fetchInit?: FetchInit): Promise<HTTPRequestResult> {
         // Check content type of the response if one is provided. Don't check if none is provided
         if (responseHandling.expectedContentTypes) {
             const responseContentType = response.headers.get('Content-Type');
@@ -329,7 +345,7 @@ class APIClient {
      * @param targetContentType Expected content type of the body. It is simply added to the headers, without checks.
      * @param body body of the request. Not modified by the method.
      */
-    private getHeaders(route: APIRouteSpecification, body?: HTTPRequestBody): Headers {
+    private getHeaders(route: APIRouteSpecification<R>, body?: HTTPRequestBody): Headers {
         // Use the syntax #{cookie-name} to fetch the value of a cookie
         const formattedHeaders = APIClient.processObjectWithCookieSyntax(route.headers);
 
@@ -369,8 +385,8 @@ class APIClient {
      * Returns the full URL of a given route
      * @param route specification of the route of which the URL is requested
      */
-    private getURL(route: APIRouteSpecification): string {
-        return this.api.baseURL + route.url;
+    private getURL(route: APIRouteSpecification<R>): string {
+        return this._api.baseURL + route.url;
     }
 
     /**
@@ -378,13 +394,13 @@ class APIClient {
      * @param routeName Name of the route concerned by the error. Must exist in the API specification.
      * @param error The error to handle. Can be a string (message) or an Error object
      */
-    private handleInternalError(routeName: string, error: string | Error): HTTPRequestResult {
+    private handleInternalError(routeName: keyof R, error: string | Error): HTTPRequestResult {
         // Don't allow unexisting routes
-        assert.ok(routeName in this.api.routes, `'routeName' must be defined in the API specification. Found: '${routeName}'.`);
+        assert.ok(routeName in this._api.routes, `'routeName' must be defined in the API specification. Found: '${routeName}'.`);
 
         // Get the error handling
         // Check first if the route has a specific one, then check if there is a default one, else provide default values.
-        const errorHandling = this.api.routes[routeName].errorHandling ?? this.api.defaultErrorHandling ?? defaultErrorHandling;
+        const errorHandling = this._api.routes[routeName].errorHandling ?? this._api.defaultErrorHandling ?? defaultErrorHandling;
 
         // Handle the error
         return APIClient.handleError(errorHandling, error, `[APIClient] The following error was thrown during a call to '${routeName}':`);
@@ -397,7 +413,7 @@ class APIClient {
      */
     private handleExternalError(url: string, error: string | Error): HTTPRequestResult {
         // Get error handling
-        const errorHandling = this.api.defaultErrorHandling ?? defaultErrorHandling;
+        const errorHandling = this._api.defaultErrorHandling ?? defaultErrorHandling;
 
         // Handle the error
         return APIClient.handleError(errorHandling, error, `[APIClient] The following error was thrown during an external call to '${url}':`);

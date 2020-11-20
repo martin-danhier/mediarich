@@ -349,7 +349,7 @@ export enum HTTPStatusCodes {
 /**
  * Specification of the way the client should handle a response.
  */
-export interface APIResponseSpecification {
+export interface APIResponseSpecification<R extends APIRoutesSpecification<R>> {
     /** 
      * Should this response be considered a success or an error ? 
      * If not specified, the default of the status code will be used.
@@ -373,7 +373,7 @@ export interface APIResponseSpecification {
      * - Alternatively, if the given value is "header-location", the redirection will
      * follow the "Location" field of the response header, if it exists.
      */
-    readonly shouldRedirectTo?: string | undefined;
+    readonly shouldRedirectTo?: keyof R | 'header-location';
     /**
      * In case of a 'header-location' redirect, should the client use the same request (only change the URL),
      * or use a simple GET ?
@@ -393,13 +393,14 @@ export interface APIResponseSpecification {
 
 /**
  * Specification of the way the client should handle each http status code.
+ * 
  */
-export type APIResponseHandlingSpecification = {
-    [propName in HTTPStatusCodes]?: APIResponseSpecification;
+export type APIResponseHandlingSpecification<R extends APIRoutesSpecification<R>> = {
+    [propName in HTTPStatusCodes]?: APIResponseSpecification<R>;
 }
 
 /** Specification of a route of an API. */
-export interface APIRouteSpecification {
+export interface APIRouteSpecification<R extends APIRoutesSpecification<R>> {
     /** URL of the route */
     readonly url: string;
     /** Method used for the request */
@@ -423,7 +424,7 @@ export interface APIRouteSpecification {
     /** Content type used for the request. */
     readonly requestContentType?: MIMETypes;
     /** Specification of all expected responses, according to the API documentation. */
-    readonly expectedResponses?: APIResponseHandlingSpecification;
+    readonly expectedResponses?: APIResponseHandlingSpecification<R>;
     /** How should a fetch error be handled for this route ? */
     readonly errorHandling?: ErrorHandlingSpecification;
     /** Object used for headers. The keys given here override the ones computed in the client.
@@ -456,18 +457,39 @@ export interface ErrorHandlingSpecification {
 }
 
 /**
+ * Routes of the API.
+ * 
+ * **Usage:**
+ * 
+ * Implement this interface in another class in that way :
+ * ```ts
+ * // Use the name of your class in the generic parameter
+ * class Routes implements APIRoutesSpecification<Routes>{
+ *    // then, each field must be a route specification
+ *    name_of_the_route: APIRouteSpecification<Routes> = {
+ *       // content
+ *    }
+ * }
+ * ```
+ * The generic parameter allows Typescript to perform additional compile-type checks.
+ * 
+ * That way, in the API Client, only the names of the routes you defined will be allowed in the "routeName" field.
+ */
+export type APIRoutesSpecification<R> = {
+    readonly [routeName in keyof R]: APIRouteSpecification<R>;
+}
+
+/**
  * Specification of an API.
  * 
  * Used by an APIClient to provide an abstraction over simple http requests.
  */
-export interface APISpecification {
+export interface APISpecification<R extends APIRoutesSpecification<R>> {
     /** URL of the api root. */
     readonly baseURL: string;
 
     /** Specification of the different routes of the API. Each key is an identifier for a route. */
-    readonly routes: {
-        readonly [propName: string]: APIRouteSpecification;
-    };
+    readonly routes: R;
 
     /** Default way to handle status codes in internal responses.
      * 
@@ -477,7 +499,7 @@ export interface APISpecification {
      * 
      * To specify the external responses, see `defaultExternalResponses`.
      */
-    readonly defaultResponses?: APIResponseHandlingSpecification;
+    readonly defaultResponses?: APIResponseHandlingSpecification<R>;
 
     /** Default way of handling fetch errors in calls */
     readonly defaultErrorHandling?: ErrorHandlingSpecification;
@@ -491,7 +513,7 @@ export interface APISpecification {
      * 
      * If none are provided, the HTTP conventions will be used (not the `defaultResponses` values !)
      */
-    readonly defaultExternalResponses?: APIResponseHandlingSpecification;
+    readonly defaultExternalResponses?: APIResponseHandlingSpecification<R>;
 }
 
 /**
