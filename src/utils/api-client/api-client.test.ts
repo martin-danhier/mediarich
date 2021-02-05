@@ -5,10 +5,13 @@ import { APIRouteSpecification, APIRoutesSpecification, APISpecification, HTTPSt
 import { strictEqual } from 'assert';
 import Cookies from 'js-cookie';
 
+
+
 /** Routes of the test API. Use a 'implements , so the autocompletion will know the names of the routes*/
 class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
+
     // Existing route
-    existing: APIRouteSpecification<TestApiRoutes> = {
+    readonly existing = {
         method: 'GET',
         url: '/API_testing',
         requestContentType: MIMETypes.None,
@@ -21,10 +24,10 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
         },
         headers: {
             'Authorization': 'Bearer #{token}'
-        }
-    };
+        },
+    } as const;
     // Existing route, but in post
-    existingPost: APIRouteSpecification<TestApiRoutes> = {
+    existingPost = {
         method: 'POST',
         url: '/API_testing',
         requestContentType: MIMETypes.None,
@@ -35,18 +38,18 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
                 expectedContentTypes: [MIMETypes.HTML],
             },
         },
-    };
+    } as const;
     // Existing route, but the URL is not valid
-    wrongSpec: APIRouteSpecification<TestApiRoutes> = {
+    wrongSpec = {
         method: 'POST',
         url: '/Error_404',
         errorHandling: {
             shouldLogError: true,
             shouldRethrow: true,
         }
-    };
+    } as const;
     // Other wrong spec, with handler
-    otherWrongSpec: APIRouteSpecification<TestApiRoutes> = {
+    otherWrongSpec = {
         method: 'POST',
         url: '/Error_404',
         errorHandling: {
@@ -54,9 +57,9 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
             shouldRethrow: false,
             callback: otherWrongSpecErrorCallback,
         }
-    };
+    } as const;
     // JSON input
-    jsonInput: APIRouteSpecification<TestApiRoutes> = {
+    jsonInput = {
         method: 'POST',
         url: '/JSON',
         requestContentType: MIMETypes.JSON,
@@ -67,9 +70,9 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
                 expectedContentTypes: [MIMETypes.JSON],
             },
         }
-    };
+    } as const;
     // Blob input
-    blobInput: APIRouteSpecification<TestApiRoutes> = {
+    blobInput = {
         method: 'POST',
         url: '/blob',
         expectedResponses: {
@@ -79,9 +82,9 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
             }
         },
         requestContentType: MIMETypes.JSON,
-    };
+    } as const;
     // Buffer input
-    bufferInput: APIRouteSpecification<TestApiRoutes> = {
+    bufferInput = {
         method: 'POST',
         url: '/buffer',
         expectedResponses: {
@@ -89,9 +92,9 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
                 isSuccess: true,
             }
         },
-    };
+    } as const;
     // API returns other type than expected
-    unexpectedContentType: APIRouteSpecification<TestApiRoutes> = {
+    unexpectedContentType = {
         method: 'POST',
         url: '/API_testing',
         expectedResponses: {
@@ -100,9 +103,9 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
                 expectedContentTypes: [MIMETypes.JSON, MIMETypes.AAC],
             }
         }
-    };
+    } as const;
     // API returns nothing, but expected something
-    expectedContentTypesInResponse: APIRouteSpecification<TestApiRoutes> = {
+    expectedContentTypesInResponse = {
         method: 'GET',
         url: '/no-content',
         expectedResponses: {
@@ -111,9 +114,9 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
                 expectedContentTypes: [MIMETypes.JSON],
             }
         }
-    };
+    } as const;
     // API returns an invalid status code
-    unknownStatusCode: APIRouteSpecification<TestApiRoutes> = {
+    unknownStatusCode = {
         method: 'GET',
         url: '/teapot',
         expectedResponses: {
@@ -121,14 +124,14 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
                 isSuccess: true,
             }
         }
-    };
+    } as const;
     // redirection with get
-    redirection: APIRouteSpecification<TestApiRoutes> = {
+    redirection = {
         method: 'GET',
         url: '/redirect',
-    };
+    } as const;
     // redirection, but override it
-    redirectionOverride: APIRouteSpecification<TestApiRoutes> = {
+    redirectionOverride = {
         method: 'GET',
         url: '/redirect',
         expectedResponses: {
@@ -137,9 +140,9 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
                 shouldRedirectTo: 'existing',
             }
         }
-    };
+    } as const;
     // Redirection to header location, but no location provided by response
-    redirectionUndefinedLocation: APIRouteSpecification<TestApiRoutes> = {
+    redirectionUndefinedLocation = {
         method: 'GET',
         url: '/no-content',
         expectedResponses: {
@@ -148,9 +151,9 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
                 shouldRedirectTo: 'header-location',
             }
         }
-    };
+    } as const;
     // Redirection and preserve body
-    redirectionPreserveBody: APIRouteSpecification<TestApiRoutes> = {
+    redirectionPreserveBody = {
         method: 'POST',
         url: '/redirect',
         expectedResponses: {
@@ -159,9 +162,9 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
                 shouldPreserveRequest: true,
             }
         }
-    };
+    } as const;
     // Redirection to header location and preserve request
-    redirectionHeaderPreserveRequest: APIRouteSpecification<TestApiRoutes> = {
+    redirectionHeaderPreserveRequest = {
         method: 'POST',
         url: '/redirect',
         expectedResponses: {
@@ -170,9 +173,9 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
                 shouldPreserveRequest: true,
             }
         }
-    };
+    } as const;
     // Header override
-    headerOverride: APIRouteSpecification<TestApiRoutes> = {
+    headerOverride = {
         method: 'POST',
         url: '/API_testing',
         requestContentType: MIMETypes.None,
@@ -187,9 +190,9 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
             'Content-Type': 'application/xml',
             'Content-Length': '7',
         }
-    };
+    } as const;
     // JSON input with body
-    jsonInputDefault: APIRouteSpecification<TestApiRoutes> = {
+    jsonInputDefault = {
         method: 'POST',
         url: '/JSON',
         requestContentType: MIMETypes.JSON,
@@ -203,7 +206,7 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
         baseJSONBody: {
             token: '#{token}'
         }
-    };
+    } as const;
 }
 
 /** API Specification used for testing */
@@ -435,6 +438,7 @@ test('can call existing routes', async () => {
     // Check that the response is valid
     expect(result.ok).toBeTruthy();
     expect(result.response).toBeDefined();
+    expect(result.isOk()).toBeTruthy();
 });
 
 /**
@@ -461,6 +465,8 @@ test('API client fetch works', async () => {
     // Check that the response is valid
     expect(result.ok).toBeTruthy();
     expect(result.response).toBeDefined();
+    expect(result.is200()).toBeTruthy();
+    expect(result.isOk()).toBeTruthy();
     if (result.response) {
         await checkMockResponse(result.response);
     }
@@ -497,6 +503,8 @@ test('JSON in request', async () => {
     expect(result.ok).not.toBeTruthy();
     expect(result.message).toBe('Internal server error');
     expect(result.response).toBeDefined();
+    expect(result.isOk()).not.toBeTruthy();
+    expect(result.is200()).toBeFalsy();
     if (result.response) {
         // The status is the same as in the mock
         expect(result.response.status).toBe(500);
@@ -505,7 +513,6 @@ test('JSON in request', async () => {
         // The body is the same as in the mock
         expect(await result.response.json()).toStrictEqual({ value: 12, list: ['item', 'item2'] });
     }
-
 });
 
 test('Blob in request', async () => {
@@ -518,6 +525,7 @@ test('Blob in request', async () => {
     expect(result.response).toBeDefined();
     if (result.response) {
         expect(result.response.status).toBe(200);
+        expect(result.is200()).toBeTruthy();
         expect(fetch).toHaveBeenCalled();
     }
 });
@@ -534,15 +542,6 @@ test('ArrayBuffer in request', async () => {
         expect(await result.response.text()).toBe(buffer.byteLength.toString());
     }
 
-});
-
-test('Generic object but no JSON content type', async () => {
-    // It is not allowed to give a generic object to the call function with a route that doesn't send JSON
-    const result = await client.call('existingPost', { number: 4 });
-
-    expect(result.ok).not.toBeTruthy();
-    expect(result.message).toBe('If body is a generic object, the content-type must be set to JSON.');
-    expect(result.response).toBeUndefined();
 });
 
 /**
@@ -563,6 +562,7 @@ test('Expected a JSON in response but received nothing', async () => {
     const result = await client.call('expectedContentTypesInResponse');
 
     expect(result.ok).not.toBeTruthy();
+    expect(result.isOk()).not.toBeTruthy();
     expect(result.message).toBe('Expected content types [\'application/json\'], but the request didn\'t specify a content type.');
     expect(result.response).toBeDefined();
 });
@@ -750,7 +750,7 @@ test('JSON array input with default body', async () => {
     // Set a Cookie
     Cookies.set('token', 'my-very-secure-token');
 
-    expect(client.call('jsonInputDefault', [4, 5, 6])).rejects.toThrow(AssertionError);
+    await expect(client.call('jsonInputDefault', [4, 5, 6])).rejects.toThrow(AssertionError);
 
 });
 
@@ -770,7 +770,7 @@ test('GET with query parameters', async () => {
     expect(result.ok).toBeTruthy();
     expect(result.message).toBeUndefined();
     expect(result.response).toBeDefined();
-    if (result.response) {
+    if (result.isOk()) {
         // It will return 201 if the query params were successful
         // it will return 200 if there were no params
         expect(result.response.status).toBe(201);

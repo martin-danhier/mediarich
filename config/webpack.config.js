@@ -220,8 +220,8 @@ module.exports = function(webpackEnv) {
               // Pending further investigation:
               // https://github.com/terser-js/terser/issues/120
               inline: 2,
-              // ++ MEDIARICH CUSTOM CONGIG ++
-              // Remove dead code from the build (example: disabled assets)
+              // ++ MEDIARICH CUSTOM CONFIG ++
+              // Remove dead code from the build (example: disabled assertions)
               dead_code: true,
             },
             mangle: {

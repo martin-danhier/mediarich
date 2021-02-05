@@ -1,4 +1,4 @@
-import { APIRouteSpecification, APIRoutesSpecification, APISpecification, HTTPStatusCodes, MIMETypes } from 'utils/api-client/types';
+import { APIRouteSpecification, APIRoutesSpecification, APISpecification, HTTPStatusCodes, MIMETypes } from 'utils/api-client';
 
 /**
  * Specification of the Mediaserver API.

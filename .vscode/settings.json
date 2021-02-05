@@ -41,4 +41,5 @@
         "doc": false
     },
     "explorerExclude.backup": null,
+    "typescript.tsdk": "node_modules\\typescript\\lib",
 }

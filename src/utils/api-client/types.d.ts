@@ -17,12 +17,16 @@ export interface ObjectMap<T> {
 
 /** Valid JSON object. Can safely be stringified to JSON. */
 export type JSONObject = JSONInnerObject | JSONInnerArray;
+
 /** JSON Object (key: value) */
-type JSONInnerObject = {
-    [key: string]: string | number | boolean | JSONInnerObject | JSONInnerArray;
+export type JSONInnerObject = {
+    [key: string]: JSONInnerObjectContent;
 }
 /** JSON array */
-type JSONInnerArray = string[] | number[] | boolean[] | JSONInnerObject[] | JSONInnerArray[];
+export type JSONInnerArray = string[] | number[] | boolean[] | JSONInnerObject[] | JSONInnerArray[];
+
+/** Types that can be assigned as a value to a JSONInnerObject */
+export type JSONInnerObjectContent = string | number | boolean | null | JSONInnerObject | JSONInnerArray;
 
 /** Enum of the different MIME type usable in the 'content-type' header.
  * @see https://developer.mozilla.org/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
@@ -158,7 +162,7 @@ export enum MIMETypes {
     /** 7-zip archive */
     SevenZIP = 'application/x-7z-compressed',
     /** No content type */
-    None = null,
+    None = 'null',
 }
 
 /**
@@ -346,6 +350,8 @@ export enum HTTPStatusCodes {
     NetworkAuthenticationRequired = 511,
 }
 
+
+
 /**
  * Specification of the way the client should handle a response.
  */
@@ -365,7 +371,7 @@ export interface APIResponseSpecification<R extends APIRoutesSpecification<R>> {
      * 
      * If not specified, all content types will be accepted.
      */
-    readonly expectedContentTypes?: MIMETypes[];
+    readonly expectedContentTypes?: ReadonlyArray<MIMETypes>;
     /**
      * Route to which the client should redirect after receiving this response.
      * - If not specified, the client won't redirect.
@@ -475,7 +481,7 @@ export interface ErrorHandlingSpecification {
  * 
  * That way, in the API Client, only the names of the routes you defined will be allowed in the "routeName" field.
  */
-export type APIRoutesSpecification<R> = {
+export type APIRoutesSpecification<R extends APIRoutesSpecification<R>> = {
     readonly [routeName in keyof R]: APIRouteSpecification<R>;
 }
 
@@ -520,14 +526,37 @@ export interface APISpecification<R extends APIRoutesSpecification<R>> {
  * Body of an HTTP request. Be sure to provide a value compatible with the Content-Type given to the specification.
  */
 export type HTTPRequestBody = string | Blob | ArrayBuffer | FormData | URLSearchParams | null | undefined;
-
-export interface HTTPRequestResult {
+export class HTTPRequestResult {
     /** Was the request successful ? `true` if it was, `false` if there was an error. */
     ok: boolean;
     /** In case of an error, this property contains the error message. */
     message?: string;
     /** Response of the HTTP request. Can be undefined if the request didn't work. */
     response?: Response;
+
+    public constructor(ok: boolean, message?: string, response?: Response) {
+        this.ok = ok;
+        this.message = message;
+        this.response = response;
+    }
+
+    /** Is the result valid ? */
+    public isOk(): this is { ok: true; response: Response; message?: string } {
+        return this.ok === true
+            && this.response !== undefined;
+    }
+
+    /** Is the result http 200 ? */
+    public is200(): this is { ok: true; response: { status: 200 }; message?: string } {
+        return this.ok === true
+            && this.response !== undefined
+            && this.response.status === 200;
+    }
+
+    /** Get the json from the response, if it exists */
+    public async getJson(): Promise<JSONObject | undefined> {
+        return await this.response?.json() ?? undefined;
+    }
 }
 
 export interface FetchInit extends RequestInit {
