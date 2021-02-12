@@ -17,12 +17,12 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
     "jsx": "react",
     "strictNullChecks": true,
   },
   "include": [
     "src",
-    "src/setupTests.ts"
+    "src/setupTests.ts",
+    "server"
   ]
 }
