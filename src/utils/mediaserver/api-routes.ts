@@ -1,4 +1,4 @@
-import { APIRouteSpecification, APIRoutesSpecification, APISpecification, HTTPStatusCodes, MIMETypes } from 'utils/api-client';
+import { APIRouteSpecification, APIRoutesSpecification, APISpecification, ErrorHandlingSpecification, HTTPStatusCodes, MIMETypes } from 'utils/api-client';
 
 /**
  * Specification of the Mediaserver API.
@@ -17,6 +17,13 @@ export class MSApiSpecification implements APISpecification<MSRoutesSpec> {
         },
         [HTTPStatusCodes.NotFound]: {
             expectedContentTypes: [MIMETypes.JSON],
+        }
+    };
+    readonly defaultErrorHandling: ErrorHandlingSpecification = {
+        shouldLogError: true,
+        shouldRethrow: false,
+        callback: (error) => {
+            console.log(error);
         }
     };
 
@@ -43,9 +50,6 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         url: '/search/',
         method: 'GET',
         mode: 'cors',
-        baseQueryParams: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        }
     };
     /**
      * Returns a list of medias and channels ordered by add date or creation date. Requests can take some time
@@ -55,54 +59,41 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         url: '/latest/',
         method: 'GET',
         mode: 'cors',
-        baseQueryParams: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        }
     };
     /** Returns a list of channels */
     '/channels': APIRouteSpecification<MSRoutesSpec> = {
         url: '/channels/',
+        headers: {
+            'Accept-Language': 'fr'
+        },
+        // credentials: 'include',
         method: 'GET',
         mode: 'cors',
-        baseQueryParams: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        }
+        credentials:'include',
     };
     /** Returns a list of channels (as a tree) */
     '/channels/tree': APIRouteSpecification<MSRoutesSpec> = {
         url: '/channels/tree/',
         method: 'GET',
         mode: 'cors',
-        baseQueryParams: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        }
     };
     /** Returns the path to access a channel or a media. The first item in the result list have no parents. */
     '/channels/path': APIRouteSpecification<MSRoutesSpec> = {
         url: '/channels/path/',
         method: 'GET',
         mode: 'cors',
-        baseQueryParams: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        }
     };
     /** Returns the list of all media and sub channels in a channel */
     '/channels/content': APIRouteSpecification<MSRoutesSpec> = {
         url: '/channels/content/',
         method: 'GET',
         mode: 'cors',
-        baseQueryParams: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        }
     };
     /** Returns info for the requested channel */
     '/channels/get': APIRouteSpecification<MSRoutesSpec> = {
         url: '/channels/get/',
         method: 'GET',
         mode: 'cors',
-        baseQueryParams: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        }
     };
     /** Add a new channel. Omitted fields are unchanged. */
     '/channels/add': APIRouteSpecification<MSRoutesSpec> = {
@@ -110,19 +101,16 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         method: 'POST',
         mode: 'cors',
         requestContentType: MIMETypes.JSON,
-        baseJSONBody: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        }
     };
     /** Edit an existing channel. Omitted fields are unchanged. */
     '/channels/edit': APIRouteSpecification<MSRoutesSpec> = {
         url: '/channels/edit/',
         method: 'POST',
-        mode: 'cors',
+        // mode: 'cors',
+        headers: {
+            'X-CSRFToken': 'test#{csrftoken}'
+        },
         requestContentType: MIMETypes.JSON,
-        baseJSONBody: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        }
     };
     /** Returns the object id of the users's personnal channel if he can have one, else a 403 will be returned.
       * The personal channel will be created  if it was not already created. If no user is specified, the user making the request will be used. */
@@ -130,9 +118,6 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         url: '/channels/personal',
         method: 'GET',
         mode: 'cors',
-        baseQueryParams: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        }
     };
     /** Delete a channel */
     '/channels/delete': APIRouteSpecification<MSRoutesSpec> = {
@@ -140,27 +125,18 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         method: 'POST',
         mode: 'cors',
         requestContentType: MIMETypes.JSON,
-        baseJSONBody: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        }
     };
     /** Returns info for the requested media */
     '/medias/get': APIRouteSpecification<MSRoutesSpec> = {
         url: '/medias/get/',
         method: 'GET',
         mode: 'cors',
-        baseQueryParams: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        }
     };
     /** Returns the metadata zip for the requested media. The user making the request must have the community settings edition permission. */
     '/medias/get/zip': APIRouteSpecification<MSRoutesSpec> = {
         url: '/medias/get/zip/',
         method: 'GET',
         mode: 'cors',
-        baseQueryParams: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        },
         expectedResponses: {
             [HTTPStatusCodes.OK]: {
                 expectedContentTypes: [MIMETypes.ZIP]
@@ -173,9 +149,6 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         method: 'POST',
         mode: 'cors',
         requestContentType: MIMETypes.JSON,
-        baseJSONBody: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        },
     };
     /** Edit an existing media. Omitted fields are unchanged. */
     '/medias/edit': APIRouteSpecification<MSRoutesSpec> = {
@@ -183,9 +156,6 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         method: 'POST',
         mode: 'cors',
         requestContentType: MIMETypes.JSON,
-        baseJSONBody: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        },
     };
     /** Delete the requested media */
     '/medias/delete': APIRouteSpecification<MSRoutesSpec> = {
@@ -193,9 +163,6 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         method: 'POST',
         mode: 'cors',
         requestContentType: MIMETypes.JSON,
-        baseJSONBody: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        },
     };
     /** Set a thumbnail image to a media */
     '/medias/add-thumb': APIRouteSpecification<MSRoutesSpec> = {
@@ -203,17 +170,11 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         method: 'POST',
         mode: 'cors',
         requestContentType: MIMETypes.JSON,
-        baseJSONBody: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        },
     };
     /** Returns a list of users. Requires the 'can_change_users' permission or the 'can_use_permissions_tab' permission. */
     '/users': APIRouteSpecification<MSRoutesSpec> = {
         url: '/users/',
         method: 'GET',
         mode: 'cors',
-        baseQueryParams: {
-            'api_key': '#{api_key}', // TODO leave in cookie ?
-        },
     };
 }

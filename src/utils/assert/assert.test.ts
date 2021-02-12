@@ -66,6 +66,6 @@ test('ok message', () => {
     try {
         assert.ok(false, 'my message');
     } catch (e) {
-        expect(e.message).toBe('my message');
+        expect(e.message).toStrictEqual('my message');
     }
 });

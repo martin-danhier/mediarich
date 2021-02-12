@@ -1,5 +1,7 @@
 import { JSONInnerObject, JSONInnerObjectContent } from 'utils/api-client';
 import MediaServerAPIHandler from '../mediaserver-api-hanler';
+import { MediaServerError } from '../types';
+import * as assert from 'utils/assert/assert';
 import { as, asDate } from '../utils';
 
 export default abstract class MSContent {
@@ -50,51 +52,65 @@ export default abstract class MSContent {
     /** The object id of the content */
     public get oid(): string { return this._oid; }
     /** The database id of the content */
-    public get dbid(): number | undefined { return this._dbid; }
+    public get dbid(): Promise<number | undefined> { return this.getter('_dbid'); }
     /** The title of the content */
-    public get title(): string | undefined { return this._title; }
+    public get title(): Promise<string | undefined> { return this.getter('_title'); }
     /** The slug of the content */
-    public get slug(): string | undefined { return this._slug; }
+    public get slug(): Promise<string | undefined> { return this.getter('_slug'); }
     /** The language of the content */
-    public get language(): string | undefined { return this._language; }
+    public get language(): Promise<string | undefined> { return this.getter('_language'); }
     /** URL of the thumbnail image */
-    public get thumb(): string | undefined { return this._thumb; }
+    public get thumb(): Promise<string | undefined> { return this.getter('_thumb'); }
     /** Add date (when the content has been added to the catalog) */
-    public get addDate(): Date | undefined { return this._addDate; }
+    public get addDate(): Promise<Date | undefined> { return this.getter('_addDate'); }
     /** Number of views */
-    public get views(): number | undefined { return this._views; }
+    public get views(): Promise<number | undefined> { return this.getter('_views'); }
     /** Number of views last month */
-    public get viewsLastMonth(): number | undefined { return this._viewsLastMonth; }
+    public get viewsLastMonth(): Promise<number | undefined> { return this.getter('_viewsLastMonth'); }
     /** Number of comments */
-    public get comments(): number | undefined { return this._comments; }
+    public get comments(): Promise<number | undefined> { return this.getter('_comments'); }
     /** Number of comments last month */
-    public get commentsLastMonth(): number | undefined { return this._commentsLastMonth; }
+    public get commentsLastMonth(): Promise<number | undefined> { return this.getter('_commentsLastMonth'); }
     /** true if not listed in the portal (only for editable channels) */
-    public get unlisted(): boolean | undefined { return this._unlisted; }
+    public get unlisted(): Promise<boolean | undefined> { return this.getter('_unlisted'); }
     /** true if the user can edit this channel */
-    public get canEdit(): boolean | undefined { return this._canEdit; }
+    public get canEdit(): Promise<boolean | undefined> { return this.getter('_canEdit'); }
     /** true if the user can delete this channel */
-    public get canDelete(): boolean | undefined { return this._canDelete; }
+    public get canDelete(): Promise<boolean | undefined> { return this.getter('_canDelete'); }
     /** Short decription of the channel */
-    public get shortDescription(): string | undefined { return this._shortDescription; }
+    public get shortDescription(): Promise<string | undefined> { return this.getter('_shortDescription', true); }
     /** Description of the channel */
-    public get description(): string | undefined { return this._description; }
+    public get description(): Promise<string | undefined> { return this.getter('_description', true); }
     /** Description of channel for HTML meta tag (no HTML markups) */
-    public get metaDescription(): string | undefined { return this._metaDescription; }
+    public get metaDescription(): Promise<string | undefined> { return this.getter('_metaDescription', true); }
     /** The folder name of the channel public and private content (used to build thumbnail path or url) */
-    public get folderName(): string | undefined { return this._folderName; }
+    public get folderName(): Promise<string | undefined> { return this.getter('_folderName', true); }
     /** the channel external reference value */
-    public get externalRef(): string | undefined { return this._externalRef; }
+    public get externalRef(): Promise<string | undefined> { return this.getter('_externalRef', true); }
     /*** the channel external data */
-    public get externalData(): string | undefined { return this._externalData; }
+    public get externalData(): Promise<string | undefined> { return this.getter('_externalData', true); }
     /** Object id of the parent channel, if any */
-    public get parentOid(): string | undefined { return this._parentOid; }
+    public get parentOid(): Promise<string | undefined> { return this.getter('_parentOid'); }
     /** Title of the parent channel, if any */
-    public get parentTitle(): string | undefined { return this._parentTitle; }
+    public get parentTitle(): Promise<string | undefined> { return this.getter('_parentTitle'); }
     /** Sluge of the parent channel, if any */
-    public get parentSlug(): string | undefined { return this._parentSlug; }
+    public get parentSlug(): Promise<string | undefined> { return this.getter('_parentSlug'); }
 
     // Methods
+
+    /** Returns the requested field. If it is missing, fetch it on the API.
+     * This is protected because it is used in other getters only (to avoid repeating code).
+     * @param field The field to get
+     * @param requiresFullFetch does the API need that the "full" parameter is true to return this field ?
+     */
+    protected async getter<T>(field: string, requiresFullFetch = false): Promise<T | undefined> {
+
+        if (this[field as keyof this] === undefined) {
+            await this.fetchInfos(requiresFullFetch);
+        }
+        // Then return the field
+        return this[field as keyof this] as any; // This is not ideal, but Typescript will have to trust us
+    }
 
     /**
      * Check if the given json is a valid json for a MSContent.
@@ -118,8 +134,11 @@ export default abstract class MSContent {
     /** 
      * Sets the values based on the given json
      * Any field that is missing or the wrong type will be set to undefined.
+     * 
+     * It is protected so that the update functions in the subclasses don't have to write the same code
+     * every time, but outside of the class it is not possible to modify the values with a fake JSON.
      */
-    protected setFromJson(json: JSONInnerObject): void {
+    protected updateFieldsFromJson(json: JSONInnerObject): void {
 
         // Add other fields if they exist.
         // If they are undefined, or if they are not of the correct type, leave the field to undefined
@@ -152,5 +171,5 @@ export default abstract class MSContent {
      * Fetch the data of this content on the API. Saves the result in the object.
      * @param full Should fetch all infos or not
      */
-    // public abstract async fetchInfos(full: boolean): Promise<void>;
+    public abstract fetchInfos(full: boolean): Promise<void>;
 }

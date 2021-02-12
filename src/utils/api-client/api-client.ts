@@ -13,19 +13,17 @@ import {
     JSONInnerObject,
     JSONObject,
     MIMETypes,
-    ObjectMap,
+    ObjectMap
 } from './types';
 import Cookies from 'js-cookie';
 
 
 
 export type CallBodyParam<R extends APIRoutesSpecification<R>, K extends keyof R> = R[K]['method'] extends 'GET' ?
-    ObjectMap<string> | URLSearchParams | undefined
-    : R[K]['requestContentType'] extends MIMETypes.JSON ?
-    (R[K]['baseJSONBody'] extends undefined ? // je regardais pourquoi blob marchait pas
-        string | Blob | JSONObject | undefined
-        : JSONInnerObject | undefined)
-    : HTTPRequestBody | undefined;
+    JSONInnerObject | URLSearchParams | undefined
+    : (R[K]['requestContentType'] extends MIMETypes.JSON ?
+        (JSONInnerObject | undefined)
+        : HTTPRequestBody);
 
 
 class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<R>> {
@@ -49,11 +47,11 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
      * @param routeName Either: Name of the route to call. Must be defined in the API specification. If it isn't, a compilation error will be thrown.
      * @param data Data used for the request. Its content depends on the request.
      *  - In methods that support a body (like POST), `data` contains the body of the request.\
-     *      If the content type is `JSON` in the specification, it can be a generic object 
-     *      that will be stringified automatically. This object will be merged (and override identical keys) 
+     *      If the content type is `JSON` in the specification, it can be a generic object
+     *      that will be stringified automatically. This object will be merged (and override identical keys)
      *      with the `baseJSONBody` provided to the request specification. If the generic object is not a list, the syntax
      *      `#{name}` will be replaced by the value of the cookie named 'name' (only in values and in the first level)
-     * 
+     *
      *  - In GET method, `data` contains the query parameters to give
      *      to the request. Its type can thus be either an object of type ``{[key: string]: string}`` or a `URLSearchParams`. In case of a generic
      *      object, it will be merged with the `baseQueryParams` provided to the request specification.
@@ -67,6 +65,7 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
         const url = new URL(this.getURL(route));
         const fetchInit: FetchInit = {
             mode: route.mode,
+            credentials: route.credentials,
             method: route.method,
         };
 
@@ -78,14 +77,25 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
             // Get the query parameters
             // We can assume that data is one of these types because we know that the request is GET
             // and the compiler would'nt have authorized another type here
-            let params = data as URLSearchParams | ObjectMap<string> | undefined;
+            let params = data as URLSearchParams | JSONInnerObject | undefined;
+
 
             // Convert {[key: string]: string} to URLSearchParams
             if (!(params instanceof URLSearchParams)) {
-                // Check if it is {[key: string]: string} or undefined
+
+                let effectiveParams: ObjectMap<string> | undefined;
+
+                // If object, convert every value to string to have a {[key: string]: string}
+                if (params !== undefined) {
+                    effectiveParams = {};
+
+                    for (const key in params) {
+                        effectiveParams[key] = String(params[key]);
+                    }
+                }
 
                 // Process Cookies syntax
-                const processedData = APIClient.processObjectWithCookieSyntax(params);
+                const processedData = APIClient.processObjectWithCookieSyntax(effectiveParams);
                 const processedBaseParams = APIClient.processObjectWithCookieSyntax(route.baseQueryParams);
                 // Convert data to URLSearchParams
                 params = new URLSearchParams({ ...processedBaseParams, ...processedData });
@@ -251,7 +261,7 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
             if (responseContentType) {
                 // Get the base type
                 // Ex: "text/html ; encoding='utf-8'" -> "text/html"
-                const baseString = responseContentType.split(';')[0].trim();
+                const baseString = responseContentType.split(';')[0].trim().split(',')[0].trim();
                 let found = false;
 
                 // For each expected type
@@ -300,7 +310,7 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
                 else return new HTTPRequestResult(false, 'Specification indicates to redirect to the location given in the response\'s \'Location\' header, but none was provided.', response);
             }
             else {
-                // Else, redirect to the route named by the value. 
+                // Else, redirect to the route named by the value.
                 // It is a choice of the developper to redirect (e.g after this route, call this one)
                 // It is not a normal HTTP redirection
                 // Thus, we don't need to keep the fetch init, only the body
@@ -312,7 +322,6 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
                 }
             }
         }
-
         // No redirect occured, return
         return new HTTPRequestResult(responseHandling.isSuccess ?? false, responseHandling.message, response);
     }

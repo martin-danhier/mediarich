@@ -5,8 +5,8 @@
  */
 
 /** Shorthand for a commonly used object type.
- * 
- * Equivalent of 
+ *
+ * Equivalent of
  * ```ts
  * {[key: string] : T}
  * ```
@@ -26,7 +26,7 @@ export type JSONInnerObject = {
 export type JSONInnerArray = string[] | number[] | boolean[] | JSONInnerObject[] | JSONInnerArray[];
 
 /** Types that can be assigned as a value to a JSONInnerObject */
-export type JSONInnerObjectContent = string | number | boolean | null | JSONInnerObject | JSONInnerArray;
+export type JSONInnerObjectContent = string | number | boolean | null | JSONInnerObject | JSONInnerArray | undefined;
 
 /** Enum of the different MIME type usable in the 'content-type' header.
  * @see https://developer.mozilla.org/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
@@ -413,6 +413,8 @@ export interface APIRouteSpecification<R extends APIRoutesSpecification<R>> {
     readonly method: 'GET' | 'POST' | 'HEAD' | 'PUT' | 'DELETE' | 'PATCH';
     /** Mode used for the request */
     readonly mode?: 'cors' | 'no-cors' | 'navigate' | 'same-origin';
+    /** A string indicating whether credentials will be sent with the request always, never, or only when sent to a same-origin URL. Sets request's credentials. */
+    readonly credentials?: 'include' | 'omit' | 'same-origin';
     /** JSON body that is merged with the body passed to the call function.
      * 
      * The content type must be JSON. The syntax `#{name}` will be replaced by the value of
@@ -553,9 +555,34 @@ export class HTTPRequestResult {
             && this.response.status === 200;
     }
 
-    /** Get the json from the response, if it exists */
+    /**
+     * Checks if the response has the given content type, without consuming the response.
+     * @param type The expected content type
+     * @returns true if the response has the given content type. false otherwise
+     */
+    public async isOfType(type: MIMETypes): Promise<boolean> {
+        const contentType = this.response?.headers?.get('content-type');
+        if (contentType) {
+            return contentType.split(/[;,]/g)[0] === type;
+        }
+        return false;
+    }
+
+    /**
+     * Get the json from the response, if it exists 
+     * @returns The body json. Consumes the body.
+     * @throws if the parsing failed. Check with ``hasType(MIMETypes.JSON)`` before using this function.
+     * */
     public async getJson(): Promise<JSONObject | undefined> {
-        return await this.response?.json() ?? undefined;
+        return await this.response?.json();
+    }
+
+    /**
+     * Get the body text from the response
+     * @returns the body text. Consumes the body.
+     */
+    public async getText(): Promise<string | undefined> {
+        return await this.response?.text();
     }
 }
 

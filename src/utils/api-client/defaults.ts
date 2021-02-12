@@ -92,132 +92,132 @@ export class DefaultResponseHandling<R extends APIRoutesSpecification<R>> implem
     // Errors 400+
     [hs.BadRequest] = {
         isSuccess: false,
-        message: 'Bad request',
+        message: '400: Bad request',
     };
     [hs.Unauthorized] = {
         isSuccess: false,
-        message: 'Unauthorized',
+        message: '401: Unauthorized',
     };
     [hs.Forbidden] = {
         isSuccess: false,
-        message: 'Forbidden',
+        message: '403: Forbidden',
     };
     [hs.NotFound] = {
         isSuccess: false,
-        message: 'Not found',
+        message: '404: Not found',
     };
     [hs.MethodNotAllowed] = {
         isSuccess: false,
-        message: 'Method not allowed',
+        message: '405: Method not allowed',
     };
     [hs.NotAcceptable] = {
         isSuccess: false,
-        message: 'Not acceptable',
+        message: '406: Not acceptable',
     };
     [hs.ProxyAuthenticationRequired] = {
         isSuccess: false,
-        message: 'Proxy authentication required',
+        message: '407: Proxy authentication required',
     };
     [hs.RequestTimeout] = {
         isSuccess: false,
-        message: 'Request timeout',
+        message: '408: Request timeout',
     };
     [hs.Conflict] = {
         isSuccess: false,
-        message: 'Conflict',
+        message: '409: Conflict',
     };
     [hs.LengthRequired] = {
         isSuccess: false,
-        message: 'Content-Length required',
+        message: '411: Content-Length required',
     };
     [hs.PreconditionFailed] = {
         isSuccess: false,
-        message: 'Precondition failed',
+        message: '412: Precondition failed',
     };
     [hs.PayloadTooLarge] = {
         isSuccess: false,
-        message: 'Payload is too large',
+        message: '413: Payload is too large',
     };
     [hs.URITooLong] = {
         isSuccess: false,
-        message: 'URI too long (try to use POST)',
+        message: '414: URI too long (try to use POST)',
     };
     [hs.UnsupportedMediaType] = {
         isSuccess: false,
-        message: 'The provided media type is not supported',
+        message: '415: The provided media type is not supported',
     };
     [hs.RangeNotSatisfiable] = {
         isSuccess: false,
-        message: 'Range not satisfiable',
+        message: '416: Range not satisfiable',
     };
     [hs.ExpectationFailed] = {
         isSuccess: false,
-        message: 'Expectation failed',
+        message: '417: Expectation failed',
     };
     [hs.Locked] = {
         isSuccess: false,
-        message: 'The requested resource is locked',
+        message: '423: The requested resource is locked',
     };
     [hs.UpgradeRequired] = {
         isSuccess: false,
-        message: 'Upgrade required',
+        message: '426: Upgrade required',
     };
     [hs.TooManyRequests] = {
         isSuccess: false,
-        message: 'Too many requests',
+        message: '429: Too many requests',
     };
     [hs.RequestHeaderFieldsTooLarge] = {
         isSuccess: false,
-        message: 'Request header fields too large',
+        message: '431: Request header fields too large',
     };
     [hs.UnavailableForLegalReasons] = {
         isSuccess: false,
-        message: 'Unavailable for legal reasons',
+        message: '451: Unavailable for legal reasons',
     };
     // Errors 500+
     [hs.InternalServerError] = {
         isSuccess: false,
-        message: 'Internal server error',
+        message: '500: Internal server error',
     };
     [hs.NotImplemented] = {
         isSuccess: false,
-        message: 'This route is not implemented',
+        message: '501: This route is not implemented',
     };
     [hs.BadGateway] = {
         isSuccess: false,
-        message: 'Bad gateway',
+        message: '502: Bad gateway',
     };
     [hs.ServiceUnavailable] = {
         isSuccess: false,
-        message: 'Service unavailable',
+        message: '503: Service unavailable',
     };
     [hs.GatewayTimeout] = {
         isSuccess: false,
-        message: 'Gateway timeout',
+        message: '504: Gateway timeout',
     };
     [hs.HTTPVersionNotSupported] = {
         isSuccess: false,
-        message: 'HTTP version not supported',
+        message: '505: HTTP version not supported',
     };
     [hs.VariantAlsoNegotiates] = {
         isSuccess: false,
-        message: 'Variant also negotiates',
+        message: '506: Variant also negotiates',
     };
     [hs.InsufficientStorage] = {
         isSuccess: false,
-        message: 'Insufficient storage',
+        message: '507: Insufficient storage',
     };
     [hs.LoopDetected] = {
         isSuccess: false,
-        message: 'Loop detected',
+        message: '508: Loop detected',
     };
     [hs.NotExtended] = {
         isSuccess: false,
-        message: 'Not extended',
+        message: '510: Not extended',
     };
     [hs.NetworkAuthenticationRequired] = {
         isSuccess: false,
-        message: 'Network authentication required',
+        message: '511: Network authentication required',
     };
 }
 

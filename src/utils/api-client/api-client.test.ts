@@ -1,7 +1,6 @@
 import APIClient from './api-client';
-import { AssertionError } from 'utils/assert/assert';
 import fetch from 'jest-fetch-mock';
-import { APIRouteSpecification, APIRoutesSpecification, APISpecification, HTTPStatusCodes, MIMETypes } from './types';
+import { APIRoutesSpecification, APISpecification, HTTPStatusCodes, MIMETypes } from './types';
 import { strictEqual } from 'assert';
 import Cookies from 'js-cookie';
 
@@ -280,12 +279,12 @@ beforeAll(() => {
             if (Array.isArray(json)) {
                 expect(json).toStrictEqual([4, 5, 6]);
             } else {
-                expect(json.number).toBe(4);
+                expect(json.number).toStrictEqual(4);
                 if (json.token) {
-                    expect(json.token).toBe('my-very-secure-token');
+                    expect(json.token).toStrictEqual('my-very-secure-token');
                 }
             }
-            expect(req.headers.get('Content-Type')).toBe('application/json; charset=utf-8');
+            expect(req.headers.get('Content-Type')).toStrictEqual('application/json; charset=utf-8');
 
             // Return a fake response
             return Promise.resolve({
@@ -412,16 +411,16 @@ async function checkMockResponse(response: Response | null): Promise<void> {
 
     if (response !== null) {
         // The header is the same as in the mock
-        expect(response.headers.get('Content-Type')).toBe('text/html; charset=UTF-8');
+        expect(response.headers.get('Content-Type')).toStrictEqual('text/html; charset=UTF-8');
         // The status is the same as in the mock
-        expect(response.status).toBe(200);
+        expect(response.status).toStrictEqual(200);
         // The status text is the same as in the mock
-        expect(response.statusText).toBe('OK');
+        expect(response.statusText).toStrictEqual('OK');
 
         const text = await response.text();
 
         // The body is the same as in the mock
-        expect(text).toBe('<!DOCTYPE html><html><body><h1>Titre</h1></body></html>');
+        expect(text).toStrictEqual('<!DOCTYPE html><html><body><h1>Titre</h1></body></html>');
     }
 
     // Just in case, check that the mock function have been called
@@ -491,7 +490,7 @@ test('API client fetch error handler works', async () => {
     expect(result.ok).not.toBeTruthy();
     expect(result.response).toBeUndefined();
     expect(result.message).toBeDefined();
-    expect(result.message).toBe('Bad URL: https://en.wikipedia.org/wiki/Error_404');
+    expect(result.message).toStrictEqual('Bad URL: https://en.wikipedia.org/wiki/Error_404');
 });
 
 
@@ -501,32 +500,17 @@ test('JSON in request', async () => {
 
     // Check that the response is the same as in the mock
     expect(result.ok).not.toBeTruthy();
-    expect(result.message).toBe('Internal server error');
+    expect(result.message).toStrictEqual('500: Internal server error');
     expect(result.response).toBeDefined();
     expect(result.isOk()).not.toBeTruthy();
     expect(result.is200()).toBeFalsy();
     if (result.response) {
         // The status is the same as in the mock
-        expect(result.response.status).toBe(500);
+        expect(result.response.status).toStrictEqual(500);
         // The status text is the same as in the mock
-        expect(result.response.statusText).toBe('Internal Server Error');
+        expect(result.response.statusText).toStrictEqual('Internal Server Error');
         // The body is the same as in the mock
         expect(await result.response.json()).toStrictEqual({ value: 12, list: ['item', 'item2'] });
-    }
-});
-
-test('Blob in request', async () => {
-    const data = '{"item" : 4, "bojnour": 4, "hey": 45}';
-    const blob = new Blob([data], { type: 'application/json' });
-
-    const result = await client.call('blobInput', blob);
-
-    expect(result.ok).toBeTruthy();
-    expect(result.response).toBeDefined();
-    if (result.response) {
-        expect(result.response.status).toBe(200);
-        expect(result.is200()).toBeTruthy();
-        expect(fetch).toHaveBeenCalled();
     }
 });
 
@@ -538,8 +522,8 @@ test('ArrayBuffer in request', async () => {
     expect(result.ok).toBeTruthy();
     expect(result.response).toBeDefined();
     if (result.response) {
-        expect(result.response.status).toBe(200);
-        expect(await result.response.text()).toBe(buffer.byteLength.toString());
+        expect(result.response.status).toStrictEqual(200);
+        expect(await result.response.text()).toStrictEqual(buffer.byteLength.toString());
     }
 
 });
@@ -550,7 +534,7 @@ test('ArrayBuffer in request', async () => {
 test('Unexpected response content type', async () => {
     const result = await client.call('unexpectedContentType');
 
-    expect(result.message).toBe('Expected content types [\'application/json\',\'audio/aac\'], got \'text/html\'.');
+    expect(result.message).toStrictEqual('Expected content types [\'application/json\',\'audio/aac\'], got \'text/html\'.');
     expect(result.ok).not.toBeTruthy();
     expect(result.response).toBeDefined();
 });
@@ -563,7 +547,7 @@ test('Expected a JSON in response but received nothing', async () => {
 
     expect(result.ok).not.toBeTruthy();
     expect(result.isOk()).not.toBeTruthy();
-    expect(result.message).toBe('Expected content types [\'application/json\'], but the request didn\'t specify a content type.');
+    expect(result.message).toStrictEqual('Expected content types [\'application/json\'], but the request didn\'t specify a content type.');
     expect(result.response).toBeDefined();
 });
 
@@ -574,7 +558,7 @@ test('API returns invalid status code', async () => {
     const result = await client.call('unknownStatusCode');
 
     expect(result.ok).not.toBeTruthy();
-    expect(result.message).toBe('Unknown status code: 418 (I\'m a teapot)');
+    expect(result.message).toStrictEqual('Unknown status code: 418 (I\'m a teapot)');
     expect(result.response).toBeDefined();
 });
 
@@ -601,7 +585,7 @@ test('External bad status', async () => {
         method: 'GET',
     });
     expect(result.ok).toBeFalsy();
-    expect(result.message).toBe('Unknown status code: 418 (I\'m a teapot)');
+    expect(result.message).toStrictEqual('Unknown status code: 418 (I\'m a teapot)');
     expect(result.response).toBeDefined();
 });
 
@@ -613,7 +597,7 @@ test('External specification', async () => {
         method: 'GET',
     });
     expect(result.ok).toBeFalsy();
-    expect(result.message).toBe('Expected content types [\'application/xml\'], but the request didn\'t specify a content type.');
+    expect(result.message).toStrictEqual('Expected content types [\'application/xml\'], but the request didn\'t specify a content type.');
     expect(result.response).toBeDefined();
 });
 
@@ -623,7 +607,7 @@ test('External bad url', async () => {
     });
     expect(result.ok).toBeFalsy();
     expect(result.response).toBeUndefined();
-    expect(result.message).toBe('Bad URL: https://www.google.com/');
+    expect(result.message).toStrictEqual('Bad URL: https://www.google.com/');
 });
 
 /**
@@ -637,8 +621,8 @@ test('Internal redirect to External', async () => {
     expect(result.message).toBeUndefined();
     expect(result.response).toBeDefined();
     if (result.response) {
-        expect(result.response.status).toBe(200);
-        expect(await result.response.text()).toBe('{"page": "UNamur"}');
+        expect(result.response.status).toStrictEqual(200);
+        expect(await result.response.text()).toStrictEqual('{"page": "UNamur"}');
     }
     // Check mock
     expect(fetch).toHaveBeenCalledTimes(2);
@@ -651,8 +635,8 @@ test('Internal redirect to other internal', async () => {
     expect(result.message).toBeUndefined();
     expect(result.response).toBeDefined();
     if (result.response) {
-        expect(result.response.status).toBe(200);
-        expect(await result.response.text()).toBe('<!DOCTYPE html><html><body><h1>Titre</h1></body></html>');
+        expect(result.response.status).toStrictEqual(200);
+        expect(await result.response.text()).toStrictEqual('<!DOCTYPE html><html><body><h1>Titre</h1></body></html>');
     }
     // Check mock
     expect(fetch).toHaveBeenCalledTimes(2);
@@ -662,7 +646,7 @@ test('Redirection to undefined location', async () => {
     const result = await client.call('redirectionUndefinedLocation');
     // Check response
     expect(result.ok).toBeFalsy();
-    expect(result.message).toBe('Specification indicates to redirect to the location given in the response\'s \'Location\' header, but none was provided.');
+    expect(result.message).toStrictEqual('Specification indicates to redirect to the location given in the response\'s \'Location\' header, but none was provided.');
     expect(result.response).toBeDefined();
 });
 
@@ -677,7 +661,7 @@ test('Redirection to other route and preserve body', async () => {
     expect(result.message).toBeUndefined();
     expect(result.response).toBeDefined();
     if (result.response) {
-        expect(result.response.status).toBe(200);
+        expect(result.response.status).toStrictEqual(200);
     }
     // check mock
     expect(fetch).toHaveBeenCalledTimes(2);
@@ -690,7 +674,7 @@ test('External call body preserved', async () => {
     expect(result.message).toBeUndefined();
     expect(result.response).toBeDefined();
     if (result.response) {
-        expect(result.response.status).toBe(200);
+        expect(result.response.status).toStrictEqual(200);
         const json = await result.response.json();
         expect(json.preserved).toBeTruthy();
     }
@@ -709,7 +693,7 @@ test('Header with Cookie', async () => {
     if (result.response) {
         // Check if the response contains a Set-Cookie
         // It is returned by the mock if the cookie was correctly replaced
-        expect(result.response.headers.get('Set-Cookie')).toBe('sesskey=ok');
+        expect(result.response.headers.get('Set-Cookie')).toStrictEqual('sesskey=ok');
     }
 });
 
@@ -721,8 +705,8 @@ test('Header override', async () => {
     if (result.response) {
         // The mock is programmed to return the received content type and content length
         // Check if the values are the overriden ones
-        expect(result.response.headers.get('Request-Content-Type')).toBe('application/xml');
-        expect(result.response.headers.get('Request-Content-Length')).toBe('7');
+        expect(result.response.headers.get('Request-Content-Type')).toStrictEqual('application/xml');
+        expect(result.response.headers.get('Request-Content-Length')).toStrictEqual('7');
     }
 });
 
@@ -734,34 +718,16 @@ test('JSON input with default body', async () => {
 
     // Check that the response is the same as in the mock
     expect(result.ok).not.toBeTruthy();
-    expect(result.message).toBe('Internal server error');
+    expect(result.message).toStrictEqual('500: Internal server error');
     expect(result.response).toBeDefined();
     if (result.response) {
         // The status is the same as in the mock
-        expect(result.response.status).toBe(500);
+        expect(result.response.status).toStrictEqual(500);
         // The status text is the same as in the mock
-        expect(result.response.statusText).toBe('Internal Server Error');
+        expect(result.response.statusText).toStrictEqual('Internal Server Error');
         // The body is the same as in the mock
         expect(await result.response.json()).toStrictEqual({ value: 12, list: ['item', 'item2'] });
     }
-});
-
-test('JSON array input with default body', async () => {
-    // Set a Cookie
-    Cookies.set('token', 'my-very-secure-token');
-
-    await expect(client.call('jsonInputDefault', [4, 5, 6])).rejects.toThrow(AssertionError);
-
-});
-
-test('JSON input without default body', async () => {
-
-    const result = await client.call('jsonInput', [4, 5, 6]);
-
-    // Check that the response is the same as in the mock
-    expect(result.ok).not.toBeTruthy();
-    expect(result.message).toBe('Internal server error');
-    expect(result.response).toBeDefined();
 });
 
 test('GET with query parameters', async () => {
@@ -773,7 +739,7 @@ test('GET with query parameters', async () => {
     if (result.isOk()) {
         // It will return 201 if the query params were successful
         // it will return 200 if there were no params
-        expect(result.response.status).toBe(201);
+        expect(result.response.status).toStrictEqual(201);
     }
 });
 
@@ -786,6 +752,6 @@ test('GET with url search params', async () => {
     if (result.response) {
         // It will return 201 if the query params were successful
         // it will return 200 if there were no params
-        expect(result.response.status).toBe(201);
+        expect(result.response.status).toStrictEqual(201);
     }
 });

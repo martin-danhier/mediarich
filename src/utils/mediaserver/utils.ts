@@ -1,4 +1,5 @@
 import { parse } from 'date-fns';
+import { JSONInnerArray, JSONInnerObject, JSONInnerObjectContent } from 'utils/api-client';
 
 /** A Type<T> is the representation of the type T\
  * For a string, it will simply be 'string' (used in a typeof)\
@@ -27,21 +28,36 @@ function isTypeClass<T extends number | string | boolean | object>(type: Type<T>
     return typeof type === 'function';
 }
 
+/** Check the type of a value at runtime (useful to handle `any` or `unknown` values).
+ * The given type can be one of the following:
+ * - `'string'`
+ * - `'number'`
+ * - `'boolean'`
+ * - A class name (not in quotes). It must exist at runtime, so it can't be an `interface`, a `type`, or other typescript compile-time types.
+ *  */
+function runtimeTypeCheck<T extends number | string | boolean | object>(type: Type<T>, value: unknown): value is T {
+    return (typeof type === 'string' && typeof value === type)
+        || (isTypeClass(type) && value instanceof type);
+}
+
 /** Unwraps a value from a type tuple.
  * @param value The value to unwrap
  * @param type The destination type. Can be a string ('number', 'string'...) or a class name
  * @return the value if the type is matching, undefined otherwise
  */
 export function as<T extends number | string | boolean | object>(type: Type<T>, value: unknown): T | undefined {
-    if ((typeof type === 'string' && typeof value === type)
-        || (isTypeClass(type) && value instanceof type)) {
-        return value as T;
+    if (runtimeTypeCheck(type, value)) {
+        return value;
     }
 }
 
 /** Unwraps a value from a type tuple to an enum.\
  * If the value is of the wrong type, or don't exist in the enum,
  * the function will return ``undefined``.
+ * 
+ * Usage: This function can be used to check a field of an HTTP response and type the values
+ * at the same time.
+ * 
  * @param enumType The destination enum
  * @param value The value to unwrap
  */
@@ -60,12 +76,83 @@ export function asEnum<T extends string | number | null>(
 }
 
 
-
-export function asDate(value: unknown): Date | undefined {
+/**
+ * Unwraps a value from a type tuple to a Date. If the parameter can be
+ * safely converted to a Date (i.e. it's a string and is in a valid format),
+ * then the Date is returned. Else, undefined is returned.
+ *
+ * Usage: This function can be used to check a field of an HTTP response and type the values
+ * at the same time.
+ *
+ * @param value The value to unwrap
+ * @param format The requested date format. Other formats won't be accepted.
+ *      The default format is `yyyy-MM-dd HH:mm:ss`
+ */
+export function asDate(value: unknown, format = 'yyyy-MM-dd HH:mm:ss'): Date | undefined {
     if (typeof value === 'string') {
-        const date = parse(value, 'yyyy-MM-dd HH:mm:ss', new Date());
+        const date = parse(value, format, new Date());
         if (!isNaN(date.getTime())) {
             return date;
         }
+    }
+}
+
+/**
+ * Unwraps a value to a given array type from an `any`, `unknown`, or type tuple. If the value is the correct type, return it.
+ * Else, return `undefined`.
+ * 
+ * Usage: This function can be used to check a field of an HTTP response and type the values
+ * at the same time.
+ * 
+ * @param type The destination type. Can be a string ('number', 'string'...) or a class name (must exist at runtime).
+ * @param value The value to unwrap
+ */
+export function asArray<T extends number | string | boolean | object>(type: Type<T>, value: unknown): T[] | undefined {
+    // First, check if the value is an array
+    if (Array.isArray(value)) {
+        // If it is, we still don't know if all the values are of the requested type (it's any[])
+        // So we runtime type check every value of the array
+        if (value.every(elem => runtimeTypeCheck(type, elem))) {
+            // Here, value is correctly typed so we can return it instead of undefined.
+            return value;
+        }
+    }
+}
+
+/**
+ * Unwraps a given JSON value if it matches a JSON object type.
+ * @param value The value to unwrap
+ * @returns the value if it is an array of objects, else `undefined`
+ * @example [{ value: 4}, { other: 4 }] // this is a valid JSON object array, it will be returned.
+ * @example 4 // this is not a valid JSON object array, undefined will be returned.
+ */
+export function asJsonObjectArray(value: JSONInnerObjectContent): JSONInnerObject[] | undefined {
+    // First, check if the value is an array
+    if (Array.isArray(value)) {
+        // Check that all values are objects.
+        let valid = true;
+        for (const elem of value) {
+            if (typeof elem !== 'object' || Array.isArray(elem)) {
+                valid = false;
+                break; // Don't loop if not needed
+            }
+        }
+
+        // If "valid" is true, then all elements are JsonInnerObjects
+        if (valid) {
+            return value as JSONInnerObject[];
+        }
+        
+    }
+}
+
+/** Unwraps a JSON object from a json value.
+ * @param value The value to unwrap
+ * @returns The value if it is a JSON object, undefined otherwise.
+ * @example { value: 4 } // This is a valid JSON object
+ */
+export function asJsonObject(value: JSONInnerObjectContent): JSONInnerObject | undefined {
+    if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
+        return value;
     }
 }
