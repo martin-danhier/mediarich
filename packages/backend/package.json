@@ -16,6 +16,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "node-fetch": "^2.6.1",
+    "node-gyp": "^3.8.0",
     "sequelize-typescript": "^2.0.0",
     "sqlite3": "^5.0.1",
     "uuid": "^8.3.2"
