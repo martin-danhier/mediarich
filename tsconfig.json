@@ -1,28 +1,21 @@
 {
-  "compilerOptions": {
-    "target": "es6",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "baseUrl": "src",
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "react",
-    "strictNullChecks": true,
-  },
-  "include": [
-    "src",
-    "src/setupTests.ts",
-    "server"
-  ]
+    "compilerOptions": {
+        "target": "es6",
+        "lib": [
+            "esnext"
+        ],
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "allowJs": false,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "strictNullChecks": true,
+    },
 }

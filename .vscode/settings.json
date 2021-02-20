@@ -1,7 +1,8 @@
 {
     "coverage-gutters.customizable.context-menu": false,
     "eslint.workingDirectories": [
-        "src"
+        "backend/src",
+        "frontend/src"
     ],
     "eslint.validate": [
         "javascript",
@@ -41,5 +42,5 @@
         "doc": false
     },
     "explorerExclude.backup": null,
-    "typescript.tsdk": "node_modules\\typescript\\lib",
+    "typescript.tsdk": ".\\node_modules\\typescript\\lib",
 }
