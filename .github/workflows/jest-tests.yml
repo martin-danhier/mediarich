@@ -22,8 +22,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: npm rebuild --build-from-source=sqlite3
+    - run: npm install --build-from-source
     - name: Jest Annotations & Coverage
       # You may pin to the exact commit or the version.
       # uses: mattallty/jest-github-action@43bbcd073fa43a927322f188220b6592acae003b

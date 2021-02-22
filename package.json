@@ -22,7 +22,8 @@
   "homepage": "https://github.com/martin-danhier/mediarich#readme",
   "dependencies": {
     "mediarich-backend": "file:packages/backend",
-    "mediarich-frontend": "file:packages/frontend"
+    "mediarich-frontend": "file:packages/frontend",
+    "node-gyp": "^7.1.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^4.2.4",
