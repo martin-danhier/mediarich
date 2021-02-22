@@ -1,0 +1,9 @@
+{
+    "testPathIgnorePatterns": [
+        "<rootDir>/scripts"
+    ],
+    "projects": [
+        "<rootDir>/packages/backend/jest.config.js",
+        "<rootDir>/packages/frontend/jest.config.js"
+    ]
+}

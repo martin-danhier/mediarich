@@ -42,5 +42,6 @@
         "doc": false
     },
     "explorerExclude.backup": null,
+    "jestTestExplorer.featureToggles": [],
     "typescript.tsdk": ".\\node_modules\\typescript\\lib",
 }

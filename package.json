@@ -6,10 +6,10 @@
     "./packages/*"
   ],
   "scripts": {
-    "test": "node ./scripts/test.js",
+    "test": "node ./scripts/tests.js",
     "backend": "cd ./packages/backend && node ./scripts/start.js && cd ../..",
     "frontend": "cd ./packages/frontend && node ./scripts/start.js && cd ../..",
-    "coverage": "node scripts/test.js --watchAll=false --coverage"
+    "coverage": "node scripts/tests.js --watchAll=false --coverage"
   },
   "repository": {
     "type": "git",
@@ -18,15 +18,6 @@
   "author": "Martin Danhier",
   "bugs": {
     "url": "https://github.com/martin-danhier/mediarich/issues"
-  },
-  "jest": {
-    "testPathIgnorePatterns": [
-      "<rootDir>/scripts"
-    ],
-    "projects": [
-      "<rootDir>/packages/backend/jest.config.js",
-      "<rootDir>/packages/frontend/jest.config.js"
-    ]
   },
   "homepage": "https://github.com/martin-danhier/mediarich#readme",
   "dependencies": {
