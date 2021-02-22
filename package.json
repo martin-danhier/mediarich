@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/martin-danhier/mediarich#readme",
   "dependencies": {
-    "mediarich-backend": "file:packages/backend",
     "mediarich-frontend": "file:packages/frontend",
     "node-gyp": "^7.1.2"
   },
@@ -37,6 +36,7 @@
     "jest-environment-jsdom-fourteen": "^1.0.1",
     "jest-fetch-mock": "^3.0.3",
     "jest-watch-typeahead": "^0.4.2",
+    "mediarich-backend": "file:packages\\backend",
     "react-app-polyfill": "^1.0.6",
     "react-dev-utils": "^11.0.2",
     "supertest": "^6.1.3",
