@@ -12,21 +12,24 @@ import {
     HTTPStatusCodes,
     JSONInnerObject,
     JSONObject,
-    MIMETypes,
-    ObjectMap
+    MIMETypes
 } from './types';
 import Cookies from 'js-cookie';
 
 
 
 
-export type CallBodyParam<R extends APIRoutesSpecification<R>, K extends keyof R> = R[K]['method'] extends 'GET' ?
+export type CallBodyParam<R extends APIRoutesSpecification<R>, K extends keyof R> = R[K]['requestContentType'] extends MIMETypes.None
+    // Don't allow body on null content type
+    ? never
+    // Else check the method
+    : R[K]['method'] extends 'GET' ?
     JSONInnerObject | URLSearchParams | undefined
     : (R[K]['requestContentType'] extends MIMETypes.JSON ?
-        (JSONInnerObject | undefined)
+        (JSONInnerObject | Blob | undefined)
         : R[K]['requestContentType'] extends MIMETypes.XWWWFormUrlencoded ?
         // Auto translate object maps into form Www url encoded
-        ObjectMap<string> | URLSearchParams | undefined :
+        JSONInnerObject | URLSearchParams | undefined :
         // Else don't preprocess the body, only accept the definitive one
         HTTPRequestBody);
 
@@ -88,15 +91,11 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
             // Convert {[key: string]: string} to URLSearchParams
             if (!(params instanceof URLSearchParams)) {
 
-                let effectiveParams: ObjectMap<string> | undefined;
+                let effectiveParams: Record<string, string> | undefined;
 
                 // If object, convert every value to string to have a {[key: string]: string}
                 if (params !== undefined) {
-                    effectiveParams = {};
-
-                    for (const key in params) {
-                        effectiveParams[key] = String(params[key]);
-                    }
+                    effectiveParams = APIClient.jsonToRecord(params);
                 }
 
                 // Process Cookies syntax
@@ -154,9 +153,9 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
                         bodyData = JSON.stringify(bodyData);
                     }
                 }
-                else if (route.requestContentType === MIMETypes.XWWWFormUrlencoded) {
-                    // Convert to url search params (we can narrow cast the json object because the typing system won't allow another type)
-                    bodyData = new URLSearchParams(bodyData as ObjectMap<string>);
+                else if (route.requestContentType === MIMETypes.XWWWFormUrlencoded && !Array.isArray(bodyData)) {
+                    // Convert to url search params
+                    bodyData = new URLSearchParams(APIClient.jsonToRecord(bodyData));
                 }
                 // Else, we have a generic object that is not json, so there is a problem.
                 else {
@@ -469,8 +468,8 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
      * Process the cookie syntax in each value of the object. See `processCookieSyntax` for more infos.
      * @param raw An object with string keys and values of type T or string. The values can support the `#{cookie}` cookie syntax.
      */
-    private static processObjectWithCookieSyntax<T>(raw: ObjectMap<T | string> | undefined): ObjectMap<T | string> {
-        const processed: ObjectMap<T | string> = {};
+    private static processObjectWithCookieSyntax<T>(raw: Record<string, T | string> | undefined): Record<string, T | string> {
+        const processed: Record<string, T | string> = {};
         for (const key in raw) {
             // Get the value to process
             const unprocessedValue = raw[key];
@@ -484,6 +483,29 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
             }
         }
         return processed;
+    }
+
+    /**
+     * Converts a JSON to a Record by serializing all values
+     * @param json The json to convert
+     * @returns the same object, with every value serialized to string
+     */
+    private static jsonToRecord(json: JSONInnerObject): Record<string, string> {
+        let record: Record<string, string> = {};
+
+        for (const key in json) {
+
+            const value = json[key];
+            // If string, don't change anything
+            if (typeof value === 'string') {
+                record[key] = value;
+            } else {
+                // Serialize sub objects
+                record[key] = String(JSON.stringify(value));
+            }
+        }
+
+        return record;
     }
 }
 

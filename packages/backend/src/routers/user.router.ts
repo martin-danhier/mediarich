@@ -164,6 +164,7 @@ router.get('/test', AuthMiddleware, async (req, res) => {
         // Send a response
         res.status(200).send({
             error: false,
+            username: req.session.user.username,
             apiKey: req.session.user.apiKey,
         });
     }

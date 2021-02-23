@@ -40,5 +40,6 @@ module.exports = {
     appTsConfig: resolveApp('tsconfig.json'),
     appPackageJson: resolveApp('package.json'),
     appNodeModules: resolveApp('node_modules'),
+    rootNodeModules: resolveApp('../../node_modules'),
     dotenv: resolveApp('.env'),
 };

@@ -1,7 +1,7 @@
 import fetchMock from 'jest-fetch-mock';
 import { JSONInnerObject } from 'utils/api-client';
 import MediaServerAPIHandler from './mediaserver-api-hanler';
-import { as, asArray, asDate, asEnum } from './utils';
+import { as, asArray, asDate, asEnum } from '../validation';
 
 beforeAll(() => {
     // Disable fetch mocks for this test file (hard to mock the mediaserver API)

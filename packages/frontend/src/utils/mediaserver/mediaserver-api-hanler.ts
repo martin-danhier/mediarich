@@ -1,8 +1,10 @@
+import * as assert from 'utils/assert/assert';
 import APIClient, { HTTPRequestResult, JSONInnerObject, MIMETypes } from 'utils/api-client';
+import { CallBodyParam } from 'utils/api-client/api-client';
 import { MSApiSpecification, MSRoutesSpec } from './api-routes';
 import MSChannel from './classes/channel';
 import { MediaServerError, MSResponseJson } from './types';
-import { asJsonObjectArray, } from './utils';
+import { asJsonObjectArray, } from '../validation';
 
 /**
  *  MediaServer API handler.
@@ -36,25 +38,24 @@ class MediaServerAPIHandler {
     }
 
 
-    public async call<K extends keyof MSRoutesSpec>(routeName: K, data?: JSONInnerObject): Promise<MSResponseJson> {
+    public async call<K extends keyof MSRoutesSpec>(
+        routeName: K,
+        data?: JSONInnerObject
+    ): Promise<MSResponseJson> {
+
+        // Assert that the route is in form url encoded
+        assert.strictEqual(this._client.api.routes[routeName].requestContentType, MIMETypes.XWWWFormUrlencoded as const, 'All MediaServer request are done in x-w-form-urlencoded');
 
         // Init data if undefined
         data = data ?? {};
         // Add Api Key
         data['api_key'] = this._apiKey;
-        // Type cast to tell typescript to trust us that no POST route has a content type type that is not JSON.
-        const effectiveData = data as MSRoutesSpec[K]['method'] extends 'GET' ?
-            JSONInnerObject
-            : MSRoutesSpec[K]['requestContentType'] extends MIMETypes.JSON ?
-            JSONInnerObject
-            : never;
-
 
         let result: HTTPRequestResult | undefined;
         try {
 
             // Call the route
-            result = await this._client.call<K>(routeName, effectiveData);
+            result = await this._client.call<K>(routeName, data as CallBodyParam<MSRoutesSpec, K>);
 
         } catch (e) {
             console.error(e);

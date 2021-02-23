@@ -13,7 +13,7 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
     readonly existing = {
         method: 'GET',
         url: '/API_testing',
-        requestContentType: MIMETypes.None,
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
         expectedResponses: {
             // OK : return page in html
             [HTTPStatusCodes.OK]: {
@@ -42,6 +42,7 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
     wrongSpec = {
         method: 'POST',
         url: '/Error_404',
+        requestContentType: MIMETypes.None,
         errorHandling: {
             shouldLogError: true,
             shouldRethrow: true,
@@ -51,6 +52,7 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
     otherWrongSpec = {
         method: 'POST',
         url: '/Error_404',
+        requestContentType: MIMETypes.None,
         errorHandling: {
             shouldLogError: false,
             shouldRethrow: false,
@@ -84,6 +86,7 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
     } as const;
     // Buffer input
     bufferInput = {
+        requestContentType: MIMETypes.OctetStream,
         method: 'POST',
         url: '/buffer',
         expectedResponses: {
@@ -96,6 +99,7 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
     unexpectedContentType = {
         method: 'POST',
         url: '/API_testing',
+        requestContentType: MIMETypes.None,
         expectedResponses: {
             [HTTPStatusCodes.OK]: {
                 isSuccess: true,
@@ -105,6 +109,7 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
     } as const;
     // API returns nothing, but expected something
     expectedContentTypesInResponse = {
+        requestContentType: MIMETypes.None,
         method: 'GET',
         url: '/no-content',
         expectedResponses: {
@@ -118,6 +123,7 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
     unknownStatusCode = {
         method: 'GET',
         url: '/teapot',
+        requestContentType: MIMETypes.None,
         expectedResponses: {
             [HTTPStatusCodes.OK]: {
                 isSuccess: true,
@@ -126,6 +132,7 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
     } as const;
     // redirection with get
     redirection = {
+        requestContentType: MIMETypes.None,
         method: 'GET',
         url: '/redirect',
     } as const;
@@ -133,6 +140,7 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
     redirectionOverride = {
         method: 'GET',
         url: '/redirect',
+        requestContentType: MIMETypes.None,
         expectedResponses: {
             [HTTPStatusCodes.SeeOther]: {
                 isSuccess: true,
@@ -144,6 +152,7 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
     redirectionUndefinedLocation = {
         method: 'GET',
         url: '/no-content',
+        requestContentType: MIMETypes.None,
         expectedResponses: {
             [HTTPStatusCodes.OK]: {
                 isSuccess: true,
@@ -155,6 +164,7 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
     redirectionPreserveBody = {
         method: 'POST',
         url: '/redirect',
+        requestContentType: MIMETypes.JSON,
         expectedResponses: {
             [HTTPStatusCodes.SeeOther]: {
                 shouldRedirectTo: 'blobInput',
@@ -166,6 +176,7 @@ class TestApiRoutes implements APIRoutesSpecification<TestApiRoutes> {
     redirectionHeaderPreserveRequest = {
         method: 'POST',
         url: '/redirect',
+        requestContentType: MIMETypes.PlainText,
         expectedResponses: {
             [HTTPStatusCodes.SeeOther]: {
                 shouldRedirectTo: 'header-location',
@@ -222,16 +233,17 @@ class TestAPISpecification implements APISpecification<TestApiRoutes> {
 
 let client: APIClient<TestAPISpecification, TestApiRoutes>;
 
+
+beforeEach(() => {
+    // Reset the call count of fetch between each mock
+    jest.clearAllMocks();
+    // Clear cookies
+    Cookies.remove('token');
+});
+
 beforeAll(() => {
     // Create API Client (the class we want to test)
     client = new APIClient(new TestAPISpecification());
-
-    beforeEach(() => {
-        // Reset the call count of fetch between each mock
-        jest.clearAllMocks();
-        // Clear cookies
-        Cookies.remove('token');
-    });
 
     // Setup mocks
     fetch.mockResponse(async req => {

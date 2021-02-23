@@ -1,7 +1,7 @@
 import { JSONInnerObject } from 'utils/api-client';
 import MediaServerAPIHandler from '../mediaserver-api-hanler';
 import { MediaServerError } from '../types';
-import { as, asDate, asEnum, asJsonObject } from '../utils';
+import { as, asDate, asEnum, asJsonObject } from '../../validation';
 import MSContent from './content';
 
 export enum VideoLayout {

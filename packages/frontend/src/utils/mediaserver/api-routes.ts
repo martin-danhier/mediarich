@@ -14,10 +14,10 @@ export class MSApiSpecification implements APISpecification<MSRoutesSpec> {
         // When a call succeeds, the server usually returns a JSON
         [HTTPStatusCodes.OK]: {
             expectedContentTypes: [MIMETypes.JSON],
-        },
+        } as const,
         [HTTPStatusCodes.NotFound]: {
             expectedContentTypes: [MIMETypes.JSON],
-        }
+        } as const
     };
     readonly defaultErrorHandling: ErrorHandlingSpecification = {
         shouldLogError: true,
@@ -40,28 +40,32 @@ export class MSApiSpecification implements APISpecification<MSRoutesSpec> {
 export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
 
     /** Ping the server */
-    '/': APIRouteSpecification<MSRoutesSpec> = {
+    '/' = {
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
         url: '/',
         method: 'GET',
         mode: 'cors',
-    };
+    } as const;
     /** Returns the list of media and sub channels matching the requested search words. */
-    '/search': APIRouteSpecification<MSRoutesSpec> = {
+    '/search' = {
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
         url: '/search/',
         method: 'GET',
         mode: 'cors',
-    };
+    } as const;
     /**
      * Returns a list of medias and channels ordered by add date or creation date. Requests can take some time
      * due to permissions checks. The API call is limited to date query in antichronological order for the moment.
      */
-    '/latest': APIRouteSpecification<MSRoutesSpec> = {
+    '/latest' = {
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
         url: '/latest/',
         method: 'GET',
         mode: 'cors',
-    };
+    } as const;
     /** Returns a list of channels */
-    '/channels': APIRouteSpecification<MSRoutesSpec> = {
+    '/channels' = {
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
         url: '/channels/',
         headers: {
             'Accept-Language': 'fr'
@@ -69,68 +73,75 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         // credentials: 'include',
         method: 'GET',
         mode: 'cors',
-    };
+    } as const;
     /** Returns a list of channels (as a tree) */
-    '/channels/tree': APIRouteSpecification<MSRoutesSpec> = {
+    '/channels/tree' = {
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
         url: '/channels/tree/',
         method: 'GET',
         mode: 'cors',
-    };
+    } as const;
     /** Returns the path to access a channel or a media. The first item in the result list have no parents. */
-    '/channels/path': APIRouteSpecification<MSRoutesSpec> = {
+    '/channels/path' = {
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
         url: '/channels/path/',
         method: 'GET',
         mode: 'cors',
-    };
+    } as const;
     /** Returns the list of all media and sub channels in a channel */
-    '/channels/content': APIRouteSpecification<MSRoutesSpec> = {
+    '/channels/content' = {
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
         url: '/channels/content/',
         method: 'GET',
         mode: 'cors',
-    };
+    } as const;
     /** Returns info for the requested channel */
-    '/channels/get': APIRouteSpecification<MSRoutesSpec> = {
+    '/channels/get' = {
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
         url: '/channels/get/',
         method: 'GET',
         mode: 'cors',
-    };
+    } as const;
     /** Add a new channel. Omitted fields are unchanged. */
-    '/channels/add': APIRouteSpecification<MSRoutesSpec> = {
+    '/channels/add' = {
         url: '/channels/add/',
         method: 'POST',
         mode: 'cors',
-        requestContentType: MIMETypes.JSON,
-    };
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
+    } as const;
     /** Edit an existing channel. Omitted fields are unchanged. */
-    '/channels/edit': APIRouteSpecification<MSRoutesSpec> = {
+    '/channels/edit' = {
         url: '/channels/edit/',
         method: 'POST',
         mode: 'cors',
         requestContentType: MIMETypes.XWWWFormUrlencoded,
-    };
+    } as const;
     /** Returns the object id of the users's personnal channel if he can have one, else a 403 will be returned.
       * The personal channel will be created  if it was not already created. If no user is specified, the user making the request will be used. */
-    '/channels/personal': APIRouteSpecification<MSRoutesSpec> = {
+    '/channels/personal' = {
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
         url: '/channels/personal',
         method: 'GET',
         mode: 'cors',
-    };
+    } as const;
     /** Delete a channel */
-    '/channels/delete': APIRouteSpecification<MSRoutesSpec> = {
+    '/channels/delete' = {
         url: '/channels/delete/',
         method: 'POST',
         mode: 'cors',
-        requestContentType: MIMETypes.JSON,
-    };
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
+    } as const;
     /** Returns info for the requested media */
-    '/medias/get': APIRouteSpecification<MSRoutesSpec> = {
+    '/medias/get' = {
         url: '/medias/get/',
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
         method: 'GET',
         mode: 'cors',
-    };
+    } as const;
     /** Returns the metadata zip for the requested media. The user making the request must have the community settings edition permission. */
-    '/medias/get/zip': APIRouteSpecification<MSRoutesSpec> = {
+    '/medias/get/zip' = {
         url: '/medias/get/zip/',
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
         method: 'GET',
         mode: 'cors',
         expectedResponses: {
@@ -138,39 +149,40 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
                 expectedContentTypes: [MIMETypes.ZIP]
             }
         }
-    };
+    } as const;
     /** This url can be used to add a new media using a metadata zip package, a media file or an upload id code. */
-    '/medias/add': APIRouteSpecification<MSRoutesSpec> = {
+    '/medias/add' = {
         url: '/medias/add/',
         method: 'POST',
         mode: 'cors',
-        requestContentType: MIMETypes.JSON,
-    };
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
+    } as const;
     /** Edit an existing media. Omitted fields are unchanged. */
-    '/medias/edit': APIRouteSpecification<MSRoutesSpec> = {
+    '/medias/edit' = {
         url: '/medias/edit/',
         method: 'POST',
         mode: 'cors',
-        requestContentType: MIMETypes.JSON,
-    };
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
+    } as const;
     /** Delete the requested media */
-    '/medias/delete': APIRouteSpecification<MSRoutesSpec> = {
+    '/medias/delete' = {
         url: '/medias/delete/',
         method: 'POST',
         mode: 'cors',
-        requestContentType: MIMETypes.JSON,
-    };
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
+    } as const;
     /** Set a thumbnail image to a media */
-    '/medias/add-thumb': APIRouteSpecification<MSRoutesSpec> = {
+    '/medias/add-thumb' = {
         url: '/medias/add-thumb/',
         method: 'POST',
         mode: 'cors',
-        requestContentType: MIMETypes.JSON,
-    };
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
+    } as const;
     /** Returns a list of users. Requires the 'can_change_users' permission or the 'can_use_permissions_tab' permission. */
-    '/users': APIRouteSpecification<MSRoutesSpec> = {
+    '/users' = {
         url: '/users/',
         method: 'GET',
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
         mode: 'cors',
-    };
+    } as const;
 }

@@ -193,6 +193,7 @@ test('User test ok', async () => {
         .expect(200)
         .expect({
             error: false,
+            username: 'bob12',
             apiKey: 'api-key'
         });
 });
@@ -228,6 +229,7 @@ test('User disconnect', async () => {
         .expect(200)
         .expect({
             error: false,
+            username: 'bob12',
             apiKey: 'api-key'
         });
 

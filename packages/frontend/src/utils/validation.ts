@@ -1,5 +1,5 @@
 import { parse } from 'date-fns';
-import { JSONInnerArray, JSONInnerObject, JSONInnerObjectContent } from 'utils/api-client';
+import { JSONInnerObject, JSONInnerObjectContent } from 'utils/api-client';
 
 /** A Type<T> is the representation of the type T\
  * For a string, it will simply be 'string' (used in a typeof)\
@@ -142,7 +142,6 @@ export function asJsonObjectArray(value: JSONInnerObjectContent): JSONInnerObjec
         if (valid) {
             return value as JSONInnerObject[];
         }
-        
     }
 }
 

@@ -4,17 +4,6 @@
  * @version 0.1
  */
 
-/** Shorthand for a commonly used object type.
- *
- * Equivalent of
- * ```ts
- * {[key: string] : T}
- * ```
-*/
-export interface ObjectMap<T> {
-    [key: string]: T;
-}
-
 /** Valid JSON object. Can safely be stringified to JSON. */
 export type JSONObject = JSONInnerObject | JSONInnerArray;
 
@@ -411,6 +400,8 @@ export interface APIRouteSpecification<R extends APIRoutesSpecification<R>> {
     readonly url: string;
     /** Method used for the request */
     readonly method: 'GET' | 'POST' | 'HEAD' | 'PUT' | 'DELETE' | 'PATCH';
+    /** Content type used for the request. */
+    readonly requestContentType: MIMETypes;
     /** Mode used for the request */
     readonly mode?: 'cors' | 'no-cors' | 'navigate' | 'same-origin';
     /** A string indicating whether credentials will be sent with the request always, never, or only when sent to a same-origin URL. Sets request's credentials. */
@@ -428,9 +419,7 @@ export interface APIRouteSpecification<R extends APIRoutesSpecification<R>> {
      * 
      * The method must be GET.
     */
-    readonly baseQueryParams?: ObjectMap<string>;
-    /** Content type used for the request. */
-    readonly requestContentType?: MIMETypes;
+    readonly baseQueryParams?: Record<string, string>;
     /** Specification of all expected responses, according to the API documentation. */
     readonly expectedResponses?: APIResponseHandlingSpecification<R>;
     /** How should a fetch error be handled for this route ? */
@@ -447,7 +436,7 @@ export interface APIRouteSpecification<R extends APIRoutesSpecification<R>> {
      * This example will replace `#{token}` with the value of the Cookie named "token".
      * If such cookie does not exist, it will be replaced by an empty string. //TODO handle that error correctly
      */
-    readonly headers?: ObjectMap<string>;
+    readonly headers?: Record<string, string>;
 }
 
 /**

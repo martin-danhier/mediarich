@@ -5,6 +5,7 @@ const resolve = require('resolve');
 const paths = require('./paths');
 const nodeExternals = require('webpack-node-externals');
 
+
 module.exports = function (webpackEnv) {
 
     const isEnvDevelopment = webpackEnv === 'development';
@@ -36,7 +37,12 @@ module.exports = function (webpackEnv) {
                 }
             ]
         },
-        externals: [nodeExternals()],
+        externals: [nodeExternals({
+            modulesDir: paths.appNodeModules,
+            additionalModuleDirs: [
+                paths.rootNodeModules,
+            ]
+        })],
         plugins: [
             new ForkTsCheckerWebpackPlugin({
                 

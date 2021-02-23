@@ -2,7 +2,7 @@ import { JSONInnerObject, JSONInnerObjectContent } from 'utils/api-client';
 import MediaServerAPIHandler from '../mediaserver-api-hanler';
 import { MediaServerError } from '../types';
 import * as assert from 'utils/assert/assert';
-import { as, asDate } from '../utils';
+import { as, asDate } from '../../validation';
 
 export default abstract class MSContent {
     // Ref to the mediaserver api handler object
