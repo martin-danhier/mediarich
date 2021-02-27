@@ -1,8 +1,8 @@
 {
     "coverage-gutters.customizable.context-menu": false,
     "eslint.workingDirectories": [
-        "backend/src",
-        "frontend/src"
+        "packages/backend/src",
+        "packages/frontend/src"
     ],
     "eslint.validate": [
         "javascript",
@@ -44,4 +44,5 @@
     "explorerExclude.backup": null,
     "jestTestExplorer.featureToggles": [],
     "typescript.tsdk": ".\\node_modules\\typescript\\lib",
+    "python.pythonPath": "C:\\Users\\marti\\scoop\\apps\\python\\current\\python.exe",
 }

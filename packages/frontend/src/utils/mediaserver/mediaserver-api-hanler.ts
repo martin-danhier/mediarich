@@ -146,6 +146,28 @@ class MediaServerAPIHandler {
         }
 
     }
+
+    /**
+     * Find the channel of the current user
+     * @param createIfDoesNotExist If the channel is not found, create it. Requires the permission to have one.
+     * @returns the channel if found or created, or null
+     * @throws MediaServerError if an unexpected error occured (e.g. the API did not return a valid JSON)
+     */
+    public async myChannel(createIfDoesNotExist = false): Promise<MSChannel | null> {
+        // Call the API
+        const result = await this.call('/channels/personal', {
+            create: createIfDoesNotExist ? 'yes' : 'no',
+        });
+
+        if (result.success) {
+            // Return the channel
+            return MSChannel.fromJSON(result, this);
+
+        } else {
+            console.error(result);
+            return null;
+        }
+    }
 }
 
 export default MediaServerAPIHandler;

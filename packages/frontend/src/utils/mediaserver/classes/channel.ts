@@ -1,6 +1,6 @@
 import { JSONInnerObject } from 'utils/api-client';
 import MediaServerAPIHandler from '../mediaserver-api-hanler';
-import { MediaServerError } from '../types';
+import { MediaServerError, MSChannelEditBody } from '../types';
 import { as, asEnum, asJsonObject, asJsonObjectArray } from '../../validation';
 import MSContent from './content';
 import { MSVideo } from './video';
@@ -153,41 +153,13 @@ export default class MSChannel extends MSContent {
         }
     }
 
-    /**
-     * Moves this channel to another channel. Requires edition permission on channel
-     * and edition permission of publishing settings.
-     * @param newParent The channel (or its oid) that will be the new parent of this channel.
-     * @returns success or not
-     */
-    public async move(newParent: MSChannel | string): Promise<boolean> {
-        // Move the channel
-        return await this.edit({
-            parent: newParent,
-        });
-    }
+
 
     /** Edits this channel. Requires edition permission on channel.
      * @param params The values to update. Omit one to ignore it.
      * @returns success or not
      */
-    public async edit(params: {
-        /** New title of the channel */
-        title?: string;
-        /** New sorting of the channel */
-        sorting?: MSChannelSorting;
-        /** New language of the channel */
-        language?: string;
-        /** New thumbnail of the channel (a file is expected) */
-        thumb?: string;
-        /** Oid of a video. The thumbnail will be used for the channel */
-        thumb_oid?: string;
-        /** Set to true to remove the thumbnail */
-        thumb_remove?: boolean;
-        /** New parent (move the channel) */
-        parent?: MSChannel | string;
-        /** Requires edition permission + edition permission of publishing settings */
-        unlisted?: boolean;
-    }): Promise<boolean> {
+    public async edit(params: MSChannelEditBody): Promise<boolean> {
 
         // Call the API
         const usedParams: {
@@ -203,15 +175,22 @@ export default class MSChannel extends MSContent {
         } = {
             oid: this._oid,
         };
+
         // Add the fields that are present
-        if (params.parent) usedParams.parent = typeof params.parent === 'string' ? params.parent : params.parent._oid;
-        if (params.unlisted) usedParams.unlisted = params.unlisted === true ? 'yes' : 'no';
-        if (params.language) usedParams.language = params.language;
+        if (params.parent) {
+            const newParentOid = typeof params.parent === 'string' ? params.parent : params.parent._oid;
+            // Don't set a channel as its own child
+            if (newParentOid !== this._oid) {
+                usedParams.parent = newParentOid;
+            }
+        }
+        if (params.unlisted !== undefined) usedParams.unlisted = params.unlisted ? 'yes' : 'no';
+        if (params.language !== undefined) usedParams.language = params.language;
         if (params.sorting) usedParams.sorting = params.sorting;
         if (params.thumb) usedParams.thumb = params.thumb;
         if (params.thumb_oid) usedParams['thumb_oid'] = params.thumb_oid;
-        if (params.thumb_remove) usedParams['thumb_remove'] = params.thumb_remove === true ? 'yes' : 'no';
-        if (params.title) usedParams.title = params.title;
+        if (params.thumb_remove !== undefined) usedParams['thumb_remove'] = params['thumb_remove'] ? 'yes' : 'no';
+        if (params.title !== undefined) usedParams.title = params.title;
 
         const result = await this._mediaServerAPIHandler.call('/channels/edit', usedParams);
 
@@ -221,6 +200,75 @@ export default class MSChannel extends MSContent {
         else {
             console.error(result);
             return false;
+        }
+    }
+
+    public async delete(): Promise<boolean> {
+        // Call the API
+        const result = await this._mediaServerAPIHandler.call('/channels/delete', {
+            oid: this._oid,
+            'delete_content': 'yes',
+            'delete_resources': 'yes'
+        });
+
+        // Handle result
+        if (result.success) {
+            return true;
+        }
+        else {
+            console.error(result);
+            return false;
+        }
+    }
+
+    /**
+     * Creates a new channel as a subchannel of the current channel
+     * @param params Parameters of the added channel
+     * @returns the new channel if success, null otherwise
+     * @throws MediaServerError in case of unexpected error (e.g. invalid response from the API)
+     */
+    public async addSubchannel(params: {
+        /** The title of the new channel */
+        title: string;
+        /** The slug of the channel (used in the URL for example) */
+        slug?: string;
+        /** The sorting settings of the channel */
+        sorting?: MSChannelSorting;
+        /** The language of the new channel */
+        language?: string;
+    }): Promise<MSChannel | null> {
+
+        // Define parameters sent to the route
+        const usedParams: {
+            // TODO parent_oid is deprecated in the API reference. However, "parent", the new option to use,
+            // does not work with the unamur server (maybe they still are using an old version).
+            // When "parent" works, remove "parent_oid"
+            'parent_oid': string;
+            parent: string;
+            title: string;
+            slug?: string;
+            sorting?: string;
+            language?: string;
+        } = {
+            'parent_oid': this._oid,
+            parent: this._oid,
+            title: params.title,
+        };
+        // Add other fields if present
+        if (params.slug) usedParams.slug = params.slug;
+        if (params.language) usedParams.language = params.language;
+        if (params.sorting) usedParams.sorting = params.sorting;
+
+        // Call the API
+        const result = await this._mediaServerAPIHandler.call('/channels/add', usedParams);
+
+        // Handle result
+        if (result.success) {
+            return MSChannel.fromJSON(result, this._mediaServerAPIHandler);
+        }
+        else {
+            console.error(result);
+            return null;
         }
     }
 }

@@ -491,7 +491,7 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
      * @returns the same object, with every value serialized to string
      */
     private static jsonToRecord(json: JSONInnerObject): Record<string, string> {
-        let record: Record<string, string> = {};
+        const record: Record<string, string> = {};
 
         for (const key in json) {
 

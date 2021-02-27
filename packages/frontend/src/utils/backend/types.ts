@@ -1,4 +1,4 @@
-import { JSONInnerObject } from "utils/api-client";
+import { JSONInnerObject } from 'utils/api-client';
 
 export type MediarichResponseJSON = { error: boolean } & JSONInnerObject;
 
@@ -11,7 +11,7 @@ export interface UserAddBody extends JSONInnerObject {
     username: string;
     password: string;
     apiKey: string;
-};
+}
 
 /**
  * Exit status of a /user/add route
@@ -23,7 +23,7 @@ export enum UserAddResult {
     Conflict,
     /** There was an error, see logs */
     Error
-};
+}
 
 // == Login ==
 

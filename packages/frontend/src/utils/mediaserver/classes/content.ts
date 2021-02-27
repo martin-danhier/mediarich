@@ -1,12 +1,12 @@
 import { JSONInnerObject, JSONInnerObjectContent } from 'utils/api-client';
 import MediaServerAPIHandler from '../mediaserver-api-hanler';
-import { MediaServerError } from '../types';
-import * as assert from 'utils/assert/assert';
+import { MSContentEditBody } from '../types';
 import { as, asDate } from '../../validation';
-
+import MSChannel from './channel';
 export default abstract class MSContent {
     // Ref to the mediaserver api handler object
     protected _mediaServerAPIHandler: MediaServerAPIHandler;
+
     // Data of the content
     protected _oid: string;
     protected _dbid?: number;
@@ -109,6 +109,7 @@ export default abstract class MSContent {
             await this.fetchInfos(requiresFullFetch);
         }
         // Then return the field
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return this[field as keyof this] as any; // This is not ideal, but Typescript will have to trust us
     }
 
@@ -172,4 +173,29 @@ export default abstract class MSContent {
      * @param full Should fetch all infos or not
      */
     public abstract fetchInfos(full: boolean): Promise<void>;
+
+    /**
+     * Moves this content to another channel. Requires edition permission on content
+     * and edition permission of publishing settings.
+     * @param newParent The channel (or its oid) that will be the new parent of this channel.
+     * @returns success or not
+     */
+    public async move(newParent: MSChannel | string): Promise<boolean> {
+        // Move the content.
+        // Since parent is common between videos and channels, it works
+        return await this.edit({
+            parent: newParent,
+        });
+    }
+
+    /** Edits the given content. Requires edition permission on the content.
+     * @param params The values to update. Omit one to ignore it.
+     * @returns success or not
+     */
+    public abstract edit(params: MSContentEditBody): Promise<boolean>;
+
+    /** Deletes the given content. Requires canDelete permission on the content.
+     * @returns success or not. This object will not be usable afterwards in case of success !
+     */
+    public abstract delete(): Promise<boolean>;
 }

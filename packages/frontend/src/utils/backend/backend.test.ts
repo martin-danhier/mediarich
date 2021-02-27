@@ -1,8 +1,6 @@
-import fetch, { FetchMock, MockResponseInit } from 'jest-fetch-mock';
-import Cookies from 'js-cookie';
+import fetch, { MockResponseInit } from 'jest-fetch-mock';
 import { JSONInnerObject } from 'utils/api-client';
-import MediarichAPIHandler from '.';
-import { UserAddResult, UserLoginResult } from './types';
+import { MediarichAPIHandler, UserAddResult, UserLoginResult } from '.';
 
 /** Helper function that generate a mock response */
 function mockUserResponse(status: number, json: JSONInnerObject, headers?: Record<string, string>): Promise<MockResponseInit> {

@@ -1,8 +1,9 @@
 import { JSONInnerObject } from 'utils/api-client';
 import MediaServerAPIHandler from '../mediaserver-api-hanler';
-import { MediaServerError } from '../types';
+import { MediaServerError, MSVideoEditBody } from '../types';
 import { as, asDate, asEnum, asJsonObject } from '../../validation';
 import MSContent from './content';
+import { format } from 'date-fns';
 
 export enum VideoLayout {
     /** Regular video */
@@ -105,6 +106,10 @@ export class MSVideo extends MSContent {
         this._duration = as('string', json.duration);
     }
 
+    /**
+     * Calls the API to update all the fields of this video.
+     * @param full If set to false, only some informations will be fetched. If true, all infos will be fetched.
+     */
     public async fetchInfos(full: boolean): Promise<void> {
         const result = await this._mediaServerAPIHandler.call('/medias/get', {
             oid: this._oid,
@@ -119,6 +124,88 @@ export class MSVideo extends MSContent {
                 this.updateFieldsFromJson(infoJson);
 
             }
+        }
+    }
+
+    public async edit(params: MSVideoEditBody): Promise<boolean> {
+
+        const usedParams: {
+            oid: string;
+            title?: string;
+            description?: string;
+            keywords?: string;
+            language?: string;
+            categories?: string;
+            thumb?: string;
+            'thumb_index'?: number;
+            'thumb_remove'?: string;
+            transcription?: string;
+            slug?: string;
+            channel?: string;
+            validated?: string;
+            'start_publication_date'?: string;
+            'end_publication_date'?: string;
+            unlisted?: string;
+            speaker?: string;
+            'speaker_email'?: string;
+            'speaker_id'?: string;
+            company?: string;
+            'company_url'?: string;
+            license?: string;
+        } = {
+            oid: this._oid,
+        };
+
+        // Add fields that are present and convert them in the right format
+        if (params.title !== undefined) usedParams.title = params.title;
+        if (params.parent) usedParams.channel = typeof params.parent === 'string' ? params.parent : params.parent.oid;
+        if (params.description !== undefined) usedParams.description = params.description;
+        if (params.keywords !== undefined) usedParams.keywords = params.keywords.join(',');
+        if (params.language !== undefined) usedParams.language = params.language;
+        if (params.categories !== undefined) usedParams.categories = params.categories.join('\n');
+        if (params.thumb) usedParams.thumb = params.thumb;
+        if (params.thumb_index !== undefined) usedParams['thumb_index'] = params.thumb_index;
+        if (params.thumb_remove !== undefined) usedParams['thumb_remove'] = params.thumb_remove ? 'yes' : 'no';
+        if (params.transcription !== undefined) usedParams['transcription'] = params.transcription;
+        if (params.slug) usedParams.slug = params.slug;
+        if (params.validated !== undefined) usedParams.validated = params.validated ? 'yes' : 'no';
+        if (params.start_publication_date) usedParams['start_publication_date'] = format(params.start_publication_date, 'yyyy-MM-dd HH:mm:ss');
+        if (params.end_publication_date) usedParams['end_publication_date'] = format(params.end_publication_date, 'yyyy-MM-dd HH:mm:ss');
+        if (params.unlisted !== undefined) usedParams.unlisted = params.unlisted ? 'yes' : 'no';
+        if (params.speaker !== undefined) usedParams.speaker = params.speaker;
+        if (params.speaker_email !== undefined) usedParams['speaker_email'] = params.speaker_email;
+        if (params.speaker_id) usedParams['speaker_id'] = params.speaker_id;
+        if (params.company !== undefined) usedParams.company = params.company;
+        if (params.company_url !== undefined) usedParams['company_url'] = params.company_url;
+        if (params.license !== undefined) usedParams.license = params.license;
+
+        // Call the API
+        const result = await this._mediaServerAPIHandler.call('/medias/edit', usedParams);
+
+        if (result.success) {
+            return true;
+        }
+        else {
+            console.error(result);
+            return false;
+        }
+    }
+
+    public async delete(): Promise<boolean> {
+        // Call the API
+        const result = await this._mediaServerAPIHandler.call('/medias/delete', {
+            oid: this._oid,
+            'delete_metadata': 'yes',
+            'delete_resources': 'yes',
+        });
+
+        // Handle result
+        if (result.success) {
+            return true;
+        }
+        else {
+            console.error(result);
+            return false;
         }
     }
 

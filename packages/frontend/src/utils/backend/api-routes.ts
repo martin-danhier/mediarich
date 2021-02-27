@@ -1,4 +1,4 @@
-import { APIResponseHandlingSpecification, APIRouteSpecification, APIRoutesSpecification, APISpecification, HTTPStatusCodes, MIMETypes } from "utils/api-client";
+import { APIResponseHandlingSpecification,  APIRoutesSpecification, APISpecification, HTTPStatusCodes, MIMETypes } from 'utils/api-client';
 
 /**
  * Specification of the Mediarich API

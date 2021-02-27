@@ -1,8 +1,8 @@
-import { APIRouteSpecification, APIRoutesSpecification, APISpecification, ErrorHandlingSpecification, HTTPStatusCodes, MIMETypes } from 'utils/api-client';
+import { APIRoutesSpecification, APISpecification, ErrorHandlingSpecification, HTTPStatusCodes, MIMETypes } from 'utils/api-client';
 
 /**
  * Specification of the Mediaserver API.
- * 
+ *
  * @see https://ubicast.tv/static/mediaserver/docs/api/api.html Official documentation
  */
 export class MSApiSpecification implements APISpecification<MSRoutesSpec> {
@@ -120,7 +120,7 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
       * The personal channel will be created  if it was not already created. If no user is specified, the user making the request will be used. */
     '/channels/personal' = {
         requestContentType: MIMETypes.XWWWFormUrlencoded,
-        url: '/channels/personal',
+        url: '/channels/personal/',
         method: 'GET',
         mode: 'cors',
     } as const;
