@@ -11,8 +11,12 @@ import { addDays } from 'date-fns/esm';
 import Cookies from 'js-cookie';
 import React from 'react';
 
+interface LanguageSwitcherProps {
+    alignTopRight?: boolean;
+}
+
 /** Button to cycle through the available languages */
-class LanguageSwitcher extends React.Component {
+class LanguageSwitcher extends React.Component<LanguageSwitcherProps> {
     static contextType = LocalizationContext;
 
     /** Triggers on click. Cycles through the languages */
@@ -35,20 +39,28 @@ class LanguageSwitcher extends React.Component {
     }
 
     render(): JSX.Element {
-        return (
-            <LocalizationConsumer>
-                {(localization): JSX.Element => {
-                    return (
-                        <Button
-                            onClick={(e): void => this.handleButtonClick(e, localization.name)}
-                        >
-                            {localization.name}
-                        </Button>
-                    );
-                }}
-            </LocalizationConsumer>
-        );
+        // Create the consumer
+        const consumer = <LocalizationConsumer>
+            {(localization): JSX.Element => {
+                return (
+                    <Button
+                        onClick={(e): void => this.handleButtonClick(e, localization.name)}
+                    >
+                        {localization.name}
+                    </Button>
+                );
+            }}
+        </LocalizationConsumer>;
+
+
+        // If it should be aligned, wrap it in a div
+        return this.props.alignTopRight ?
+            <div className="alignContent-topRightAbsolute">
+                {consumer}
+            </div> : consumer;
     }
 }
+
+
 
 export default LanguageSwitcher;

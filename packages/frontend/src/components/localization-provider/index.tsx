@@ -64,7 +64,7 @@ export class LocalizationProvider extends React.Component<LocalizationProviderPr
     render(): JSX.Element {
         if (this.state.strings === undefined) {
             // Load when undefined
-            return <LoadingScreen />;
+            return <LoadingScreen hideText />;
         }
         else {
             // Use a provider when defined

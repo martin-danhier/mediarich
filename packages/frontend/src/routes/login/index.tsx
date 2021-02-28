@@ -24,9 +24,7 @@ class Login extends React.Component<Partial<RouteComponentProps>> {
         return (
             <>
                 {/* Place the language switcher at the top right */}
-                <div className="alignContent-topLeftAbsolute">
-                    <LanguageSwitcher />
-                </div>
+                <LanguageSwitcher alignTopRight />
 
                 { /* Place the body at the center */}
                 <LocalizationConsumer>
