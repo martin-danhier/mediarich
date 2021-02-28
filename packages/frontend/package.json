@@ -3,8 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js"
+    "build": "node scripts/build.js",
+    "start": "node scripts/start.js"
+  },
+  "babel": {
+    "presets": [
+      "react-app"
+    ],
+    "plugins": [
+      "@babel/plugin-syntax-dynamic-import"
+    ]
   },
   "browserslist": {
     "production": [
@@ -18,8 +26,17 @@
       "last 1 safari version"
     ]
   },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "resolutions": {
+    "immer": "^8.0.1"
+  },
   "dependencies": {
     "@babel/core": "7.9.0",
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.57",
     "@svgr/webpack": "4.3.3",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
@@ -64,8 +81,9 @@
     "postcss-safe-parser": "4.0.1",
     "react": "^16.13.1",
     "react-app-polyfill": "^1.0.6",
-    "react-dev-utils": "^10.2.1",
+    "react-dev-utils": "^11.0.2",
     "react-dom": "^16.13.1",
+    "react-localization": "^1.0.16",
     "react-router-dom": "^5.2.0",
     "resolve": "1.15.0",
     "resolve-url-loader": "^3.1.2",
@@ -82,17 +100,11 @@
     "workbox-webpack-plugin": "4.3.1"
   },
   "devDependencies": {
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@types/react-router-dom": "^5.1.7",
     "@typescript-eslint/eslint-plugin": "^2.10.0",
     "@typescript-eslint/parser": "^2.10.0",
     "eslint": "^6.6.0",
     "eslint-config-react-app": "^5.2.1"
-  },
-  "babel": {
-    "presets": [
-      "react-app"
-    ]
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   }
 }

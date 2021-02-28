@@ -1,0 +1,17 @@
+{
+    "name": "en",
+    "LoadingScreen": {
+        "loading": "Loading ..."
+    },
+    "Login": {
+        "username": "Username",
+        "password": "Password",
+        "login": "Log in",
+        "register": "Sign up",
+        "description": "Enhanced media management platform for medias.unamur.be"
+    },
+    "Error404": {
+        "error404": "Error 404",
+        "pageNotFound": "The page you're trying to reach does not exist."
+    }
+}

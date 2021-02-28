@@ -1,9 +1,8 @@
 import React from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 import * as assert from 'utils/assert/assert';
-import MediaServerAPIHandler from 'utils/mediaserver/mediaserver-api-hanler';
-import { findAsync } from 'utils/useful-functions';
 
-interface HomeProps {
+interface HomeProps extends Partial<RouteComponentProps> {
     name: string;
     title?: string;
 }

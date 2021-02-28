@@ -1,0 +1,127 @@
+/**
+@file Global CSS file used in the entire app.
+@author Martin Danhier
+@version 1.0
+*/
+
+/* === DEFINE BASE CSS FOR ELEMENTS === */
+
+html {
+
+    /* Take the whole height */
+    min-height: 100vh;
+
+    /* 10px simplification
+    By default, 1rem is equivalent to 16px.
+    To have an easier time expressing sizes in rem, we set it to 62.5% of its original size.
+    Since 62.5% of 16 is 10, a rem is now equivalent to 10px, which is easier to imagine. */
+    font-size: 62.5%;
+}
+
+body {
+    /* Take the whole height */
+    min-height: 100vh;
+}
+
+#root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* === DEFINE COMMON CLASSES === */
+
+/* Useful flex classes */
+
+.centerContent {
+    /* Center the content in a flex */
+    display: flex !important;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+.expand {
+    flex-grow: 1;
+}
+.fullHeight {
+    height: 100%;
+}
+.fullWidth {
+    width: 100%;
+}
+.alignContent-right{
+    display: flex !important;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+}
+.alignContent-topLeftAbsolute {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+/* Common paddings */
+
+.padding-top {
+    padding-top: 1.4rem !important;
+}
+.padding-bottom {
+    padding-bottom: 1.4rem !important;
+}
+.padding-left {
+    padding-left: 1.4rem !important;
+}
+.padding-right {
+    padding-right: 1.4rem !important;
+}
+.padding-vertical {
+    padding-top: 1.4rem !important;
+    padding-bottom: 1.4rem !important;
+}
+.padding-horizontal {
+    padding-left: 1.4rem !important;
+    padding-right: 1.4rem !important;
+}
+.padding-all {
+    padding: 1.4rem !important;
+}
+
+/* Common margins */
+
+.margin-top {
+    margin-top: 1.4rem !important;
+}
+.margin-bottom {
+    margin-bottom: 1.4rem !important;
+}
+.margin-left {
+    margin-left: 1.4rem !important;
+}
+.margin-right {
+    margin-right: 1.4rem !important;
+}
+.margin-vertical {
+    margin-top: 1.4rem !important;
+    margin-bottom: 1.4rem !important;
+}
+.margin-horizontal {
+    margin-left: 1.4rem !important;
+    margin-right: 1.4rem !important;
+}
+.margin-all {
+    margin: 1.4rem !important;
+}
+
+/* Buttons */
+
+.buttonBar {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, auto));
+    gap: 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}

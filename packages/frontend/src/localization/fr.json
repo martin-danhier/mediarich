@@ -1,0 +1,17 @@
+{
+    "name": "fr",
+    "LoadingScreen": {
+        "loading": "Chargement ..."
+    },
+    "Login": {
+        "username": "Nom d'utilisateur",
+        "password": "Mot de passe",
+        "login": "Se connecter",
+        "register": "S'inscrire",
+        "description": "Plateforme de gestion de médias pour medias.unamur.be"
+    },
+    "Error404": {
+        "error404": "Erreur 404",
+        "pageNotFound": "La page que vous essayez d'atteindre n'a pas été trouvée."
+    }
+}

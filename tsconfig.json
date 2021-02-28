@@ -2,6 +2,8 @@
     "compilerOptions": {
         "target": "es6",
         "lib": [
+            "dom",
+            "dom.iterable",
             "esnext"
         ],
         "experimentalDecorators": true,
@@ -17,5 +19,6 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "strictNullChecks": true,
+        "jsx": "react",
     },
 }
