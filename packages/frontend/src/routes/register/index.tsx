@@ -21,6 +21,7 @@ import { MediarichAPIHandler, UserAddResult } from 'utils/backend';
 
 class Register extends React.Component<Partial<RouteComponentProps>> {
 
+    // Link to mediaserver context to be able to login with the api key
     context!: React.ContextType<typeof MediaServerContext>;
     static contextType = MediaServerContext;
 

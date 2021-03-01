@@ -115,8 +115,8 @@ class FormContent<T extends FormValues<T>> extends React.Component<FormProps<T>,
             }
         }
 
-        // Validate with callback
-        if (this.props.validateSubmit) {
+        // Validate with callback, if still ok (no required field missing)
+        if (ok && this.props.validateSubmit) {
             const result = await this.props.validateSubmit(this.state.values);
             ok = result.ok;
             errors = {

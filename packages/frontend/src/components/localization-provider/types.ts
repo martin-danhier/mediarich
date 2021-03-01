@@ -34,6 +34,7 @@ export interface Localization {
             invalidApiKey: string;
             wrongCredentials: string;
             unknownError: string;
+            apiKeyNoLongerValid: string;
         };
     };
     Error404: {

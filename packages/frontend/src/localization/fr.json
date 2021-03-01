@@ -28,7 +28,8 @@
             "usernameTaken": "Ce nom d'utilisateur est déjà pris.",
             "invalidApiKey": "Clé d'API invalide.",
             "wrongCredentials": "Nom d'utilisateur ou mot de passe incorrect.",
-            "unknownError": "Une erreur inconnue est survenue."
+            "unknownError": "Une erreur inconnue est survenue.",
+            "apiKeyNoLongerValid": "La clé d'API liée à votre compte n'est plus valide. Veuillez contacter votre administrateur MediaServer ou créer un nouveau compte avec une autre clé."
         }
     },
     "Error404": {

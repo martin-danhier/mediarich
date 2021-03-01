@@ -28,7 +28,8 @@
             "usernameTaken": "Username already taken.",
             "invalidApiKey": "Invalid API key",
             "wrongCredentials": "Username or password incorrect.",
-            "unknownError": "An unknown error occured."
+            "unknownError": "An unknown error occured.",
+            "apiKeyNoLongerValid": "The API key linked with your account is no longer valid. Please contact your MediaServer administrator or create a new account with another key."
         }
     },
     "Error404": {
