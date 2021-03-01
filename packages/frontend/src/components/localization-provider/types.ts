@@ -12,16 +12,36 @@ export interface Localization {
     LoadingScreen: {
         loading: string;
     };
-    Login: {
+    Auth: {
         username: string;
         password: string;
+        newPassword: string;
+        repeatPassword: string;
         login: string;
+        backToLogin: string;
         register: string;
         description: string;
+        apiKey: string;
+        apiKeyTutorial: {
+            title: string;
+            info: string;
+            warning: string;
+            steps: string[];
+        };
+        errors: {
+            pwdMustMatch: string;
+            usernameTaken: string;
+            invalidApiKey: string;
+            wrongCredentials: string;
+            unknownError: string;
+        };
     };
     Error404: {
         error404: string;
         pageNotFound: string;
+    };
+    Form: {
+        required: string;
     };
 }
 
@@ -29,8 +49,8 @@ export interface Localization {
  * The import is done lazily, and webpack will create a separate chunk per localization.
 */
 export const availableLocalisations = {
-    en: async (): Promise<Localization> => await import(/* webpackChunkName: "LocalizationEN" */ 'localization/en.json'),
-    fr: async (): Promise<Localization> => await import(/* webpackChunkName: "LocalizationFR" */ 'localization/fr.json'),
+    en: async (): Promise<Localization> => await import(/* webpackChunkName: "LangEN" */ 'localization/en.json'),
+    fr: async (): Promise<Localization> => await import(/* webpackChunkName: "LangFR" */ 'localization/fr.json'),
 };
 
 // Helper types

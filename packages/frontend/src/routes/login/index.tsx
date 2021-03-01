@@ -32,9 +32,9 @@ class Login extends React.Component<Partial<RouteComponentProps>> {
                     {(localization): JSX.Element => {
 
                         // Loading strings for this component
-                        const strings = localization.Login;
+                        const strings = localization.Auth;
 
-                        return (<Container className='centerContent' maxWidth='sm'>
+                        return (<Container className='alignContent-center' maxWidth='sm'>
                             {/* Icon */}
                             <img src={`${process.env.PUBLIC_URL}/logo.png`} alt='logo' className='Login-logo' />
 
@@ -42,10 +42,10 @@ class Login extends React.Component<Partial<RouteComponentProps>> {
                             <Typography className='margin-bottom' align='center'>{strings.description}</Typography>
 
                             {/* Username */}
-                            <CustomTextField required label={strings.username} />
+                            <CustomTextField required name='username' label={strings.username} />
 
                             {/* Password */}
-                            <CustomTextField required password label={strings.password} />
+                            <CustomTextField required name='password' password label={strings.password} />
 
                             {/* Buttons */}
                             <div className='buttonBar'>

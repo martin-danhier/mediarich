@@ -11,11 +11,13 @@ import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
 import { LocalizationProvider } from 'components/localization-provider';
 import { AvailableLanguage, availableLocalisations } from 'components/localization-provider/types';
 import Cookies from 'js-cookie';
+import { MediaServerProvider } from 'components/mediaserver-provider';
 
 // Import pages in a lazy mode for code splitting
 // Code splitting = only download the code of the page you are visiting
 const Home = React.lazy(() => import('routes/home'));
 const Login = React.lazy(() => import('routes/login'));
+const Register = React.lazy(() => import('routes/register'));
 const Error404 = React.lazy(() => import('routes/error-404'));
 
 // Define theme
@@ -65,22 +67,26 @@ class App extends React.Component {
                 {/* Apply common CSS fixes for modern apps */}
                 <CssBaseline />
 
-                {/* Give the localization manager to the provider */}
-                <LocalizationProvider
-                    defaultLanguage={defaultLanguage as AvailableLanguage}
-                >
-                    {/* Main router of the app */}
-                    <BrowserRouter>
-                        <Switch>
-                            {/* Home page */}
-                            <LazyRoute exact path='/' render={(p): JSX.Element => <Home name='Hey' {...p} />} />
-                            {/* Login page */}
-                            <LazyRoute exact path='/login' render={(p): JSX.Element => <Login {...p} />} />
-                            {/* Fallback to error 404 when nothing else found */}
-                            <LazyRoute render={(p): JSX.Element => <Error404 {...p} />} />
-                        </Switch>
-                    </BrowserRouter>
-                </LocalizationProvider>
+                <MediaServerProvider>
+                    {/* Give the localization manager to the provider */}
+                    <LocalizationProvider
+                        defaultLanguage={defaultLanguage as AvailableLanguage}
+                    >
+                        {/* Main router of the app */}
+                        <BrowserRouter>
+                            <Switch>
+                                {/* Home page */}
+                                <LazyRoute exact path='/' render={(p): JSX.Element => <Home name='Hey' {...p} />} />
+                                {/* Register page */}
+                                <LazyRoute exact path='/register' render={(p): JSX.Element => <Register {...p} />} />
+                                {/* Login page */}
+                                <LazyRoute exact path='/login' render={(p): JSX.Element => <Login {...p} />} />
+                                {/* Fallback to error 404 when nothing else found */}
+                                <LazyRoute render={(p): JSX.Element => <Error404 {...p} />} />
+                            </Switch>
+                        </BrowserRouter>
+                    </LocalizationProvider>
+                </MediaServerProvider>
             </ThemeProvider>
         );
     }

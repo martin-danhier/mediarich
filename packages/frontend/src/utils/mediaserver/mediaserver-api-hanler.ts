@@ -18,7 +18,7 @@ import { asJsonObjectArray, } from '../validation';
  * ```
  */
 class MediaServerAPIHandler {
-
+    
     private _apiKey: string;
 
     /** APIClient handling the MediaServer API. The base URL can be set with the ``REACT_APP_MEDIASERVER_API_ROOT`` environment variable. */
@@ -28,11 +28,12 @@ class MediaServerAPIHandler {
      * Create a new media server
      * @param baseUrl base url of the server.
      * If not set, it will take the value of the environment variable ``REACT_APP_MEDIASERVER_API_ROOT``.
+     * The base URL should NOT include the `/api/v2` part.
      * If still not set, it will default to `http://localhost:8080`.
      */
     public constructor(apiKey: string, baseUrl?: string) {
         this._client = new APIClient<MSApiSpecification, MSRoutesSpec>(
-            new MSApiSpecification(baseUrl ?? process.env.REACT_APP_MEDIASERVER_API_ROOT ?? 'http://localhost:8080')
+            new MSApiSpecification((baseUrl ?? process.env.REACT_APP_MEDIASERVER_API_ROOT ?? 'http://localhost:8080') + '/api/v2')
         );
         this._apiKey = apiKey;
     }

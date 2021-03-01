@@ -7,7 +7,7 @@ import { RouteComponentProps } from 'react-router';
 
 class Error404 extends React.Component<Partial<RouteComponentProps>> {
     render(): JSX.Element {
-        return <div className="centerContent">
+        return <div className="alignContent-center">
             
             <LanguageSwitcher alignTopRight />
 

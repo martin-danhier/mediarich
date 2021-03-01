@@ -3,15 +3,39 @@
     "LoadingScreen": {
         "loading": "Loading ..."
     },
-    "Login": {
+    "Auth": {
         "username": "Username",
         "password": "Password",
+        "newPassword" : "New password",
+        "repeatPassword" : "Repeat password",
         "login": "Log in",
+        "backToLogin": "Go back to login",
         "register": "Sign up",
-        "description": "Enhanced media management platform for medias.unamur.be"
+        "apiKey": "API key",
+        "description": "Enhanced media management platform for medias.unamur.be",
+        "apiKeyTutorial": {
+            "title" : "Where can I find my API key ?",
+            "info": "The API key allows you to log into MediaServer. You only have to give it once.",
+            "warning": "Never send this key to anyone ! Whoever has this key can act on your behalf on MediaServer.",
+            "steps": [
+                "Go to to your {MediaServer account settings}.",
+                "Click on the \"Display my API key\" button.",
+                "Copy the key and paste it in the field above."
+            ]
+        },
+        "errors": {
+            "pwdMustMatch": "Passwords must be the same.",
+            "usernameTaken": "Username already taken.",
+            "invalidApiKey": "Invalid API key",
+            "wrongCredentials": "Username or password incorrect.",
+            "unknownError": "An unknown error occured."
+        }
     },
     "Error404": {
         "error404": "Error 404",
         "pageNotFound": "The page you're trying to reach does not exist."
+    },
+    "Form": {
+        "required": "This field is required."
     }
 }

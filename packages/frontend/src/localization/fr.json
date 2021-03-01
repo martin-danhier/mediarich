@@ -3,15 +3,39 @@
     "LoadingScreen": {
         "loading": "Chargement ..."
     },
-    "Login": {
+    "Auth": {
         "username": "Nom d'utilisateur",
         "password": "Mot de passe",
+        "newPassword" : "Nouveau mot de passe",
+        "repeatPassword" : "Répéter le mot de passe",
         "login": "Se connecter",
+        "backToLogin": "Retour à la connexion",
         "register": "S'inscrire",
-        "description": "Plateforme de gestion de médias pour medias.unamur.be"
+        "apiKey": "Clé d'API",
+        "description": "Plateforme de gestion de médias pour medias.unamur.be",
+        "apiKeyTutorial": {
+            "title" : "Où trouver ma clé d'API ?",
+            "info": "La clé d'API permet de se connecter à votre compte MediaServer. Vous ne devrez l'entrer qu'une seule fois.",
+            "warning": "Ne donnez cette clé à personne ! N'importe qui possédant cette clé peut agir en votre nom sur MediaServer.",
+            "steps": [
+                "Rendez-vous sur la page de votre {compte MediaServer}.",
+                "Cliquez sur le bouton \"Afficher ma clé d'API\".",
+                "Copiez la clé affichée et collez-la dans le champ ci-dessus."
+            ]
+        },
+        "errors": {
+            "pwdMustMatch": "Les mots de passe doivent être identiques.",
+            "usernameTaken": "Ce nom d'utilisateur est déjà pris.",
+            "invalidApiKey": "Clé d'API invalide.",
+            "wrongCredentials": "Nom d'utilisateur ou mot de passe incorrect.",
+            "unknownError": "Une erreur inconnue est survenue."
+        }
     },
     "Error404": {
         "error404": "Erreur 404",
         "pageNotFound": "La page que vous essayez d'atteindre n'a pas été trouvée."
+    },
+    "Form": {
+        "required": "Ce champ est obligatoire."
     }
 }

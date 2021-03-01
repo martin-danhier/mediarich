@@ -33,15 +33,6 @@ body {
 
 /* Useful flex classes */
 
-.centerContent {
-    /* Center the content in a flex */
-    display: flex !important;
-    flex-direction: column;
-    flex-grow: 1;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-}
 .expand {
     flex-grow: 1;
 }
@@ -56,6 +47,15 @@ body {
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
+}
+.alignContent-center {
+    /* Center the content in a flex */
+    display: flex !important;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }
 .alignContent-topRightAbsolute {
     position: absolute;
@@ -124,4 +124,10 @@ body {
     gap: 1rem;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
+}
+
+/* Text */
+
+.alignText-left {
+    text-align: start;
 }

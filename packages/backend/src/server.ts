@@ -6,6 +6,7 @@ import { ContentTypeCheckMiddleware, ErrorHandlerMiddleware, LoggerMiddleware } 
 import session, { SessionOptions } from 'express-session';
 import { getSessionOptions } from './utils';
 import { Sequelize } from 'sequelize-typescript';
+import cors from 'cors';
 import { ok, strictEqual } from 'assert';
 
 /**
@@ -51,6 +52,13 @@ export default class Server {
 
         // Logger: log each request
         this.app.use(LoggerMiddleware);
+        // Cors
+        this.app.use(cors({
+            origin: [
+                'http://localhost:3000'
+            ],
+            methods: ['GET', 'POST'],
+        }));
         // Session: used for authentication
         this.app.use(session(this.sessionOptions));
         // Only accept JSON content types on post requests

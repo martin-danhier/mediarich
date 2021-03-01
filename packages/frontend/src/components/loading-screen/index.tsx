@@ -20,7 +20,7 @@ interface LoadingScreenProps {
 class LoadingScreen extends React.Component<LoadingScreenProps>{
     render(): JSX.Element {
         return (
-            <div className='centerContent'>
+            <div className='alignContent-center'>
                 {/* Hide the text when not needed */}
                 {!this.props.hideText &&
                     /* Loading screen */
