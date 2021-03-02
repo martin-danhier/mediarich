@@ -6,19 +6,20 @@
 
 import LazyRoute from 'components/lazy-route';
 import React from 'react';
-import { BrowserRouter, Switch } from 'react-router-dom';
-import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { unstable_createMuiStrictModeTheme as createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
 import { LocalizationProvider } from 'components/localization-provider';
 import { AvailableLanguage, availableLocalisations } from 'components/localization-provider/types';
 import Cookies from 'js-cookie';
 import { MediaServerProvider } from 'components/mediaserver-provider';
+import Error404 from 'routes/error-404';
 
 // Import pages in a lazy mode for code splitting
 // Code splitting = only download the code of the page you are visiting
 const Home = React.lazy(() => import('routes/home'));
 const Login = React.lazy(() => import('routes/login'));
 const Register = React.lazy(() => import('routes/register'));
-const Error404 = React.lazy(() => import('routes/error-404'));
+const Channel = React.lazy(() => import('routes/channel'));
 
 // Define theme
 const theme = createMuiTheme({
@@ -43,6 +44,19 @@ const theme = createMuiTheme({
         // Tell Material UI that we applied the 10px fix
         // (see global.style.css for details)
         htmlFontSize: 10,
+    },
+    overrides: {
+        MuiToolbar: {
+            regular: {
+                '@media (min-width: 0px) and (orientation: landscape)': {
+                    minHeight: 'var(--MuiToolbar-regular-minHeight)',
+                },
+                '@media (min-width: 600px)': {
+                    minHeight: 'var(--MuiToolbar-regular-minHeight)',
+                },
+                minHeight: 'var(--MuiToolbar-regular-minHeight)',
+            }
+        }
     }
 });
 
@@ -81,8 +95,10 @@ class App extends React.Component {
                                 <LazyRoute exact path='/register' render={(p): JSX.Element => <Register {...p} />} />
                                 {/* Login page */}
                                 <LazyRoute exact path='/login' render={(p): JSX.Element => <Login {...p} />} />
+                                {/* Channel page */}
+                                <LazyRoute path='/channel' render={(p): JSX.Element => <Channel {...p} />} />
                                 {/* Fallback to error 404 when nothing else found */}
-                                <LazyRoute render={(p): JSX.Element => <Error404 {...p} />} />
+                                <Route component={Error404} />
                             </Switch>
                         </BrowserRouter>
                     </LocalizationProvider>

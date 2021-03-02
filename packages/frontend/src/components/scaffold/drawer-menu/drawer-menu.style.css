@@ -1,0 +1,36 @@
+.DrawerMenu-treeView {
+    padding: 1rem 0rem;
+}
+
+.DrawerMenu-treeViewItemLabel {
+    padding: 0;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    border-radius: 0.9rem 0 0 0.9rem;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.DrawerMenu-treeViewIconContainer {
+    margin: 0;
+    width: 0;
+}
+
+.DrawerMenu-treeViewItemGroup {
+    margin-left: 1.5rem;
+}
+
+.DrawerMenu-iconButton {
+    padding: 0.6rem;
+    margin: 0.4rem;
+    width: 3.6rem;
+    height: 3.6rem;
+}
+
+.DrawerMenu-labelText {
+    padding: 1rem 0;
+    display: inline-block;
+}

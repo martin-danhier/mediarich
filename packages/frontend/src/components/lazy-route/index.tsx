@@ -9,7 +9,7 @@ import React, { Suspense, } from 'react';
 import { Route, RouteComponentProps } from 'react-router-dom';
 
 /** Props of a LazyRoute */
-interface LazyRouteProps {
+export interface LazyRouteProps{
     /** Should the route exactly match the path ? */
     exact?: boolean;
     /** Path of the route */

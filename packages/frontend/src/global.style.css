@@ -16,6 +16,9 @@ html {
     To have an easier time expressing sizes in rem, we set it to 62.5% of its original size.
     Since 62.5% of 16 is 10, a rem is now equivalent to 10px, which is easier to imagine. */
     font-size: 62.5%;
+
+    /* Define variables */
+    --MuiToolbar-regular-minHeight: 6rem;
 }
 
 body {

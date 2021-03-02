@@ -1,0 +1,55 @@
+/* appBar */
+
+.Scaffold-appBar {
+    transition: margin 195ms cubic-bezier(0.4, 0, 0.6, 1) 0ms, width 195ms cubic-bezier(0.4, 0, 0.6, 1) 0ms;
+}
+
+.Scaffold-appBar-shift {
+    transition: margin 255ms cubic-bezier(0.0, 0, 0.2, 1) 0ms, width 255ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
+    width: calc(100% - var(--Scaffold-drawerWidth));
+    margin-left: var(--Scaffold-drawerWidth);
+}
+
+
+/* Menu button */
+
+.Scaffold-appBarMenuButton {
+    margin-right: 1.6rem;
+}
+.Scaffold-appBarMenuButton-hide {
+    display: none;
+}
+
+/* drawer */
+
+.Scaffold-drawer {
+    width: var(--Scaffold-drawerWidth);
+    flex-shrink: 0;
+}
+
+.Scaffold-drawerPaper {
+    width: var(--Scaffold-drawerWidth);
+}
+
+.Scaffold-drawerHeader {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 1rem;
+    min-height: var(--MuiToolbar-regular-minHeight);
+    padding: 0;
+}
+
+/* content */
+
+.Scaffold-content {
+    padding-top: var(--MuiToolbar-regular-minHeight);
+    transition: margin  195ms cubic-bezier(0.4, 0, 0.6, 1);
+    margin-left: 0;
+    min-height: 100vh;
+}
+
+.Scaffold-content-shift {
+    transition: margin 255ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;
+    margin-left: var(--Scaffold-drawerWidth);
+}
