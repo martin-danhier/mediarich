@@ -1,0 +1,51 @@
+.ImageField-thumbnailRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.ImageField-currentThumbnail {
+    height: 16rem;
+    /* border: 2px solid #b6b5b5; */
+    background-color: #f0eeee;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    align-items: center;
+}
+
+.ImageField-currentThumbnail>img {
+    height: 100%;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.ImageField-currentThumbnailWrapper {
+    display: flex;
+    flex-direction: column;
+    margin-right: 1rem;
+    flex-grow: 1;
+    max-width: 50%;
+}
+
+.ImageField-dropZonePromptText {
+    font-size: 2.2rem;
+    padding: 0 2rem;
+}
+
+.ImageField-dropZoneIcon {
+    color: #4CAF50;
+}
+
+.ImageField-dropZone-root {
+    min-height: 21rem;
+    max-width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.ImageField-reset {
+    cursor: pointer;
+}

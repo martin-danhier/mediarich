@@ -114,3 +114,5 @@ export function fail(message?: Message): never | void {
         assert.fail(message);
     }
 }
+
+export default ok;

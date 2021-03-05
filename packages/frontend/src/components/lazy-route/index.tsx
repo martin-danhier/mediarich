@@ -7,9 +7,10 @@
 import LoadingScreen from 'components/loading-screen';
 import React, { Suspense, } from 'react';
 import { Route, RouteComponentProps } from 'react-router-dom';
+import { StaticContext } from 'react-router';
 
 /** Props of a LazyRoute */
-export interface LazyRouteProps{
+export interface LazyRouteProps<T>{
     /** Should the route exactly match the path ? */
     exact?: boolean;
     /** Path of the route */
@@ -18,14 +19,14 @@ export interface LazyRouteProps{
      *
      * @example <LazyRoute exact path="/" render={(p): JSX.Element => <Home {...p} customProp="value" />}/>
      */
-    render: (props: RouteComponentProps) => JSX.Element;
+    render: (props: RouteComponentProps<T, StaticContext, {}>) => JSX.Element;
 }
 
 /** Route that can load a Lazy component on demand.
  *
  * @example <LazyRoute exact path="/" render={(p): JSX.Element => <Home {...p} customProp="value" />}/>
 */
-class LazyRoute extends React.Component<LazyRouteProps> {
+class LazyRoute<T = {}> extends React.Component<LazyRouteProps<T>> {
     render(): JSX.Element {
         return (
             <Route
@@ -37,7 +38,7 @@ class LazyRoute extends React.Component<LazyRouteProps> {
                         fallback={<LoadingScreen />}
                     >
                         {/* Render child */}
-                        {this.props.render(props)}
+                        {this.props.render(props as RouteComponentProps<T, StaticContext, {}>)}
                     </Suspense>
                 }
             />

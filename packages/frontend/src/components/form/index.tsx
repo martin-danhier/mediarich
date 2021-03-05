@@ -4,17 +4,20 @@
  * @author Martin Danhier
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import CustomTextField, { CustomTextFieldProps } from 'components/text-field';
 import React from 'react';
 
-import { Button, ButtonProps } from '@material-ui/core';
 import { Localization } from 'components/localization-provider/types';
 import { LocalizationConsumer } from 'components/localization-provider';
+import { RouteComponentProps } from 'react-router';
+import { DropzoneArea, DropzoneAreaProps } from 'material-ui-dropzone';
+import { DialogActions, DialogContent } from '@material-ui/core';
+import ImageField, { ImageFieldProps } from 'components/image-field';
 
 /** Format of the values that can be stored in a Form */
 export type FormValues<T extends FormValues<T>> = {
-    [key in keyof T]: string | boolean | number;
+    [key in keyof T]: string | boolean | number | File | null | undefined;
 }
 
 /** Function that checks if the new value of a text field is valid. */
@@ -48,12 +51,14 @@ export interface SubmitValidationCallbackResult<T extends FormValues<T>> {
 }
 
 /** props of a Form component */
-export interface FormProps<T extends FormValues<T>> {
+export interface FormProps<T extends FormValues<T>> extends Partial<RouteComponentProps> {
     children: JSX.Element[];
     initialState: T;
     localization: Localization;
-    /** Called when the form is submitted and the data is valid */
-    onSubmit?: (validData: T) => void | Promise<void>;
+    /** Called when the form is submitted and the data is valid
+     * @return a string with an url to redirect there
+    */
+    onSubmit?: (validData: T) => Promise<void> | Promise<string>;
     /** Validation function for change event. Place checks in the callback to check if the new value is valid
      * @returns a ChangeValidationCallback
     */
@@ -101,7 +106,7 @@ class FormContent<T extends FormValues<T>> extends React.Component<FormProps<T>,
     }
 
     /** Called when the submit button is clicked */
-    handleSubmit = async (event: React.MouseEvent): Promise<void> => {
+    handleSubmit = async (): Promise<void> => {
 
         // Validate inputs
         let ok = true;
@@ -126,20 +131,30 @@ class FormContent<T extends FormValues<T>> extends React.Component<FormProps<T>,
         }
 
         // If ok, call callback
+        let willRedirect = false;
+        let destination = '';
         if (ok && this.props.onSubmit) {
-            this.props.onSubmit(this.state.values);
+            const result = await this.props.onSubmit(this.state.values);
+            if (typeof result === 'string') {
+                destination = result;
+                willRedirect = true;
+            }
         }
         // If there are errors
-        if (errors !== undefined) {
+        if (!willRedirect && errors !== undefined) {
             this.setState(prevState => ({
                 ...prevState,
                 errors,
             }));
         }
+        // If should redirect
+        if (willRedirect) {
+            this.props.history?.push(destination);
+        }
     }
 
     /** Called when a textfield changes */
-    handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    handleTextFieldChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         // Get info about the sender of the event
         const newValue = event.target.value;
         const name = event.target.name;
@@ -171,20 +186,34 @@ class FormContent<T extends FormValues<T>> extends React.Component<FormProps<T>,
         this.setState(newState);
     }
 
+    /** Called when a dropzone changes */
+    handleDropZoneChange = (files: File[], name: string): void => {
+        // Assert that the name is a key in the state
+        assert.ok(Object.keys(this.state.values).includes(name), `The field "${name}" should be present in the state object.`);
+        assert.ok(this.state.values[name as keyof T] instanceof File || this.state.values[name as keyof T] === undefined, `The field "${name}" should be a File or undefined.`);
+
+        // Update state
+        const newState: FormState<T> = { ...this.state };
+        (newState.values as { [key in keyof T]: File })[name as keyof T] = files[0];
+        this.setState(newState);
+    }
+
+    handleImageFieldChange = (image: File | null, name: string): void => {
+        // Assert that the name is a key in the state
+        assert.ok(Object.keys(this.state.values).includes(name), `The field "${name}" should be present in the state object.`);
+        assert.ok(this.state.values[name as keyof T] instanceof File || this.state.values[name as keyof T] === null, `The field "${name}" should be a File or null.`);
+
+        // Update state
+        const newState: FormState<T> = { ...this.state };
+        (newState.values as { [key in keyof T]: File | null })[name as keyof T] = image;
+        this.setState(newState);
+    }
+
     /** Links event handlers to children */
     processChildren = (children: React.ReactElement[]): React.ReactElement[] => {
         return React.Children.map(children, elem => {
-
-            // If a button bar is found, process it as well
-            if (elem.type === 'div' && elem.props.className === 'buttonBar') {
-                return React.cloneElement(elem, { children: this.processChildren(elem.props.children) });
-            }
-            // If a submit button is found, add a hook to the handleSubmit function
-            else if (elem.type === Button && React.isValidElement<ButtonProps>(elem) && elem.props.type === 'submit') {
-                return React.cloneElement(elem, { onClick: this.handleSubmit });
-            }
             // If a text field is found
-            else if (elem.type === CustomTextField && React.isValidElement<CustomTextFieldProps>(elem)) {
+            if (elem.type === CustomTextField && React.isValidElement<CustomTextFieldProps>(elem)) {
                 // Assert that the name is in the state type and that it is a string
                 assert.ok(
                     Object.keys(this.props.initialState).includes(elem.props.name),
@@ -197,22 +226,76 @@ class FormContent<T extends FormValues<T>> extends React.Component<FormProps<T>,
 
                 // Return a clone linked to the function
                 return React.cloneElement(elem, {
-                    onChange: this.handleChange,
+                    onChange: this.handleTextFieldChange,
                     value: this.state.values[elem.props.name as keyof T] as string,
                     error: this.state.errors[elem.props.name as keyof T],
                 });
             }
-            // Else don't change anything
-            else {
-                return elem;
+            // Vanilla dropzone
+            else if (elem.type === DropzoneArea && React.isValidElement<DropzoneAreaProps>(elem)) {
+                // Assert that the name is in the state type and that it is a file
+                assert(elem.props.inputProps !== undefined, 'The "inputProps" field must be defined');
+                assert(elem.props.inputProps.name !== undefined, 'The "name" field must be defined');
+                assert(
+                    Object.keys(this.props.initialState).includes(elem.props.inputProps.name),
+                    `Unexpected name: "${elem.props.inputProps.name}". The "name" of a field must exist in the form state.`
+                );
+                assert(
+                    this.props.initialState[elem.props.inputProps.name as keyof T] instanceof File
+                    || this.props.initialState[elem.props.inputProps.name as keyof T] === undefined,
+                    `The type of the "${elem.props.inputProps.name}" field should be a file or undefined.`
+                );
+                // Get the name
+                const name = elem.props.inputProps.name;
+
+                return React.cloneElement(elem, {
+                    onChange: (files: File[]) => this.handleDropZoneChange(files, name),
+                });
             }
+            // Custom image field
+            else if (elem.type === ImageField && React.isValidElement<ImageFieldProps>(elem)) {
+                assert(
+                    Object.keys(this.props.initialState).includes(elem.props.name),
+                    `Unexpected name: "${elem.props.name}". The "name" of a field must exist in the form state.`
+                );
+                assert(
+                    this.props.initialState[elem.props.name as keyof T] instanceof File
+                    || this.props.initialState[elem.props.name as keyof T] === null,
+                    `The type of the "${elem.props.name}" field should be a file or null.`
+                );
+                // Get
+                const name = elem.props.name;
+
+                return React.cloneElement(elem, {
+                    onChange: (image: File | null) => this.handleImageFieldChange(image, name),
+                });
+
+            }
+            // Div or other common containers of fields
+            else if (elem.type === 'div' || elem.type === DialogContent) {
+                if (elem.props.children) {
+                    return React.cloneElement(elem, {
+                        children: this.processChildren(elem.props.children),
+                    });
+                }
+            }
+            // Else don't change anything
+            return elem;
+
         });
     }
 
     render(): JSX.Element {
-        return <div>
+        return <form
+            noValidate
+            onSubmit={(e): void => {
+                e.preventDefault();
+                this.handleSubmit();
+            }}
+            className='fullWidth'
+        >
             {this.processChildren(this.props.children)}
-        </div>;
+        </form>;
 
     }
 }

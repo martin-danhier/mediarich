@@ -35,37 +35,37 @@ export class MSVideo extends MSContent {
     // Getters
 
     /** Media creation date */
-    public get creationDate(): Promise<Date | undefined> { return this.getter('_creationDate'); }
+    public get creationDate(): Date | undefined { return this._creationDate; }
     /** Validated (only for editable medias) */
-    public get validated(): Promise<boolean | undefined> { return this.getter('_validated'); }
+    public get validated(): boolean | undefined { return this._validated; }
     /** Media keywords (comma separated values 'a,b') */
-    public get keywords(): Promise<string | undefined> { return this.getter('_keywords'); }
+    public get keywords(): string | undefined { return this._keywords; }
     /** Media speaker */
-    public get speaker(): Promise<string | undefined> { return this.getter('_speaker'); }
+    public get speaker(): string | undefined { return this._speaker; }
     /** Media speaker email */
-    public get speakerEmail(): Promise<string | undefined> { return this.getter('_speakerEmail'); }
+    public get speakerEmail(): string | undefined { return this._speakerEmail; }
     /** Media company */
-    public get company(): Promise<string | undefined> { return this.getter('_company'); }
+    public get company(): string | undefined { return this._company; }
     /** Media company URL */
-    public get companyUrl(): Promise<string | undefined> { return this.getter('_companyUrl'); }
+    public get companyUrl(): string | undefined { return this._companyUrl; }
     /** Media license */
-    public get license(): Promise<string | undefined> { return this.getter('_license'); }
+    public get license(): string | undefined { return this._license; }
     /** License URL */
-    public get licenseUrl(): Promise<string | undefined> { return this.getter('_licenseUrl'); }
+    public get licenseUrl(): string | undefined { return this._licenseUrl; }
     /** Media categories (separate values with \n).
      * The categories that are not present in the global settings will be hidden in search and edition pages */
-    public get categories(): Promise<string | undefined> { return this.getter('_categories'); }
+    public get categories(): string | undefined { return this._categories; }
     /** A text describing the device or application which requested the media add.
      * @example "autopublisher v1.6 on example.com"
      * @example "Manual (form: AddMediaWithFileForm)"
      */
-    public get origin(): Promise<string | undefined> { return this.getter('_origin'); }
+    public get origin(): string | undefined { return this._origin; }
     /** Media layout */
-    public get layout(): Promise<string | undefined> { return this.getter('_layout'); }
+    public get layout(): string | undefined { return this._layout; }
     /** Media duration
      * @example "5 m 58 s"
      */
-    public get duration(): Promise<string | undefined> { return this.getter('_duration'); }
+    public get duration(): string | undefined { return this._duration; }
 
     // Methods
 

@@ -1,4 +1,4 @@
-import * as assert from './assert';
+import * as assert from '.';
 
 test('strictEqual throws exception', () => {
     // strictEqual of different values throws an AssertionError

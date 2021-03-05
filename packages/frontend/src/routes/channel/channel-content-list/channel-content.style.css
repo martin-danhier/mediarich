@@ -1,0 +1,33 @@
+.ChannelContent-actionColumn {
+    text-align: center;
+    justify-content: center;
+}
+
+.ChannelContent-dataGrid, .ChannelContent-dataGrid .MuiDataGrid-columnsContainer, .ChannelContent-dataGrid .MuiDataGrid-footer, .ChannelContent-dataGrid .MuiDataGrid-cell {
+    border-color: rgba(196, 193, 193, 0.637);
+}
+
+.ChannelContent-actionColumnButton {
+    padding: 0.8rem;
+}
+
+.ChannelContent-header {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
+.ChannelContent-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.ChannelContent-addButton {
+    margin-left: 0.8rem;
+}
+
+.ChannelContent-wrapper {
+    min-width: 70rem;
+}

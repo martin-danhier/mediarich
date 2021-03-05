@@ -52,6 +52,7 @@ export class MediarichRoutesSpec implements APIRoutesSpecification<MediarichRout
         url: '/user/add',
         method: 'POST',
         requestContentType: MIMETypes.JSON,
+        credentials: 'include',
         mode: 'cors',
     } as const;
     /** Login a user
@@ -79,6 +80,7 @@ export class MediarichRoutesSpec implements APIRoutesSpecification<MediarichRout
         method: 'POST',
         requestContentType: MIMETypes.JSON,
         mode: 'cors',
+        credentials: 'include',
     } as const;
     /** Edit a user
      *
@@ -105,6 +107,7 @@ export class MediarichRoutesSpec implements APIRoutesSpecification<MediarichRout
         url: '/user/edit',
         method: 'POST',
         requestContentType: MIMETypes.JSON,
+        credentials: 'include',
         mode: 'cors',
     } as const;
     /**
@@ -124,6 +127,7 @@ export class MediarichRoutesSpec implements APIRoutesSpecification<MediarichRout
         requestContentType: MIMETypes.XWWWFormUrlencoded,
         method: 'GET',
         mode: 'cors',
+        credentials: 'include',
     } as const;
     /**
      * Disconnect the user
@@ -140,6 +144,7 @@ export class MediarichRoutesSpec implements APIRoutesSpecification<MediarichRout
         url: '/user/disconnect',
         requestContentType: MIMETypes.XWWWFormUrlencoded,
         method: 'GET',
+        credentials: 'include',
         mode: 'cors',
     } as const;
 }

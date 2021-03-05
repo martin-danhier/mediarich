@@ -44,6 +44,43 @@ export interface Localization {
     Form: {
         required: string;
     };
+    Channel: {
+        channel: string;
+        channels: string;
+        subchannels: string;
+        video: string;
+        videos: string;
+        noRows: string;
+        error: string;
+        actionsNames: {
+            delete: string;
+            publish: string;
+            edit: string;
+            move: string;
+        };
+        fieldsNames: {
+            title: string;
+            public: string;
+            addDate: string;
+            description: string;
+            views: string;
+            thumbnail: string;
+            duration: string;
+        };
+        dialogs: {
+            areYouSure: string;
+            cancel: string;
+            thisIsIrreversible: string;
+            publishInfoStartPlural: string;
+            publishInfoEndPlural: string;
+            publishInfoSingular: string;
+            editDialogTitleSingular: string;
+            editDialogTitlePlural: string;
+        };
+    };
+    ImageField: {
+        dragNewThumbnailImage: string;
+    };
 }
 
 /** Import functions of each supported localization.

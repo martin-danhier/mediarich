@@ -16,15 +16,25 @@ import LanguageSwitcher from 'components/language-switcher';
 import Form, { FormErrors, SubmitValidationCallbackResult } from 'components/form';
 import { MediarichAPIHandler, UserLoginResult } from 'utils/backend';
 import { MediaServerContext } from 'components/mediaserver-provider';
-import assert from 'assert';
+import assert from 'utils/assert';
+import { StaticContext } from 'react-router';
 
-
-
-class Login extends React.Component<Partial<RouteComponentProps>> {
+class Login extends React.Component<RouteComponentProps<{}, StaticContext, {} & { next?: string }>>{
 
     // Link to mediaserver context to be able to login with the api key
     context!: React.ContextType<typeof MediaServerContext>;
     static contextType = MediaServerContext;
+
+    componentDidMount(): void {
+        assert(this.context !== null, 'There should be a MediaServerProvider in the tree.');
+
+        // If mediaserver is not null, then the user is connected
+        if (this.context.mediaserver) {
+            // If connected, redirect to the next destination if any, or go to the default
+            const next = this.props.location.state.next ?? '/channel';
+            this.props.history.push(next);
+        }
+    }
 
     render(): JSX.Element {
         return (
@@ -49,6 +59,8 @@ class Login extends React.Component<Partial<RouteComponentProps>> {
                             <Typography className='margin-bottom' align='center'>{strings.description}</Typography>
 
                             <Form
+                                {...this.props}
+
                                 initialState={{
                                     password: '',
                                     username: '',
@@ -76,12 +88,14 @@ class Login extends React.Component<Partial<RouteComponentProps>> {
                                     // It worked
                                     else if (loginResult.apiKey) {
                                         // If it worked, we need to recreate the Mediaserver API handler with the API key
-                                        assert.ok(this.context !== null, 'There should be a MediaServerProvider in the tree.');
+                                        assert(this.context !== null, 'There should be a MediaServerProvider in the tree.');
                                         const mediaserver = this.context.changeApiKey(loginResult.apiKey);
                                         const callResult = await mediaserver.myChannel();
                                         if (callResult === null) {
                                             result.ok = false;
                                             result.errors.password = strings.errors.apiKeyNoLongerValid;
+                                            // Reset handler to avoid further requests
+                                            this.context.reset();
                                         }
                                     }
                                     // Server didn't return the api key for some reason
@@ -91,6 +105,10 @@ class Login extends React.Component<Partial<RouteComponentProps>> {
                                         result.errors.password = strings.errors.unknownError;
                                     }
                                     return result;
+                                }}
+                                onSubmit={async (): Promise<string> => {
+                                    // If connected, redirect to the next destination if any, or go to the default
+                                    return this.props.location?.state?.next ?? '/channel';
                                 }}
                             >
                                 {/* Username */}

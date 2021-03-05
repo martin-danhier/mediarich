@@ -19,7 +19,7 @@ import { MediaServerContext } from 'components/mediaserver-provider';
 import { MediarichAPIHandler, UserAddResult } from 'utils/backend';
 
 
-class Register extends React.Component<Partial<RouteComponentProps>> {
+class Register extends React.Component<RouteComponentProps> {
 
     // Link to mediaserver context to be able to login with the api key
     context!: React.ContextType<typeof MediaServerContext>;
@@ -45,6 +45,7 @@ class Register extends React.Component<Partial<RouteComponentProps>> {
 
 
                             <Form
+                                {...this.props}
 
                                 // Init the fields
                                 initialState={{
@@ -82,6 +83,8 @@ class Register extends React.Component<Partial<RouteComponentProps>> {
                                         if (callResult === null) {
                                             result.ok = false;
                                             result.errors.apiKey = strings.errors.invalidApiKey;
+                                            // Reset the handler to avoid further requests
+                                            this.context.reset();
                                         }
                                     }
 
@@ -106,8 +109,8 @@ class Register extends React.Component<Partial<RouteComponentProps>> {
 
                                     return result;
                                 }}
-                                onSubmit={(): void => {
-                                    this.props.history?.push('/login');
+                                onSubmit={async (): Promise<string> => {
+                                    return '/channel';
                                 }}
                             >
                                 {/* Username */}

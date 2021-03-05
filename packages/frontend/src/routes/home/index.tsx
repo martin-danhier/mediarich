@@ -1,6 +1,6 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import * as assert from 'utils/assert/assert';
+import * as assert from 'utils/assert';
 
 interface HomeProps extends Partial<RouteComponentProps> {
     name: string;

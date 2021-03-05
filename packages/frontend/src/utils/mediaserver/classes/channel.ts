@@ -1,7 +1,7 @@
 import { JSONInnerObject } from 'utils/api-client';
 import MediaServerAPIHandler from '../mediaserver-api-hanler';
 import { MediaServerError, MSChannelEditBody } from '../types';
-import { as, asEnum, asJsonObject, asJsonObjectArray } from '../../validation';
+import { as, asBool, asEnum, asJsonObject, asJsonObjectArray } from '../../validation';
 import MSContent from './content';
 import { MSVideo } from './video';
 
@@ -31,17 +31,17 @@ export default class MSChannel extends MSContent {
     // Getters for the new variables
 
     /** Default content sorting used in this channel */
-    public get sorting(): Promise<MSChannelSorting | undefined> { return this.getter('_sorting'); }
+    public get sorting(): MSChannelSorting | undefined { return this._sorting; }
     /** Indicates if RSS links should be displayed */
-    public get displayRSSLinks(): Promise<boolean | undefined> { return this.getter('_displayRSSLinks'); }
+    public get displayRSSLinks(): boolean | undefined { return this._displayRSSLinks; }
     /** true if the user can add new subchannels in this channel */
-    public get canAddChannel(): Promise<boolean | undefined> { return this.getter('_canAddChannel', true); }
+    public get canAddChannel(): boolean | undefined { return this._canAddChannel; }
     /** true if the user can add new videos in this channel */
-    public get canAddVideo(): Promise<boolean | undefined> { return this.getter('_canAddVideo', true); }
+    public get canAddVideo(): boolean | undefined { return this._canAddVideo; }
     /** true if the user can see statistics on this channel */
-    public get canSeeStats(): Promise<boolean | undefined> { return this.getter('_canSeeStats', true); }
+    public get canSeeStats(): boolean | undefined { return this._canSeeStats; }
     /** Language of the parent channel, if any */
-    public get parentLanguage(): Promise<string | undefined> { return this.getter('_parentLanguage'); }
+    public get parentLanguage(): string | undefined { return this._parentLanguage; }
 
     // Methods
 
@@ -69,9 +69,9 @@ export default class MSChannel extends MSContent {
         // Add the additional fields if present
         this._sorting = asEnum(MSChannelSorting, json.sorting);
         this._displayRSSLinks = as('boolean', json.display_rss_links);
-        this._canAddChannel = as('boolean', json.can_add_channel);
-        this._canAddVideo = as('boolean', json.can_add_video);
-        this._canSeeStats = as('boolean', json.can_see_stats);
+        this._canAddChannel = asBool(json.can_add_channel);
+        this._canAddVideo = asBool(json.can_add_video);
+        this._canSeeStats = asBool(json.can_see_stats);
         this._parentLanguage = as('string', json.parent_language);
     }
 

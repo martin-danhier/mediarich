@@ -51,6 +51,23 @@ export function as<T extends number | string | boolean | object>(type: Type<T>, 
     }
 }
 
+/**
+ * Unwraps a bool from a unknown value that could potentially either a bool or a number
+ * @param value The value to unwrap
+ * @return the boolean value if the type is number or boolean, undefined otherwise
+ *
+ * This function exists because the MediaServer API sometimes returns the boolean values as
+ * bools (`true` or `false`), and sometimes as numbers (`1` or `0`), even in the same routes with
+ * the same parameters.
+ */
+export function asBool(value: unknown): boolean | undefined {
+    if (typeof value === 'boolean') {
+        return value;
+    } else if (typeof value === 'number') {
+        return value === 1;
+    }
+}
+
 /** Unwraps a value from a type tuple to an enum.\
  * If the value is of the wrong type, or don't exist in the enum,
  * the function will return ``undefined``.

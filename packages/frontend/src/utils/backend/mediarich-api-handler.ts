@@ -202,7 +202,7 @@ export class MediarichAPIHandler {
             return {
                 status: UserTestResult.Connected,
                 username: as('string', result.json.username),
-                apiKey: as('string', result.json.error),
+                apiKey: as('string', result.json.apiKey),
             };
         }
     }

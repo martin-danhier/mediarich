@@ -24,7 +24,8 @@ export function getSessionOptions(sequelize: Sequelize): SessionOptions {
                 expires: defaults.expires,
                 userId: session.user.uuid,
             };
-        }
+        },
+
     });
 
     // Init session options
@@ -35,6 +36,7 @@ export function getSessionOptions(sequelize: Sequelize): SessionOptions {
         // Init sequelize store
         store,
         cookie: {
+            sameSite: 'strict',
             secure: 'auto',
         },
     };

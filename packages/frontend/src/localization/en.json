@@ -38,5 +38,42 @@
     },
     "Form": {
         "required": "This field is required."
+    },
+    "Channel": {
+        "channel": "Channel",
+        "channels": "Channels",
+        "subchannels": "Subchannels",
+        "video": "Video",
+        "videos": "Videos",
+        "noRows": "No rows.",
+        "error": "An error occured.",
+        "actionsNames": {
+            "delete": "delete",
+            "publish": "(Un)publish",
+            "edit": "edit",
+            "move": "move"
+        },
+        "fieldsNames": {
+            "title": "Title",
+            "public": "Public",
+            "addDate": "Add date",
+            "views": "Views",
+            "thumbnail": "Thumbnail",
+            "duration": "Duration",
+            "description": "Description"
+        },
+        "dialogs": {
+            "areYouSure": "Are you sure that you want to",
+            "cancel": "Cancel",
+            "thisIsIrreversible": "This action is irreversible.",
+            "publishInfoStartPlural": "The unlisted",
+            "publishInfoEndPlural": "will because public, and vice versa. Note: this operation doesn't always work as of now because of a bug in the API, which is beyond our control.",
+            "publishInfoSingular": "If it is unlisted, it will become public, and vice versa. Note: this operation doesn't always work as of now because of a bug in the API, which is beyond our control.",
+            "editDialogTitleSingular": "Edit a",
+            "editDialogTitlePlural" : "Edit several"
+        }
+    },
+    "ImageField": {
+        "dragNewThumbnailImage": "Drag a new thumbnail image or click here"
     }
 }

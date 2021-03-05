@@ -6,19 +6,21 @@ import { RouteComponentProps } from 'react-router-dom';
 
 import './drawer-menu.style.css';
 
-export interface DrawerMenuItem {
+export interface DrawerMenuItem<T> {
     /** Label of the item (displayed in the menu) */
     label: string;
     /** Children of this item (other items) */
-    children?: DrawerMenuItem[];
+    children?: DrawerMenuItem<T>[];
     /** Callback to call when the item is clicked */
     onClick?: (e: React.MouseEvent) => void;
     /** URL of the resource (move when clicked) */
     url: string;
+    /** Data not used by the drawer */
+    data: T;
 }
 
-export interface DrawerMenuProps extends RouteComponentProps {
-    items: DrawerMenuItem[];
+export interface DrawerMenuProps<T> extends RouteComponentProps {
+    items: DrawerMenuItem<T>[];
 }
 
 export interface DrawerMenuState {
@@ -27,9 +29,9 @@ export interface DrawerMenuState {
 }
 
 /** Tree menu */
-class DrawerMenu extends React.Component<DrawerMenuProps, DrawerMenuState> {
+class DrawerMenu<T> extends React.Component<DrawerMenuProps<T>, DrawerMenuState> {
 
-    constructor(props: DrawerMenuProps) {
+    constructor(props: DrawerMenuProps<T>) {
         super(props);
 
         const current = props.location.pathname;
@@ -59,7 +61,7 @@ class DrawerMenu extends React.Component<DrawerMenuProps, DrawerMenuState> {
         this.setState(newState);
     }
 
-    handleItemClicked = (event: React.MouseEvent<HTMLLIElement>, item: DrawerMenuItem): void => {
+    handleItemClicked = (event: React.MouseEvent<HTMLLIElement>, item: DrawerMenuItem<T>): void => {
         const newState = { ...this.state };
 
         // Select that url
@@ -72,7 +74,7 @@ class DrawerMenu extends React.Component<DrawerMenuProps, DrawerMenuState> {
     }
 
     /* Recursively renders a drawer menu item and its elements */
-    renderMenuItem = (item: DrawerMenuItem, index: number): React.ReactElement<TreeItemProps> => {
+    renderMenuItem = (item: DrawerMenuItem<T>, index: number): React.ReactElement<TreeItemProps> => {
         return <TreeItem
             classes={{
                 label: 'DrawerMenu-treeViewItemLabel',
@@ -111,7 +113,7 @@ class DrawerMenu extends React.Component<DrawerMenuProps, DrawerMenuState> {
         </TreeItem >;
     }
 
-    getParents(url: string, list: DrawerMenuItem[]): string[] | undefined {
+    getParents(url: string, list: DrawerMenuItem<T>[]): string[] | undefined {
         for (const item of list) {
             if (item.url === url) {
                 // If the destination is found, go back up with an empty string

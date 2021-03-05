@@ -1,0 +1,7 @@
+.ChannelScaffold-innerLoadingWrapper {
+    height: calc(100vh - var(--Scaffold-drawerWidth));
+}
+
+.ChannelScaffold-breadcrumbsLink {
+    cursor: pointer;
+}

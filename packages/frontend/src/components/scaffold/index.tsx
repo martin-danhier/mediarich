@@ -13,7 +13,7 @@ import './scaffold.style.css';
 import DrawerMenu, { DrawerMenuItem } from './drawer-menu';
 import { RouteComponentProps } from 'react-router';
 
-export interface ScaffoldProps extends RouteComponentProps {
+export interface ScaffoldProps<T> extends RouteComponentProps {
     /** Title of the page */
     title?: string;
     /** Should the drawer be open by default when there is enough space ? */
@@ -21,7 +21,7 @@ export interface ScaffoldProps extends RouteComponentProps {
     /** Actions to place at the right of the app bar */
     appBarActions?: JSX.Element[] | JSX.Element;
     /** Items of the drawer menu */
-    drawerMenuItems?: DrawerMenuItem[];
+    drawerMenuItems?: DrawerMenuItem<T>[];
     /** The drawer width in rem */
     drawerWidth?: number;
     /** Children of the scaffold */
@@ -33,11 +33,11 @@ export interface ScaffoldState {
 }
 
 /** Scaffold of a page. Inspired by Flutter scaffold. */
-class Scaffold extends React.Component<ScaffoldProps, ScaffoldState> {
+class Scaffold<T> extends React.Component<ScaffoldProps<T>, ScaffoldState> {
     /** The drawer width in rem, effectively used */
     private _drawerWidth: number;
 
-    constructor(props: ScaffoldProps) {
+    constructor(props: ScaffoldProps<T>) {
         super(props);
 
         // Set drawer width

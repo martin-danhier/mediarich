@@ -1,10 +1,11 @@
-import * as assert from 'utils/assert/assert';
+import * as assert from 'utils/assert';
 import APIClient, { HTTPRequestResult, JSONInnerObject, MIMETypes } from 'utils/api-client';
 import { CallBodyParam } from 'utils/api-client/api-client';
 import { MSApiSpecification, MSRoutesSpec } from './api-routes';
 import MSChannel from './classes/channel';
 import { MediaServerError, MSResponseJson } from './types';
-import { asJsonObjectArray, } from '../validation';
+import { as, asJsonObjectArray, } from '../validation';
+import { MSChannelTreeItem } from './classes/tree';
 
 /**
  *  MediaServer API handler.
@@ -18,7 +19,7 @@ import { asJsonObjectArray, } from '../validation';
  * ```
  */
 class MediaServerAPIHandler {
-    
+
     private _apiKey: string;
 
     /** APIClient handling the MediaServer API. The base URL can be set with the ``REACT_APP_MEDIASERVER_API_ROOT`` environment variable. */
@@ -38,6 +39,10 @@ class MediaServerAPIHandler {
         this._apiKey = apiKey;
     }
 
+    /** Clones this class */
+    public clone(): MediaServerAPIHandler {
+        return new MediaServerAPIHandler(this._apiKey);
+    }
 
     public async call<K extends keyof MSRoutesSpec>(
         routeName: K,
@@ -94,17 +99,10 @@ class MediaServerAPIHandler {
     /**
      * Returns the list of all channels of the server.
      *
-     * The first time, the API will be called to get the data. It will be cached for later use.
-     * If you call this function several times, the cache will be used instead of a request.
-     *
-     * To force a refresh, set the `forceRefresh` parameter to true. Since channels don't change very often, this is not
-     * recommended.
-     *
-     * @param forceRefresh If true, a request will always be sent (slower)
      * @returns the list of all the channels
      * @throws a MediaServerError if the API responds a completely unusable answer. You should try catch this function to handle that case.
      */
-    public async channels(forceRefresh = false): Promise<MSChannel[]> {
+    public async channels(): Promise<MSChannel[]> {
 
         // Make the request
         const result: MSResponseJson = await this.call('/channels');
@@ -146,6 +144,78 @@ class MediaServerAPIHandler {
 
         }
 
+    }
+
+    /**
+     * Returns a tree of all the channels on the server.
+     *
+     * @returns a tree of all the channels
+     * @throws MediaServerError if the API returns something completely unusable. You should catch that error to handle that case.
+     */
+    public async channelsTree(): Promise<MSChannelTreeItem[]> {
+        // Make the request
+        const result = await this.call('/channels/tree');
+
+        if (result.success) {
+            const channels = asJsonObjectArray(result.channels);
+
+            if (channels) {
+                // Parse the tree
+                return this.parseTree(channels);
+            } else {
+                // Throw it since the MS client is useless without channels
+                throw new MediaServerError('Bad response format. Expected an array of channels.', result);
+            }
+        } else {
+            // Throw it since the MS client is useless without channels
+            throw new MediaServerError('An error occured while accessing MediaServer channels', result);
+        }
+    }
+
+    /** Recursively parses a JSON describing the channel tree.
+     * @params JSON array representing a channel tree.
+     * @returns the object representation of that tree
+     */
+    private parseTree(channelsJsonList: JSONInnerObject[]): MSChannelTreeItem[] {
+        const list: MSChannelTreeItem[] = [];
+
+        for (const channelJson of channelsJsonList) {
+
+            // Try to init fields
+            const title = as<string>('string', channelJson.title);
+            const slug = as<string>('string', channelJson.slug);
+            let channel: MSChannel;
+            try {
+                channel = MSChannel.fromJSON(channelJson, this);
+
+                const children = asJsonObjectArray(channelJson.channels);
+
+                // Ignore if invalid
+                if (title && slug) {
+                    // Create item
+                    const item: MSChannelTreeItem = {
+                        title,
+                        slug,
+                        channel
+                    };
+
+                    // Parse children if any
+                    if (children && children.length > 0) {
+                        item.children = this.parseTree(children);
+                    }
+
+                    // Add to the list
+                    list.push(item);
+                }
+            } catch (error) {
+                if (error instanceof MediaServerError) {
+                    // Log the MS error. We simply ignore the channel and don't add it in the list.
+                    // We don't throw the error, since maybe there are other usable channels that parsed successfully.
+                    error.log('The following error was found when parsing a channel. The channel won\'t be added. ');
+                } else throw error;
+            }
+        }
+        return list;
     }
 
     /**

@@ -1,4 +1,4 @@
-import * as assert from 'utils/assert/assert';
+import * as assert from 'utils/assert';
 import { defaultErrorHandling, DefaultResponseHandling } from './defaults';
 import {
     APIResponseSpecification,
