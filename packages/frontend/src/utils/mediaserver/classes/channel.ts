@@ -161,38 +161,27 @@ export default class MSChannel extends MSContent {
      */
     public async edit(params: MSChannelEditBody): Promise<boolean> {
 
-        // Call the API
-        const usedParams: {
-            oid: string;
-            sorting?: string;
-            language?: string;
-            thumb?: string;
-            thumb_oid?: string;
-            thumb_remove?: string;
-            parent?: string;
-            unlisted?: string;
-            title?: string;
-        } = {
-            oid: this._oid,
-        };
+        // Use a form data so we can add files in it as well (the thumbnail for instance)
+        const formData = new FormData();
+        formData.append('oid', this._oid);
 
         // Add the fields that are present
         if (params.parent) {
             const newParentOid = typeof params.parent === 'string' ? params.parent : params.parent._oid;
             // Don't set a channel as its own child
             if (newParentOid !== this._oid) {
-                usedParams.parent = newParentOid;
+                formData.append('parent', newParentOid);
             }
         }
-        if (params.unlisted !== undefined) usedParams.unlisted = params.unlisted ? 'yes' : 'no';
-        if (params.language !== undefined) usedParams.language = params.language;
-        if (params.sorting) usedParams.sorting = params.sorting;
-        if (params.thumb) usedParams.thumb = params.thumb;
-        if (params.thumb_oid) usedParams['thumb_oid'] = params.thumb_oid;
-        if (params.thumb_remove !== undefined) usedParams['thumb_remove'] = params['thumb_remove'] ? 'yes' : 'no';
-        if (params.title !== undefined) usedParams.title = params.title;
+        if (params.unlisted !== undefined) formData.append('unlisted', params.unlisted ? 'yes' : 'no');
+        if (params.language !== undefined) formData.append('language', params.language);
+        if (params.sorting) formData.append('sorthing', params.sorting);
+        if (params.thumb) formData.append('thumb', params.thumb);
+        if (params.thumb_oid) formData.append('thumb_oid', params.thumb_oid);
+        if (params.thumb_remove !== undefined) formData.append('thumb_remove', params['thumb_remove'] ? 'yes' : 'no');
+        if (params.title !== undefined) formData.append('title', params.title);
 
-        const result = await this._mediaServerAPIHandler.call('/channels/edit', usedParams);
+        const result = await this._mediaServerAPIHandler.call('/channels/edit', formData);
 
         if (result.success) {
             return true;

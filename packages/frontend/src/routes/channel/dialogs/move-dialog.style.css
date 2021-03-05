@@ -1,0 +1,14 @@
+.MoveDialog-autocompleteItem {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.MoveDialog-autocompleteItemTitle {
+    font-weight: 500;
+}
+
+.MoveDialog-autocompleteItemPath {
+    font-weight: 400;
+    font-size: 1.3rem;
+}

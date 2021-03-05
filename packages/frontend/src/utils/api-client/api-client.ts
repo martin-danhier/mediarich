@@ -345,18 +345,6 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
 
         const headers = new Headers(formattedHeaders);
 
-        // Check content length if it is not already provided
-        if (!headers.has('Content-Length')) {
-            // Content length, when possible
-            if (typeof data === 'string') {
-                headers.append('Content-Length', data.length.toString());
-            } else if (data instanceof Blob) {
-                headers.append('Content-Length', data.size.toString());
-            } else if (data instanceof ArrayBuffer) {
-                headers.append('Content-Length', data.byteLength.toString());
-            }
-        }
-
         // Check content type if it is not already provided
         if (!headers.has('Content-Type')) {
             // Content Type : check if provided in route
@@ -366,7 +354,8 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
                 if (typeof data === 'string') {
                     headers.append('Content-Type', route.requestContentType + '; charset=utf-8');
                 }
-                else {
+                // Leave fetch set the content type with form data because it needs to add the boundary
+                else if (!(data instanceof FormData)) {
                     headers.append('Content-Type', route.requestContentType);
                 }
             }

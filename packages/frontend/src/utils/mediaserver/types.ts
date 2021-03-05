@@ -32,7 +32,7 @@ export interface MSContentEditBody {
     /** New language of the content */
     language?: string;
     /** New thumbnail of the content (a file is expected) */
-    thumb?: string;
+    thumb?: Blob;
     /** Set to true to remove the thumbnail */
     thumb_remove?: boolean;
     /** New parent (move the content) */

@@ -36,7 +36,9 @@ export class MSVideo extends MSContent {
 
     /** Media creation date */
     public get creationDate(): Date | undefined { return this._creationDate; }
-    /** Validated (only for editable medias) */
+    /** Validated (only for editable medias)
+     * Same as "published"
+     */
     public get validated(): boolean | undefined { return this._validated; }
     /** Media keywords (comma separated values 'a,b') */
     public get keywords(): string | undefined { return this._keywords; }
@@ -129,58 +131,36 @@ export class MSVideo extends MSContent {
 
     public async edit(params: MSVideoEditBody): Promise<boolean> {
 
-        const usedParams: {
-            oid: string;
-            title?: string;
-            description?: string;
-            keywords?: string;
-            language?: string;
-            categories?: string;
-            thumb?: string;
-            'thumb_index'?: number;
-            'thumb_remove'?: string;
-            transcription?: string;
-            slug?: string;
-            channel?: string;
-            validated?: string;
-            'start_publication_date'?: string;
-            'end_publication_date'?: string;
-            unlisted?: string;
-            speaker?: string;
-            'speaker_email'?: string;
-            'speaker_id'?: string;
-            company?: string;
-            'company_url'?: string;
-            license?: string;
-        } = {
-            oid: this._oid,
-        };
-
+        const formData = new FormData();
+        formData.append('oid', this._oid);
+        
         // Add fields that are present and convert them in the right format
-        if (params.title !== undefined) usedParams.title = params.title;
-        if (params.parent) usedParams.channel = typeof params.parent === 'string' ? params.parent : params.parent.oid;
-        if (params.description !== undefined) usedParams.description = params.description;
-        if (params.keywords !== undefined) usedParams.keywords = params.keywords.join(',');
-        if (params.language !== undefined) usedParams.language = params.language;
-        if (params.categories !== undefined) usedParams.categories = params.categories.join('\n');
-        if (params.thumb) usedParams.thumb = params.thumb;
-        if (params.thumb_index !== undefined) usedParams['thumb_index'] = params.thumb_index;
-        if (params.thumb_remove !== undefined) usedParams['thumb_remove'] = params.thumb_remove ? 'yes' : 'no';
-        if (params.transcription !== undefined) usedParams['transcription'] = params.transcription;
-        if (params.slug) usedParams.slug = params.slug;
-        if (params.validated !== undefined) usedParams.validated = params.validated ? 'yes' : 'no';
-        if (params.start_publication_date) usedParams['start_publication_date'] = format(params.start_publication_date, 'yyyy-MM-dd HH:mm:ss');
-        if (params.end_publication_date) usedParams['end_publication_date'] = format(params.end_publication_date, 'yyyy-MM-dd HH:mm:ss');
-        if (params.unlisted !== undefined) usedParams.unlisted = params.unlisted ? 'yes' : 'no';
-        if (params.speaker !== undefined) usedParams.speaker = params.speaker;
-        if (params.speaker_email !== undefined) usedParams['speaker_email'] = params.speaker_email;
-        if (params.speaker_id) usedParams['speaker_id'] = params.speaker_id;
-        if (params.company !== undefined) usedParams.company = params.company;
-        if (params.company_url !== undefined) usedParams['company_url'] = params.company_url;
-        if (params.license !== undefined) usedParams.license = params.license;
+        if (params.title !== undefined) formData.append('title', params.title);
+        if (params.parent) formData.append('channel', typeof params.parent === 'string' ? params.parent : params.parent.oid);
+        if (params.description !== undefined) formData.append('description', params.description);
+        if (params.keywords !== undefined) formData.append('keywords', params.keywords.join(','));
+        if (params.language !== undefined) formData.append('language', params.language);
+        if (params.categories !== undefined) formData.append('categories', params.categories.join('\n'));
+        if (params.thumb) formData.append('thumb', params.thumb);
+        if (params.thumb_index !== undefined) formData.append('thumb_index', params.thumb_index.toString());
+        if (params.thumb_remove !== undefined) formData.append('thumb_remove', params.thumb_remove ? 'yes' : 'no');
+        if (params.transcription !== undefined) formData.append('transcription', params.transcription);
+        if (params.slug) formData.append('slug', params.slug);
+        if (params.validated !== undefined) formData.append('validated', params.validated ? 'yes' : 'no');
+        if (params.start_publication_date) formData.append('start_publication_date', format(params.start_publication_date, 'yyyy-MM-dd HH:mm:ss'));
+        if (params.end_publication_date) formData.append('end_publication_date', format(params.end_publication_date, 'yyyy-MM-dd HH:mm:ss'));
+        if (params.unlisted !== undefined) formData.append('unlisted', params.unlisted ? 'yes' : 'no');
+        if (params.speaker !== undefined) formData.append('speaker', params.speaker);
+        if (params.speaker_email !== undefined) formData.append('speaker_email', params.speaker_email);
+        if (params.speaker_id) formData.append('speaker_id', params.speaker_id);
+        if (params.company !== undefined) formData.append('company', params.company);
+        if (params.company_url !== undefined) formData.append('company_url', params.company_url);
+        if (params.license !== undefined) formData.append('license', params.license);
+
+
 
         // Call the API
-        const result = await this._mediaServerAPIHandler.call('/medias/edit', usedParams);
+        const result = await this._mediaServerAPIHandler.call('/medias/edit', formData);
 
         if (result.success) {
             return true;

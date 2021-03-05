@@ -4,7 +4,7 @@
  * @author Martin Danhier
  */
 
-import { Button } from '@material-ui/core';
+import { Button, Tooltip } from '@material-ui/core';
 import { LocalizationConsumer, LocalizationContext } from 'components/localization-provider';
 import { AvailableLanguage, availableLocalisations } from 'components/localization-provider/types';
 import { addDays } from 'date-fns/esm';
@@ -14,6 +14,7 @@ import * as assert from 'assert';
 
 interface LanguageSwitcherProps {
     alignTopRight?: boolean;
+    color?: 'inherit' | 'primary' | 'secondary' | 'default';
 }
 
 interface LanguageSwitcherState {
@@ -85,11 +86,16 @@ class LanguageSwitcher extends React.Component<LanguageSwitcherProps, LanguageSw
         const consumer = <LocalizationConsumer>
             {(localization): JSX.Element => {
                 return (
-                    <Button
-                        onClick={this.handleButtonClick}
+                    <Tooltip
+                        title={localization.LanguageSwitcher.tooltip}
                     >
-                        {this.state.next}
-                    </Button>
+                        <Button
+                            onClick={this.handleButtonClick}
+                            color={this.props.color}
+                        >
+                            {this.state.next}
+                        </Button>
+                    </Tooltip>
                 );
             }}
         </LocalizationConsumer>;

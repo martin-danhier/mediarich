@@ -181,4 +181,9 @@ export default abstract class MSContent {
      * @returns success or not. This object will not be usable afterwards in case of success !
      */
     public abstract delete(): Promise<boolean>;
+
+    /** Returns a permalink to the resource */
+    public getPermalink(): string {
+        return `${this._mediaServerAPIHandler.baseUrl}/permalink/${this._oid}/`;
+    }
 }

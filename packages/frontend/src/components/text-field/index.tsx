@@ -27,6 +27,8 @@ export interface CustomTextFieldProps extends Partial<RouteComponentProps> {
     multiline?: boolean;
     /** Autocomplete settings */
     autoComplete?: string;
+    /** Autofocus */
+    autoFocus?: boolean;
 }
 
 class CustomTextField extends React.Component<CustomTextFieldProps> {
@@ -45,6 +47,7 @@ class CustomTextField extends React.Component<CustomTextFieldProps> {
             multiline={this.props.multiline}
             autoComplete={this.props.autoComplete}
             error={!!this.props.error}
+            autoFocus={this.props.autoFocus}
         />;
     }
 }

@@ -9,6 +9,7 @@
         "newPassword": "Nouveau mot de passe",
         "repeatPassword": "Répéter le mot de passe",
         "login": "Se connecter",
+        "logout": "Se déconnecter",
         "backToLogin": "Retour à la connexion",
         "register": "S'inscrire",
         "apiKey": "Clé d'API",
@@ -47,18 +48,21 @@
         "videos": "Vidéos",
         "noRows": "Il n'y a aucune ligne à afficher.",
         "error": "Une erreur est survenue.",
+        "refresh": "Actualiser",
         "actionsNames": {
             "delete": "supprimer",
             "publish": "(Dé)publier",
             "edit": "modifier",
-            "move": "déplacer"
+            "move": "déplacer",
+            "visit": "ouvrir",
+            "add": "ajouter"
         },
         "fieldsNames": {
             "title": "Titre",
             "public": "Public",
             "addDate": "Date d'ajout",
             "views": "Vues",
-            "thumbnail": "Miniature",
+            "thumbnail": "Miniature actuelle",
             "duration": "Durée",
             "description": "Description"
         },
@@ -66,14 +70,18 @@
             "areYouSure": "Êtes-vous certain(e) de vouloir",
             "cancel": "Annuler",
             "thisIsIrreversible": "Cette action est irréversible.",
-            "publishInfoStartPlural": "Les",
-            "publishInfoEndPlural": "non-repertoriées deviendront publiques, et inversément. Note: cette opération ne fonctionne pas toujours pour le moment à cause d'un bug dans l'API, qui est hors de notre contrôle.",
-            "publishInfoSingular": "Si elle est non-répertoriée, elle deviendra publique, et inversément. Note: cette opération ne fonctionne pas toujours pour le moment à cause d'un bug dans l'API, qui est hors de notre contrôle.",
+            "publishInfoPlural": "Les vidéos non-publiées deviendront publiées, et inversément.",
+            "publishInfoSingular": "Si elle n'est pas publiée, elle sera publiée, et inversément.",
             "editDialogTitleSingular": "Modifier une",
-            "editDialogTitlePlural": "Modifier plusieurs"
+            "editDialogTitlePlural": "Modifier plusieurs",
+            "dragNewThumbnailImage": "Glissez une nouvelle image de miniature ou cliquez ici",
+            "addChannelTitle": "Ajouter une nouvelle chaîne",
+            "addVideoTitle": "Ajouter une nouvelle vidéo",
+            "addChannelUnlistedWarning": "La nouvelle chaîne sera non-répertoriée. Il n'y a malheureusement aucun moyen de changer cela depuis Mediarich. Si vous voulez créer une chaîne publique, vous devez donc l'ajouter depuis le site de MediaServer.",
+            "noOptions": "Aucune option."
         }
     },
-    "ImageField": {
-        "dragNewThumbnailImage": "Glissez une nouvelle image de miniature ou cliquez ici"
+    "LanguageSwitcher": {
+        "tooltip": "Changer la langue"
     }
 }

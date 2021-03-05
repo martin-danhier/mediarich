@@ -1,11 +1,11 @@
-import { Button, ButtonGroup, IconButton, Typography } from '@material-ui/core';
+import { Button, ButtonGroup, IconButton, Tooltip, Typography } from '@material-ui/core';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { DataGrid, GridColDef, GridRowsProp } from '@material-ui/data-grid';
 import { Add, Check, Clear, Delete, Edit, Public } from '@material-ui/icons';
 import { Icon } from '@iconify/react';
 import moveFile from '@iconify/icons-ic/round-drive-file-move';
-import { formatDuration } from 'utils/useful-functions';
+import { formatDuration, toUpperCaseFirstLetter } from 'utils/useful-functions';
 
 import './channel-content.style.css';
 import assert from 'utils/assert';
@@ -60,16 +60,23 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
                     <Typography variant='h5'>{this.props.title}</Typography>
 
                     {/* Add button */}
-                    <IconButton
-                        className='ChannelContent-addButton'
-                        disabled={this.props.addItem === undefined}
-                        onClick={(): void => {
-                            if (this.props.addItem) {
-                                this.props.addItem();
-                            }
-                        }}
-                    ><Add />
-                    </IconButton>
+                    <Tooltip
+                        title={toUpperCaseFirstLetter(this.props.localization.Channel.actionsNames.add)}
+                    >
+                        {/* Wrap in span so that the tooltip can still receive events even when the button is disabled */}
+                        <span>
+                            <IconButton
+                                className='ChannelContent-addButton'
+                                disabled={this.props.addItem === undefined}
+                                onClick={(): void => {
+                                    if (this.props.addItem) {
+                                        this.props.addItem();
+                                    }
+                                }}
+                            ><Add />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
 
                     {/* Fill the space */}
                     <div className='expand' />
@@ -80,8 +87,8 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
 
                     >
                         {/* Edit button */}
-                        <Button startIcon={<Edit />}
-                            disabled={this.props.editItems === undefined || this.state.selectionModel.length === 0}
+                        {this.props.editItems !== undefined && <Button startIcon={<Edit />}
+                            disabled={this.state.selectionModel.length === 0 || !this.state.selectionModel.every(this.props.editPermissionCheck)}
                             onClick={(): void => {
                                 if (this.props.editItems) {
                                     this.props.editItems(this.state.selectionModel);
@@ -89,12 +96,12 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
                             }}
                         >
                             {this.props.localization.Channel.actionsNames.edit}
-                        </Button>
+                        </Button>}
                         {/* (Un)publish button */}
 
-                        <Button
+                        {this.props.publishItems !== undefined && <Button
                             startIcon={<Public />}
-                            disabled={this.props.publishItems === undefined || this.state.selectionModel.length === 0}
+                            disabled={this.state.selectionModel.length === 0 || !this.state.selectionModel.every(this.props.editPermissionCheck)}
                             onClick={(): void => {
                                 if (this.props.publishItems) {
                                     this.props.publishItems(this.state.selectionModel);
@@ -102,12 +109,12 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
                             }}
                         >
                             {this.props.localization.Channel.actionsNames.publish}
-                        </Button>
+                        </Button>}
 
                         {/* Move button */}
                         {this.props.moveItems !== undefined && <Button
                             startIcon={<Icon icon={moveFile} />}
-                            disabled={this.state.selectionModel.length === 0 || this.state.selectionModel.every(this.props.editPermissionCheck)}
+                            disabled={this.state.selectionModel.length === 0 || !this.state.selectionModel.every(this.props.editPermissionCheck)}
                             onClick={(): void => {
                                 if (this.props.moveItems) {
                                     this.props.moveItems(this.state.selectionModel);
@@ -119,7 +126,7 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
                         {/* Delete button */}
                         <Button
                             startIcon={<Delete />}
-                            disabled={this.state.selectionModel.length === 0 || this.state.selectionModel.every(this.props.deletePermissionCheck)}
+                            disabled={this.state.selectionModel.length === 0 || !this.state.selectionModel.every(this.props.deletePermissionCheck)}
                             onClick={(): void => {
                                 if (this.props.deleteItems) {
                                     this.props.deleteItems(this.state.selectionModel);
@@ -187,6 +194,7 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
                                     assert(typeof data.onUpdate === 'function', 'The "onUpdate" callback must be a function');
 
                                     return <EditableTypography
+                                        key={data.defaultText}
                                         defaultText={data.defaultText}
                                         onRename={data.onUpdate}
                                         disabled={data.disabled}
@@ -278,13 +286,23 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
                                     assert(data.disabled === undefined || typeof data.disabled === 'boolean', 'The "disabled" field must be of type "boolean | undefined"');
                                     assert(data.onClick === undefined || typeof data.onClick === 'function', 'The "onClick" field must be of type "function | undefined"');
 
-                                    return <IconButton
+                                    // Define the button
+                                    const button = <IconButton
                                         className='ChannelContent-actionColumnButton'
                                         disabled={data.disabled}
                                         onClick={data.onClick}
                                     >
                                         {data.icon}
                                     </IconButton>;
+
+                                    // Wrap in a tooltip if a description is provided
+                                    return params.colDef.description !== undefined ?
+                                        <Tooltip title={params.colDef.description}>
+                                            {/* Wrap in a span so that the tooltip can still receive hover events when the button is disabled. */}
+                                            <span>
+                                                {button}
+                                            </span>
+                                        </Tooltip> : button;
                                 }
                             }
                         }}

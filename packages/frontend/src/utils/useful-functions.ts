@@ -65,7 +65,7 @@ export function toUpperCaseFirstLetter(str: string): string {
  */
 export function filterObject<T>(object: { [key: string]: T }, callback: (key: string, value: T) => boolean): { [key: string]: T } {
     const obj: Record<string, T> = {};
-    for (let key in object) {
+    for (const key in object) {
         // Call the callback
         const shouldKeep = callback(key, object[key]);
         // Don't add it if false

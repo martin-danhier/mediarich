@@ -114,7 +114,7 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         url: '/channels/edit/',
         method: 'POST',
         mode: 'cors',
-        requestContentType: MIMETypes.XWWWFormUrlencoded,
+        requestContentType: MIMETypes.FormData,
     } as const;
     /** Returns the object id of the users's personnal channel if he can have one, else a 403 will be returned.
       * The personal channel will be created  if it was not already created. If no user is specified, the user making the request will be used. */
@@ -162,7 +162,8 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         url: '/medias/edit/',
         method: 'POST',
         mode: 'cors',
-        requestContentType: MIMETypes.XWWWFormUrlencoded,
+        // credentials: 'include',
+        requestContentType: MIMETypes.FormData,
     } as const;
     /** Delete the requested media */
     '/medias/delete' = {

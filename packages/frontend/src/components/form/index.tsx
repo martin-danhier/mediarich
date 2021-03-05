@@ -12,7 +12,7 @@ import { Localization } from 'components/localization-provider/types';
 import { LocalizationConsumer } from 'components/localization-provider';
 import { RouteComponentProps } from 'react-router';
 import { DropzoneArea, DropzoneAreaProps } from 'material-ui-dropzone';
-import { DialogActions, DialogContent } from '@material-ui/core';
+import { DialogContent } from '@material-ui/core';
 import ImageField, { ImageFieldProps } from 'components/image-field';
 
 /** Format of the values that can be stored in a Form */
@@ -58,7 +58,7 @@ export interface FormProps<T extends FormValues<T>> extends Partial<RouteCompone
     /** Called when the form is submitted and the data is valid
      * @return a string with an url to redirect there
     */
-    onSubmit?: (validData: T) => Promise<void> | Promise<string>;
+    onSubmit?: (validData: T) => Promise<void> | Promise<string> | void;
     /** Validation function for change event. Place checks in the callback to check if the new value is valid
      * @returns a ChangeValidationCallback
     */

@@ -5,3 +5,9 @@
 .ChannelScaffold-breadcrumbsLink {
     cursor: pointer;
 }
+
+.ChannelScaffold-breadcrumbs {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}

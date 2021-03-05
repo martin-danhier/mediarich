@@ -1,4 +1,4 @@
-import * as assert from 'utils/assert';
+import assert from 'utils/assert';
 import APIClient, { HTTPRequestResult, JSONInnerObject, MIMETypes } from 'utils/api-client';
 import { CallBodyParam } from 'utils/api-client/api-client';
 import { MSApiSpecification, MSRoutesSpec } from './api-routes';
@@ -21,9 +21,12 @@ import { MSChannelTreeItem } from './classes/tree';
 class MediaServerAPIHandler {
 
     private _apiKey: string;
+    private _baseUrl: string;
 
     /** APIClient handling the MediaServer API. The base URL can be set with the ``REACT_APP_MEDIASERVER_API_ROOT`` environment variable. */
     private readonly _client;
+
+    public get baseUrl(): string { return this._baseUrl; }
 
     /**
      * Create a new media server
@@ -33,29 +36,38 @@ class MediaServerAPIHandler {
      * If still not set, it will default to `http://localhost:8080`.
      */
     public constructor(apiKey: string, baseUrl?: string) {
+        // Get the base URL
+        const url = (baseUrl ?? process.env.REACT_APP_MEDIASERVER_API_ROOT ?? 'http://localhost:8080');
+
+        // create a client and save parameters
         this._client = new APIClient<MSApiSpecification, MSRoutesSpec>(
-            new MSApiSpecification((baseUrl ?? process.env.REACT_APP_MEDIASERVER_API_ROOT ?? 'http://localhost:8080') + '/api/v2')
+            new MSApiSpecification(url + '/api/v2')
         );
         this._apiKey = apiKey;
+        this._baseUrl = url;
     }
 
     /** Clones this class */
     public clone(): MediaServerAPIHandler {
-        return new MediaServerAPIHandler(this._apiKey);
+        return new MediaServerAPIHandler(this._apiKey, this._baseUrl);
     }
 
     public async call<K extends keyof MSRoutesSpec>(
         routeName: K,
-        data?: JSONInnerObject
+        data?: JSONInnerObject | FormData
     ): Promise<MSResponseJson> {
 
         // Assert that the route is in form url encoded
-        assert.strictEqual(this._client.api.routes[routeName].requestContentType, MIMETypes.XWWWFormUrlencoded as const, 'All MediaServer request are done in x-w-form-urlencoded');
+        assert(this._client.api.routes[routeName].requestContentType === MIMETypes.XWWWFormUrlencoded as const
+            || this._client.api.routes[routeName].requestContentType === MIMETypes.FormData as const, 'All MediaServer request are done in x-w-form-urlencoded or in form-data');
 
-        // Init data if undefined
-        data = data ?? {};
-        // Add Api Key
-        data['api_key'] = this._apiKey;
+        if (data instanceof FormData) {
+            data.append('api_key', this._apiKey);
+        } else {        // Init data if undefined
+            data = data ?? {};
+            // Add Api Key
+            data['api_key'] = this._apiKey;
+        }
 
         let result: HTTPRequestResult | undefined;
         try {

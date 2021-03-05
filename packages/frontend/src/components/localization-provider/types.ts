@@ -18,6 +18,7 @@ export interface Localization {
         newPassword: string;
         repeatPassword: string;
         login: string;
+        logout: string;
         backToLogin: string;
         register: string;
         description: string;
@@ -52,11 +53,14 @@ export interface Localization {
         videos: string;
         noRows: string;
         error: string;
+        refresh: string;
         actionsNames: {
             delete: string;
             publish: string;
             edit: string;
             move: string;
+            visit: string;
+            add: string;
         };
         fieldsNames: {
             title: string;
@@ -71,15 +75,19 @@ export interface Localization {
             areYouSure: string;
             cancel: string;
             thisIsIrreversible: string;
-            publishInfoStartPlural: string;
-            publishInfoEndPlural: string;
+            publishInfoPlural: string;
             publishInfoSingular: string;
             editDialogTitleSingular: string;
             editDialogTitlePlural: string;
+            dragNewThumbnailImage: string;
+            addChannelTitle: string;
+            addVideoTitle: string;
+            addChannelUnlistedWarning: string;
+            noOptions: string;
         };
     };
-    ImageField: {
-        dragNewThumbnailImage: string;
+    LanguageSwitcher: {
+        tooltip: string;
     };
 }
 

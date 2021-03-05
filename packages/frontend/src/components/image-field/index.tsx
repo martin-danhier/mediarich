@@ -8,6 +8,7 @@ export interface ImageFieldProps {
     name: string;
     defaultImageUrl?: string;
     dropzoneText: string;
+    title: string;
     onChange?: (file: File | null) => void;
 }
 
@@ -71,14 +72,14 @@ class ImageField extends React.Component<ImageFieldProps, ImageFieldState> {
                 {/* Current thumbnail */}
                 <div className='ImageField-currentThumbnailWrapper'>
 
-                    <Typography variant='h6' className='expand'>Current thumbnail</Typography>
+                    <Typography variant='h6' className='expand'>{this.props.title}</Typography>
 
                     {/* Rectangle with the current thumbail*/}
                     <div className='ImageField-currentThumbnail'>
                         {(this.state.currentImageURL || this.props.defaultImageUrl) &&
                             <img
                                 src={this.state.currentImageURL ?? this.props.defaultImageUrl}
-                                alt='Current thumbnail' />}
+                                alt={this.props.title} />}
                     </div>
                 </div>
                 {/* Dropzone for new thumbnail */}

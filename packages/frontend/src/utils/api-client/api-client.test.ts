@@ -526,20 +526,6 @@ test('JSON in request', async () => {
     }
 });
 
-test('ArrayBuffer in request', async () => {
-    // Create an array buffer from a int 32 array (example)
-    const buffer = new Int32Array([5, 2, 3, 10, 22]).buffer;
-    const result = await client.call('bufferInput', buffer);
-
-    expect(result.ok).toBeTruthy();
-    expect(result.response).toBeDefined();
-    if (result.response) {
-        expect(result.response.status).toStrictEqual(200);
-        expect(await result.response.text()).toStrictEqual(buffer.byteLength.toString());
-    }
-
-});
-
 /**
  * When the api returns an unexpected content type, still return the response, but tell that this is not normal
  */
@@ -660,23 +646,6 @@ test('Redirection to undefined location', async () => {
     expect(result.ok).toBeFalsy();
     expect(result.message).toStrictEqual('Specification indicates to redirect to the location given in the response\'s \'Location\' header, but none was provided.');
     expect(result.response).toBeDefined();
-});
-
-test('Redirection to other route and preserve body', async () => {
-    // Prepare body
-    const data = '{"item" : 4, "bojnour": 4, "hey": 45}';
-    const blob = new Blob([data], { type: 'application/json' });
-    // Send request
-    const result = await client.call('redirectionPreserveBody', blob);
-
-    expect(result.ok).toBeTruthy();
-    expect(result.message).toBeUndefined();
-    expect(result.response).toBeDefined();
-    if (result.response) {
-        expect(result.response.status).toStrictEqual(200);
-    }
-    // check mock
-    expect(fetch).toHaveBeenCalledTimes(2);
 });
 
 test('External call body preserved', async () => {

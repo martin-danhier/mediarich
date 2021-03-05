@@ -15,7 +15,7 @@ interface ConfirmationDialogProps {
     /** Function to close the dialog. Don't handle the result here but in `onValidate`. */
     handleClose: () => void;
     /** Function called when the submit button is pressed. */
-    onValidate?: () => void | Promise<void>;
+    onSubmit?: () => void | Promise<void>;
 }
 
 /** Dialog displaying a title, a message, and two buttons */
@@ -42,8 +42,8 @@ class AlertDialog extends React.Component<ConfirmationDialogProps> {
                 </Button>
                 <Button onClick={(): void => {
                     this.props.handleClose();
-                    if (this.props.onValidate) {
-                        this.props.onValidate();
+                    if (this.props.onSubmit) {
+                        this.props.onSubmit();
                     }
                 }}
                 >
