@@ -65,7 +65,7 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
      *      object, it will be merged with the `baseQueryParams` provided to the request specification.
      * @async
      */
-    public async call<K extends keyof R>(routeName: K, data?: CallBodyParam<R, K>): Promise<HTTPRequestResult> {
+    public async call<K extends keyof R>(routeName: K, data?: CallBodyParam<R, K>, headers?: Record<string, string>): Promise<HTTPRequestResult> {
 
         const route = this._api.routes[routeName];
 
@@ -108,7 +108,7 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
             url.search = params.toString();
 
             // Get headers if there are some in the specification
-            if (route.headers) {
+            if (!headers && route.headers) {
                 const headers = new Headers(APIClient.processObjectWithCookieSyntax(route.headers));
                 fetchInit.headers = headers;
             }
@@ -165,8 +165,14 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
             }
 
             // Get headers
-            const headers = this.getHeaders(route, bodyData);
-            fetchInit.headers = headers;
+            const fetchHeaders = this.getHeaders(route, bodyData);
+            // Add parameters headers
+            if (headers) {
+                Object.keys(headers).forEach(key => {
+                    fetchHeaders.set(key, headers[key]);
+                });
+            }
+            fetchInit.headers = fetchHeaders;
 
             // Save body
             fetchInit.body = bodyData;

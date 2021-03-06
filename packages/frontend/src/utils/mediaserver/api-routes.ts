@@ -186,4 +186,18 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         requestContentType: MIMETypes.XWWWFormUrlencoded,
         mode: 'cors',
     } as const;
+    /** Uploads a chunk of a video */
+    '/upload' = {
+        url: '/upload/',
+        method: 'POST',
+        mode: 'cors',
+        requestContentType: MIMETypes.FormData,
+    } as const;
+    /** Marks an upload as complete */
+    '/upload/complete' = {
+        url: '/upload/complete/',
+        method: 'POST',
+        mode: 'cors',
+        requestContentType: MIMETypes.XWWWFormUrlencoded,
+    } as const;
 }

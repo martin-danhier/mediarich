@@ -23,6 +23,7 @@ import MoveDialog from '../dialogs/move-dialog';
 import assert from 'utils/assert';
 import MediaServerAPIHandler from 'utils/mediaserver/mediaserver-api-hanler';
 import Cookies from 'js-cookie';
+import AddVideoDialog from '../dialogs/add-video-dialog';
 
 export interface ChannelScaffoldRouterProps {
     slug: string;
@@ -74,6 +75,10 @@ export interface ChannelScaffoldState {
     addChannelDialog: {
         open: boolean;
     };
+    /** Data of the add dialog */
+    addVideoDialog: {
+        open: boolean;
+    };
     /** Data of the move dialog */
     moveDialog: {
         open: boolean;
@@ -116,6 +121,9 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                 }
             },
             addChannelDialog: {
+                open: false,
+            },
+            addVideoDialog: {
                 open: false,
             },
             moveDialog: {
@@ -527,11 +535,22 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                         console.log(params);
 
                         const editedMedia: string[] = [];
+
+                        const promises: Promise<boolean>[] = [];
+
                         // For each selected media
                         for (const media of selected) {
                             // Try to edit it with the given params
-                            const edited = await media.edit(params);
-                            if (edited && media.slug) {
+                            promises.push(media.edit(params));
+                        }
+
+                        // Wait for all responses to come back
+                        const results = await Promise.all(promises);
+
+                        // Handle the responses
+                        for (let i = 0; i < results.length; i++) {
+                            const media = selected[i];
+                            if (results[i] && media.slug) {
                                 editedMedia.push(media.slug);
                             }
                         }
@@ -580,13 +599,17 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                 submitText: localization.actionsNames.publish,
                 onSubmit: async (): Promise<void> => {
 
+                    const promises: Promise<boolean>[] = [];
+
                     for (const content of selected) {
                         // Toggle the unlisted property
-                        await content.edit({
+                        promises.push(content.edit({
                             validated: !content.validated,
-                        });
-
+                        }));
                     }
+
+                    // Wait for all responses to arrive
+                    await Promise.all(promises);
 
                     // Trigger a refresh
                     await this.triggerRefresh();
@@ -626,13 +649,25 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                 onSubmit: async (): Promise<void> => {
                     const deletedItems: string[] = [];
 
+                    const promises: Promise<boolean>[] = [];
+
                     // Delete the contents
                     for (const content of selected) {
-                        const deleted = await content.delete();
-                        if (deleted && content.slug) {
+                        promises.push(content.delete());
+                    }
+
+                    // Wait for all responses to arrive
+                    const results = await Promise.all(promises);
+
+                    // Handle results
+                    for (let i = 0; i < results.length; i++) {
+                        const content = selected[i];
+                        if (results[i] && content.slug) {
                             deletedItems.push(content.slug);
                         }
                     }
+
+
                     // Trigger refresh
                     if (isVideo) {
                         const newVideos = filterObject(this.state.videos, (key) => !deletedItems.includes(key));
@@ -686,6 +721,14 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
         }));
     }
 
+    /** Adds a new video */
+    onAddVideo = (): void => {
+        this.setState(prev => ({
+            ...prev,
+            addVideoDialog: { open: true },
+        }));
+    }
+
     /** Moves a content */
     onMoveContent = (selected: string[], isVideo: boolean): void => {
         const localization = this.props.localization.Channel;
@@ -735,11 +778,16 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                 onSubmit: async (destination: string): Promise<void> => {
                     const destinationChannel = this.state.channels[destination];
 
+                    const promises: Promise<boolean>[] = [];
+
                     // Move everything
                     for (const slug of selected) {
                         const content: MSContent = isVideo ? this.state.videos[slug] : this.state.channels[slug];
-                        await content.move(destinationChannel);
+                        promises.push(content.move(destinationChannel));
                     }
+
+                    // Wait for all responses to come back
+                    await Promise.all(promises);
 
                     // Close dialog
                     this.setState(prev => ({
@@ -886,6 +934,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                                         editItems={(items): void => this.onEdit(items.map(slug => this.state.videos[slug]))}
                                         publishItems={(items): void => this.onPublish(items.map(slug => this.state.videos[slug]))}
                                         deleteItems={(items): void => this.onDelete(items.map(slug => this.state.videos[slug]), true)}
+                                        addItem={(): void => this.onAddVideo()}
                                         moveItems={(items): void => this.onMoveContent(items, true)}
                                         title={this.props.localization.Channel.videos}
                                         columns={[
@@ -984,6 +1033,15 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                                     localization={this.props.localization}
                                     handleClose={(): void => this.setState(prev => ({ ...prev, addChannelDialog: { ...prev.addChannelDialog, open: false } }))}
                                     open={this.state.addChannelDialog.open}
+                                />
+                                <AddVideoDialog
+                                    parentChannel={this.state.channels[this.state.current]}
+                                    localization={this.props.localization}
+                                    handleClose={(): void => this.setState(prev => ({ ...prev, addVideoDialog: { ...prev.addVideoDialog, open: false } }))}
+                                    open={this.state.addVideoDialog.open}
+                                    handleDone={async (): Promise<void> => {
+                                        await this.triggerRefresh();
+                                    }}
                                 />
                                 <MoveDialog
                                     onSubmit={this.state.moveDialog.onSubmit}

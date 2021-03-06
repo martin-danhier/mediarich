@@ -52,15 +52,16 @@ class MediaServerAPIHandler {
         return new MediaServerAPIHandler(this._apiKey, this._baseUrl);
     }
 
-    public async call<K extends keyof MSRoutesSpec>(
-        routeName: K,
-        data?: JSONInnerObject | FormData
-    ): Promise<MSResponseJson> {
-
+    /** Handle a basic mediaserver request, but don't handle the response body.
+     * @param routeName Name of the called route
+     * @param data Data to send with the request
+    */
+    public async freeCall<K extends keyof MSRoutesSpec>(routeName: K, data?: JSONInnerObject | FormData, headers?: Record<string, string>): Promise<HTTPRequestResult> {
         // Assert that the route is in form url encoded
         assert(this._client.api.routes[routeName].requestContentType === MIMETypes.XWWWFormUrlencoded as const
             || this._client.api.routes[routeName].requestContentType === MIMETypes.FormData as const, 'All MediaServer request are done in x-w-form-urlencoded or in form-data');
 
+        // Add api key
         if (data instanceof FormData) {
             data.append('api_key', this._apiKey);
         } else {        // Init data if undefined
@@ -69,16 +70,33 @@ class MediaServerAPIHandler {
             data['api_key'] = this._apiKey;
         }
 
+        // Do the request
         let result: HTTPRequestResult | undefined;
         try {
-
             // Call the route
-            result = await this._client.call<K>(routeName, data as CallBodyParam<MSRoutesSpec, K>);
+            result = await this._client.call<K>(routeName, data as CallBodyParam<MSRoutesSpec, K>, headers);
 
         } catch (e) {
             console.error(e);
             throw new MediaServerError(e.message);
         }
+
+        return result;
+
+    }
+
+    /**
+     * Sends a request to media server and handle parts of the response
+     * @param routeName Name of the called route
+     * @param data Data to send with the request
+     * @returns The returned media server json
+     */
+    public async call<K extends keyof MSRoutesSpec>(
+        routeName: K,
+        data?: JSONInnerObject | FormData,
+    ): Promise<MSResponseJson> {
+
+        const result = await this.freeCall(routeName, data);
 
         // Parse the JSON if there is a content type
         if (await result.isOfType(MIMETypes.JSON)) {
@@ -93,13 +111,6 @@ class MediaServerAPIHandler {
         }
         // No JSON
         else {
-            const body = await result.getText();
-
-            if (body && await result.isOfType(MIMETypes.HTML)) {
-                const newWindow = window.open();
-                newWindow?.document.write(body);
-            }
-            console.log(body);
             throw new MediaServerError('The API didn\'t return a JSON.');
         }
 

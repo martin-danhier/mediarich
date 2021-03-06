@@ -6,7 +6,7 @@
 
 import LazyRoute from 'components/lazy-route';
 import React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import { unstable_createMuiStrictModeTheme as createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
 import { LocalizationProvider } from 'components/localization-provider';
 import { AvailableLanguage, availableLocalisations } from 'components/localization-provider/types';
@@ -16,7 +16,6 @@ import Error404 from 'routes/error-404';
 
 // Import pages in a lazy mode for code splitting
 // Code splitting = only download the code of the page you are visiting
-const Home = React.lazy(() => import('routes/home'));
 const Login = React.lazy(() => import('routes/login'));
 const Register = React.lazy(() => import('routes/register'));
 const Channel = React.lazy(() => import('routes/channel'));
@@ -90,7 +89,7 @@ class App extends React.Component {
                         <BrowserRouter>
                             <Switch>
                                 {/* Home page */}
-                                <LazyRoute exact path='/' render={(p): JSX.Element => <Home name='Hey' {...p} />} />
+                                <LazyRoute exact path='/' render={(p): JSX.Element => <Redirect to='/login' {...p} />} />
                                 {/* Register page */}
                                 <LazyRoute exact path='/register' render={(p): JSX.Element => <Register {...p} />} />
                                 {/* Login page */}

@@ -97,3 +97,21 @@ export function mapToObject<T, V>(array: T[], callback: MapToObjectCallback<T, V
     }
     return obj;
 }
+
+/** Provides an async API for a FileReader. Reads a blob as an arrayBuffer and returns it */
+export function getBlobArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        // On load, resolve with the result if it's an array buffer
+        reader.onload = (): void => {
+            if (reader.result instanceof ArrayBuffer) {
+                resolve(reader.result);
+            } else reject();
+        };
+
+        reader.onerror = reject;
+
+        reader.readAsArrayBuffer(blob);
+    });
+}

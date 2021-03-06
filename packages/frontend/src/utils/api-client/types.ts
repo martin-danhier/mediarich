@@ -560,7 +560,7 @@ export class HTTPRequestResult {
     /**
      * Get the json from the response, if it exists 
      * @returns The body json. Consumes the body.
-     * @throws if the parsing failed. Check with ``hasType(MIMETypes.JSON)`` before using this function.
+     * @throws if the parsing failed. Check with ``isOfType(MIMETypes.JSON)`` before using this function.
      * */
     public async getJson(): Promise<JSONObject | undefined> {
         return await this.response?.json();

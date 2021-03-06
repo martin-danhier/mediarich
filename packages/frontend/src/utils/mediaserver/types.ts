@@ -90,3 +90,8 @@ export interface MSVideoEditBody extends MSChannelEditBody {
     /** License name. */
     license?: string;
 }
+
+export interface MSVideoAddBody {
+    title: string;
+    videoFile: File;
+}

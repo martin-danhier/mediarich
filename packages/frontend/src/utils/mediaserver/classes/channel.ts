@@ -1,9 +1,10 @@
 import { JSONInnerObject } from 'utils/api-client';
 import MediaServerAPIHandler from '../mediaserver-api-hanler';
-import { MediaServerError, MSChannelEditBody } from '../types';
+import { MediaServerError, MSChannelEditBody, MSVideoAddBody } from '../types';
 import { as, asBool, asEnum, asJsonObject, asJsonObjectArray } from '../../validation';
 import MSContent from './content';
 import { MSVideo } from './video';
+import VideoUpload from './upload';
 
 /** Possible ways to sort the content of a channel */
 export enum MSChannelSorting {
@@ -259,5 +260,13 @@ export default class MSChannel extends MSContent {
             console.error(result);
             return null;
         }
+    }
+
+    /** Add a new video to the server. Since a video can be big, this function returns a VideoUpload.
+     * You need to call the `continueUpload()` function until it returns false. You can use the other properties for
+     * progress bars for instance.
+     */
+    public addVideo(params: MSVideoAddBody): VideoUpload {
+        return new VideoUpload(params, 2000000, this._mediaServerAPIHandler, this._oid);
     }
 }
