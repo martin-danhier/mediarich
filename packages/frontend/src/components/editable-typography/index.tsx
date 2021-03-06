@@ -1,10 +1,13 @@
 import { TextField, Typography } from '@material-ui/core';
+import { Variant } from '@material-ui/core/styles/createTypography';
 import React from 'react';
 
 export interface EditableTypographyProps {
     defaultText: string;
     onRename: (newText: string) => void | Promise<void>;
     disabled?: boolean;
+    variant?: 'inherit' | Variant;
+    typographyClassName?: string;
 }
 
 export interface EditableTypographyState {
@@ -73,6 +76,8 @@ class EditableTypography extends React.Component<EditableTypographyProps, Editab
         // No edit mode : typography
         if (!this.state.inEditMode) {
             return <Typography
+                className={this.props.typographyClassName}
+                variant={this.props.variant}
                 onClick={this.enterEditMode}
             >{this.state.text}</Typography>;
         }

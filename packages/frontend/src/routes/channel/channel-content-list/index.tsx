@@ -9,7 +9,7 @@ import { formatDuration, toUpperCaseFirstLetter } from 'utils/useful-functions';
 
 import './channel-content.style.css';
 import assert from 'utils/assert';
-import EditableTypography from './editable-typography';
+import EditableTypography from '../../../components/editable-typography';
 import { format } from 'date-fns';
 import { Localization } from 'components/localization-provider/types';
 

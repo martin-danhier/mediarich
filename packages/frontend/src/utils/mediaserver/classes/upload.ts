@@ -1,12 +1,13 @@
 import { MIMETypes } from 'utils/api-client';
-import { MediaServerError, MSVideoAddBody } from '..';
+import { MediaServerError } from '..';
 import SparkMd5 from 'spark-md5';
 import MediaServerAPIHandler from '../mediaserver-api-hanler';
 import { getBlobArrayBuffer } from 'utils/useful-functions';
+import assert from 'utils/assert';
 
 class VideoUpload {
     private _parentOid: string;
-    private _addParams: MSVideoAddBody;
+    private _file: File;
     private _start = 0;
     private _end = 0;
     private _lastChunkSize = 0;
@@ -20,10 +21,12 @@ class VideoUpload {
     /** Returns the end index of the last chunk */
     public get end(): number { return this._end; }
     /** Returns the total size of the file */
-    public get size(): number { return this._addParams.videoFile.size; }
+    public get size(): number { return this._file.size; }
+    /** Returns the name of the uploaded file */
+    public get filename(): string { return this._file.name; }
 
-    constructor(params: MSVideoAddBody, sliceSize: number, mediaServerAPIHandler: MediaServerAPIHandler, parentOid: string) {
-        this._addParams = params;
+    constructor(params: File, sliceSize: number, mediaServerAPIHandler: MediaServerAPIHandler, parentOid: string) {
+        this._file = params;
         this._sliceSize = sliceSize;
         this._mediaServerAPIHandler = mediaServerAPIHandler;
         this._parentOid = parentOid;
@@ -41,8 +44,7 @@ class VideoUpload {
                 this._end = this.size;
             }
             // Slice the file
-            console.log(`${this._start}-${this._end - 1}`);
-            const chunk = this._addParams.videoFile.slice(this._start, this._end, this._addParams.videoFile.type);
+            const chunk = this._file.slice(this._start, this._end, this._file.type);
 
             // Save the size
             this._lastChunkSize = chunk.size;
@@ -66,7 +68,7 @@ class VideoUpload {
         if (nextChunk !== null) {
             // Add it in a form data
             const data = new FormData();
-            data.append('file', nextChunk, this._addParams.videoFile.name);
+            data.append('file', nextChunk, this._file.name);
 
             // Add upload id if present
             if (this._uploadId !== null) {
@@ -108,30 +110,36 @@ class VideoUpload {
         else {
             // Upload complete : validate it
             const hash = this._md5Hash.end();
-            console.log(hash);
+
             const result = await this._mediaServerAPIHandler.call('/upload/complete', {
                 md5: hash,
                 'upload_id': this._uploadId,
             });
 
-            if (result.success) {
-                // Add the video
-                const addResult = await this._mediaServerAPIHandler.call('/medias/add', {
-                    code: this._uploadId,
-                    title: this._addParams.title,
-                    channel: this._parentOid,
-                });
-
-                if (!addResult.success) {
-                    throw new MediaServerError('Unable to add video', addResult);
-                }
-
-                // process finished, no need to call this function again
-                return false;
-            } else {
+            if (!result.success) {
                 throw new MediaServerError('The upload didn\'t complete successfully', result);
             }
+
+            return false;
         }
+    }
+
+    /** Only call this when the file uploaded successfully. Saves the uploaded video. */
+    async saveVideo(params: {
+        title: string;
+    }): Promise<boolean> {
+
+        assert(this._end >= this.size, 'The file must have finished uploading.');
+        assert(this._uploadId !== null, 'uploadId must not be null, call this function only when the upload worked.');
+
+        // Add the video
+        const addResult = await this._mediaServerAPIHandler.call('/medias/add', {
+            code: this._uploadId,
+            title: params.title,
+            channel: this._parentOid,
+        });
+
+        return addResult.success;
     }
 }
 
