@@ -83,13 +83,25 @@ export class AddVideoDialog extends React.Component<AddVideoDialogProps, AddVide
     }
 
     /** Called when an upload is complete */
-    handleUploadComplete = (id: number, title: string): void => {
+    handleUploadComplete = (id: number): void => {
         const newState = { ...this.state };
 
         // Set the item from the list as done
         const upload = newState.uploads.find(x => x.id === id);
         if (upload) {
             upload.done = true;
+        }
+        // Save
+        this.setState(newState);
+    }
+
+    /** Called when the title of an upload is modified */
+    handleTitleChange = (id: number, title: string): void => {
+        const newState = { ...this.state };
+
+        // Set the item from the list as done
+        const upload = newState.uploads.find(x => x.id === id);
+        if (upload) {
             upload.title = title;
         }
         // Save
@@ -123,7 +135,8 @@ export class AddVideoDialog extends React.Component<AddVideoDialogProps, AddVide
                         return <UploadCard
                             localization={this.props.localization}
                             defaultTitle={defaultTitle}
-                            onUploadComplete={(title): void => this.handleUploadComplete(id, title)}
+                            onUploadComplete={(): void => this.handleUploadComplete(id)}
+                            onTitleChange={(title): void => this.handleTitleChange(id, title)}
                             onDelete={(): void => this.handleUploadCancelled(id)}
                             key={id}
                             upload={upload}

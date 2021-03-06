@@ -114,7 +114,7 @@ class Login extends React.Component<RouteComponentProps<{}, StaticContext, {} & 
                                 }}
                             >
                                 {/* Username */}
-                                <CustomTextField required name='username' label={strings.username} />
+                                <CustomTextField autoComplete='off' required name='username' label={strings.username} />
 
                                 {/* Password */}
                                 <CustomTextField required name='password' password label={strings.password} />

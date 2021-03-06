@@ -115,7 +115,7 @@ class Register extends React.Component<RouteComponentProps> {
                                 }}
                             >
                                 {/* Username */}
-                                <CustomTextField required name='username' label={strings.username} />
+                                <CustomTextField autoComplete='off' required name='username' label={strings.username} />
 
                                 {/* Password */}
                                 <CustomTextField required name='password' password label={strings.newPassword} />
@@ -124,7 +124,7 @@ class Register extends React.Component<RouteComponentProps> {
                                 <CustomTextField required name='confirmPassword' password label={strings.repeatPassword} />
 
                                 {/* Api Key */}
-                                <CustomTextField required name='apiKey' label={strings.apiKey} />
+                                <CustomTextField autoComplete='off' required name='apiKey' label={strings.apiKey} />
 
                                 {/* Tutorial */}
                                 <div className="Register-apiKeyTutorial">

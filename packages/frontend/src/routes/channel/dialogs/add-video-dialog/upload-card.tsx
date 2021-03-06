@@ -11,12 +11,12 @@ export interface UploadCardProps {
     upload: VideoUpload;
     defaultTitle: string;
     onDelete: () => void;
-    onUploadComplete: (title: string) => void;
+    onUploadComplete: () => void;
+    onTitleChange: (newTitle: string) => void;
     localization: Localization;
 }
 
 export interface UploadCardState {
-    title: string;
     progressBar: number;
     done: boolean;
 }
@@ -30,7 +30,6 @@ class UploadCard extends React.Component<UploadCardProps, UploadCardState> {
         super(props);
 
         this.state = {
-            title: this.props.defaultTitle,
             progressBar: 0,
             done: false,
         };
@@ -77,7 +76,7 @@ class UploadCard extends React.Component<UploadCardProps, UploadCardState> {
                     done: true,
                 }));
                 // call the callback
-                this.props.onUploadComplete(this.state.title);
+                this.props.onUploadComplete();
             }
 
         } catch (e) {
@@ -94,12 +93,7 @@ class UploadCard extends React.Component<UploadCardProps, UploadCardState> {
                         typographyClassName='UploadCard-title'
                         variant='subtitle1'
                         defaultText={this.props.defaultTitle}
-                        onRename={(newText): void => {
-                            this.setState(prev => ({
-                                ...prev,
-                                title: newText,
-                            }));
-                        }}
+                        onRename={this.props.onTitleChange}
                     />
                     <div className='expand' />
                     {/* Delete button */}
