@@ -108,7 +108,7 @@ class Login extends React.Component<RouteComponentProps<{}, StaticContext, {} & 
                                 }}
                                 onSubmit={async (): Promise<string> => {
                                     // If connected, redirect to the next destination if any, or go to the default
-                                    return this.props.location?.state?.next ?? '/channel';
+                                    return this.props.location?.state?.next ?? '/channel/my';
                                 }}
                             >
                                 {/* Username */}

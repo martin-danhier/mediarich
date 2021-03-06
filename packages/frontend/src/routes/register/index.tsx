@@ -110,7 +110,7 @@ class Register extends React.Component<RouteComponentProps> {
                                     return result;
                                 }}
                                 onSubmit={async (): Promise<string> => {
-                                    return '/channel';
+                                    return '/channel/my';
                                 }}
                             >
                                 {/* Username */}
