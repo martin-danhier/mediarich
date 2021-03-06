@@ -17,7 +17,12 @@ export class MSApiSpecification implements APISpecification<MSRoutesSpec> {
         } as const,
         [HTTPStatusCodes.NotFound]: {
             expectedContentTypes: [MIMETypes.JSON],
+        } as const,
+        [HTTPStatusCodes.Forbidden]: {
+            isSuccess: false, // prevent error on 403
+            expectedContentType: [MIMETypes.JSON]
         } as const
+
     };
     readonly defaultErrorHandling: ErrorHandlingSpecification = {
         shouldLogError: true,

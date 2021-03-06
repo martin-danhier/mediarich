@@ -90,8 +90,10 @@ class Login extends React.Component<RouteComponentProps<{}, StaticContext, {} & 
                                         // If it worked, we need to recreate the Mediaserver API handler with the API key
                                         assert(this.context !== null, 'There should be a MediaServerProvider in the tree.');
                                         const mediaserver = this.context.changeApiKey(loginResult.apiKey);
-                                        const callResult = await mediaserver.myChannel();
-                                        if (callResult === null) {
+
+                                        // Test a request to check if the key is valid
+                                        const keyValid = await mediaserver.test();
+                                        if (!keyValid) {
                                             result.ok = false;
                                             result.errors.password = strings.errors.apiKeyNoLongerValid;
                                             // Reset handler to avoid further requests

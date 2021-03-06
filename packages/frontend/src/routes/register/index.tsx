@@ -76,16 +76,17 @@ class Register extends React.Component<RouteComponentProps> {
                                         assert.ok(this.context !== null, 'MediaServerProvider should be in the tree.');
 
                                         const mediaserver = this.context.changeApiKey(values.apiKey);
-                                        const callResult = await mediaserver.myChannel();
 
-                                        // If null, that means that there is no channel associated with this api key
-                                        // We assume that the key is invalid, because the app is useless without a channel anyway
-                                        if (callResult === null) {
+                                        // Test a request to check if the key is valid
+                                        const keyValid = await mediaserver.test();
+                                        if (!keyValid) {
+                                            // if it throws, then the api key is not valid
                                             result.ok = false;
                                             result.errors.apiKey = strings.errors.invalidApiKey;
                                             // Reset the handler to avoid further requests
                                             this.context.reset();
                                         }
+
                                     }
 
                                     // If everything is still good at this point, try to add the user

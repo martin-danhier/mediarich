@@ -77,11 +77,11 @@ export class MediaServerProvider extends React.Component<MediaServerProviderProp
             // Refresh api Key
             mediaserver = this.changeApiKey(result.apiKey);
 
-            // Try to get a channel to see if the connection works
-            const callResult = await mediaserver.myChannel();
+            // Test a request to check if the key is valid
+            const keyValid = await mediaserver.test();
 
-            // If it doesn't work, reset the handler abd redirect to login
-            if (callResult === null) {
+            if (!keyValid) {
+                // If it doesn't work, reset the handler abd redirect to login
                 history.push('/login', { next: currentUrl });
 
                 // Reset handler to avoid further requests
@@ -91,6 +91,8 @@ export class MediaServerProvider extends React.Component<MediaServerProviderProp
                 // Disconnect from backend
                 Cookies.remove('connect.sid');
             }
+
+
         } else {
             throw new Error('Unable to refresh');
         }

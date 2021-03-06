@@ -51,6 +51,8 @@ export interface ChannelScaffoldState {
     error: string;
     /** Current channel slug */
     current: string;
+    /** True if the user has a personnal channel */
+    hasAPersonalChannel: boolean;
     /** Data of the alert dialog */
     alertDialog: {
         open: boolean;
@@ -104,6 +106,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
             innerLoading: false,
             error: '',
             current: '',
+            hasAPersonalChannel: false,
             alertDialog: {
                 open: false,
                 title: '',
@@ -155,6 +158,9 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                     slug = firstChannel;
                 }
 
+                // Check if the user has a personal channel
+                const hasAPersonalChannel = (await mediaserver.myChannel()) !== null;
+
                 // Get infos about the current channel
                 const result = await this.fetchCurrentChannelInfos(slug, channels);
 
@@ -164,6 +170,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                     videos: result.videos,
                     subchannelsSlugs: result.subchannelsSlugs,
                     menuItems,
+                    hasAPersonalChannel,
                     current: slug,
                     loading: false,
                 }));
@@ -242,6 +249,8 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
         videos: Record<string, MSVideo>;
         subchannelsSlugs: string[];
     }> {
+        assert(channels[slug] !== undefined, 'The given slug must be the slug of an existing channel');
+
         // Load content of the current channel
         await channels[slug].fetchInfos(true);
         const result = await channels[slug].content(true, true);
@@ -309,7 +318,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
 
         if (mediaserver != null) {
             // Get current slug
-            const current = await this.getSlug(mediaserver);
+            let current = await this.getSlug(mediaserver);
 
 
             // Refresh if the current channel changed
@@ -321,6 +330,13 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                     innerLoading: true,
                     current,
                 }));
+
+                // Redirect if the current channel does not exist
+                if (!Object.keys(this.state.channels).includes(current)) {
+                    const firstChannel = Object.keys(this.state.channels)[0];
+                    this.props.history.push(`/channel/${firstChannel}`);
+                    current = firstChannel;
+                }
 
                 // Fetch infos about the current channel
                 const result = await this.fetchCurrentChannelInfos(current, this.state.channels);
@@ -870,16 +886,18 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                         <LanguageSwitcher
                             color='inherit'
                         />
+
                         {/* My channel*/}
-                        <Button
-                            color='inherit'
-                            onClick={(): void => {
-                                // Redirect
-                                this.props.history.push('/channel/my');
-                            }}
-                        >
-                            {this.props.localization.Channel.myChannel}
-                        </Button >
+                        {this.state.hasAPersonalChannel &&
+                            <Button
+                                color='inherit'
+                                onClick={(): void => {
+                                    // Redirect
+                                    this.props.history.push('/channel/my');
+                                }}
+                            >
+                                {this.props.localization.Channel.myChannel}
+                            </Button >}
 
                         {/* Disconnect button */}
                         <Button
@@ -929,7 +947,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                                                 field: 'title',
                                                 headerName: this.props.localization.Channel.fieldsNames.title,
                                                 type: 'editable',
-                                                flex: 3,
+                                                flex: 4,
                                             },
                                             // Actions
                                             {
@@ -967,7 +985,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                                                 field: 'title',
                                                 headerName: this.props.localization.Channel.fieldsNames.title,
                                                 type: 'editable',
-                                                flex: 2,
+                                                flex: 5,
                                             },
                                             // Add date
                                             {

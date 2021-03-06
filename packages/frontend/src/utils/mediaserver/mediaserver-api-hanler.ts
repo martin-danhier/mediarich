@@ -256,11 +256,18 @@ class MediaServerAPIHandler {
         if (result.success) {
             // Return the channel
             return MSChannel.fromJSON(result, this);
-
         } else {
-            console.error(result);
             return null;
         }
+    }
+
+    /** Tests if the api key is valid or not */
+    public async test(): Promise<boolean> {
+        // Call the "ping" route with the api key
+        // If the key is valid, it will respond 200
+        // Else it will respond 403
+        const result = await this.call('/');
+        return result.success;
     }
 }
 
