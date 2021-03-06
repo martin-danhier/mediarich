@@ -29,7 +29,7 @@
             "usernameTaken": "Ce nom d'utilisateur est déjà pris.",
             "invalidApiKey": "Clé d'API invalide.",
             "wrongCredentials": "Nom d'utilisateur ou mot de passe incorrect.",
-            "unknownError": "Une erreur inconnue est survenue.",
+            "unknownError": "Une erreur inconnue est survenue. Essayez d'actualiser la page.",
             "apiKeyNoLongerValid": "La clé d'API liée à votre compte n'est plus valide. Veuillez contacter votre administrateur MediaServer ou créer un nouveau compte avec une autre clé."
         }
     },
@@ -49,6 +49,7 @@
         "noRows": "Il n'y a aucune ligne à afficher.",
         "error": "Une erreur est survenue.",
         "refresh": "Actualiser",
+        "myChannel": "Ma chaîne",
         "actionsNames": {
             "delete": "supprimer",
             "publish": "(Dé)publier",
@@ -78,7 +79,11 @@
             "addChannelTitle": "Ajouter une nouvelle chaîne",
             "addVideoTitle": "Ajouter une nouvelle vidéo",
             "addChannelUnlistedWarning": "La nouvelle chaîne sera non-répertoriée. Il n'y a malheureusement aucun moyen de changer cela depuis Mediarich. Si vous voulez créer une chaîne publique, vous devez donc l'ajouter depuis le site de MediaServer.",
-            "noOptions": "Aucune option."
+            "noOptions": "Aucune option.",
+            "dragNewVideo": "Glissez une ou plusieurs vidéos ou cliquez ici",
+            "uploadComplete": "Mise en ligne terminée ! Appuyez sur \"Ajouter\" pour confirmer l'ajout.",
+            "uploadInProgress": "Mise en ligne en cours...",
+            "omittedFields": "Les champs omis ne seront pas modifiés."
         }
     },
     "LanguageSwitcher": {

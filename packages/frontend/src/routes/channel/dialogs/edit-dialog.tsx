@@ -49,17 +49,19 @@ class EditDialog extends React.Component<EditDialogProps> {
                     description: this.props.defaultData.description ?? '',
                     thumbnail: null,
                 }}
+                requiredFieldsOverride={this.props.omitEmpty ? undefined : ['title']}
                 onSubmit={(data): void => { if (this.props.onSubmit) this.props.onSubmit(data); }}
+
             >
                 {/* Content */}
                 <DialogContent>
 
-                    {this.props.omitEmpty ? <Typography className='margin-bottom'>Les champs omis ne seront pas modifiés.</Typography> : <></>}
+                    {this.props.omitEmpty ? <Typography className='margin-bottom'>{this.props.localization.Channel.dialogs.omittedFields}</Typography> : <></>}
 
                     <CustomTextField
                         label={this.props.localization.Channel.fieldsNames.title}
                         name='title'
-                        required
+                        required={!this.props.omitEmpty}
                         noMargin
                         autoComplete='off'
                     />

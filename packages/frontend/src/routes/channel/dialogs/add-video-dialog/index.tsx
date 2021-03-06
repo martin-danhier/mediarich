@@ -121,6 +121,7 @@ export class AddVideoDialog extends React.Component<AddVideoDialogProps, AddVide
                 {   // Place one card by upload
                     this.state.uploads.map(({ upload, id, title: defaultTitle }) => {
                         return <UploadCard
+                            localization={this.props.localization}
                             defaultTitle={defaultTitle}
                             onUploadComplete={(title): void => this.handleUploadComplete(id, title)}
                             onDelete={(): void => this.handleUploadCancelled(id)}
@@ -130,11 +131,12 @@ export class AddVideoDialog extends React.Component<AddVideoDialogProps, AddVide
                     })
                 }
                 <DropzoneArea
-                    dropzoneClass='margin-top'
+                    dropzoneClass='margin-top alignContent-center'
                     acceptedFiles={['video/mp4', 'video/x-msvideo']}
                     maxFileSize={2147483648}
                     onDrop={this.addUpload}
                     clearOnUnmount
+                    dropzoneText={this.props.localization.Channel.dialogs.dragNewVideo}
                     // We use key to refresh the dropzone after each upload, which clears it
                     // This cause a warning because the dropzone package calls setState even when unmounted
                     // To prevent this, the dropzone package should add a way to clear the dropzone programmatically

@@ -138,23 +138,12 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
     // Called when the component is mounted
     async componentDidMount(): Promise<void> {
 
-        let slug = this.props.match.params.slug;
-
         const mediaserver = await this.getMediaServer();
 
         // If there is a mediaserver
         if (mediaserver) {
             try {
-                // /channel/my is a special URL reserved as a shortcut to the personnal channel
-                if (slug === 'my') {
-                    // Find the personnal channel
-                    const myChannel = await mediaserver.myChannel();
-                    if (myChannel && myChannel.slug) {
-                        // Go to that page
-                        this.props.history.push(`/channel/${myChannel.slug}`);
-                        slug = myChannel.slug;
-                    }
-                }
+                let slug = await this.getSlug(mediaserver);
 
                 // Load the channels
                 const { channels, menuItems } = await this.fetchChannelList(mediaserver);
@@ -188,6 +177,24 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
         }
     }
 
+    /** Returns the slug of the current channel and redirect if it is /my (special slug) */
+    async getSlug(mediaserver: MediaServerAPIHandler): Promise<string> {
+        let slug = this.props.match.params.slug;
+
+        // /channel/my is a special URL reserved as a shortcut to the personnal channel
+        if (slug === 'my') {
+            // Find the personnal channel
+            const myChannel = await mediaserver.myChannel();
+            if (myChannel && myChannel.slug) {
+                // Go to that page
+                this.props.history.push(`/channel/${myChannel.slug}`);
+                slug = myChannel.slug;
+            }
+        }
+
+        return slug;
+    }
+
     /** Returns the api handler, and try to refresh it if it is */
     async getMediaServer(): Promise<MediaServerAPIHandler | null> {
         // Get the list of channels for the menu
@@ -201,7 +208,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
             catch (e) {
                 this.setState(prev => ({
                     ...prev,
-                    error: this.props.localization.Channel.error,
+                    error: this.props.localization.Auth.errors.unknownError,
                 }));
             }
         }
@@ -236,7 +243,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
         subchannelsSlugs: string[];
     }> {
         // Load content of the current channel
-        await channels[slug].fetchInfos(false);
+        await channels[slug].fetchInfos(true);
         const result = await channels[slug].content(true, true);
         if (result === undefined) {
             throw Error('Unknown error');
@@ -298,27 +305,34 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
 
     /** Called on update. We use it to refresh the channel when a new one is selected. */
     componentDidUpdate = async (): Promise<void> => {
-        const current = this.props.match.params.slug;
-        // Refresh if the current channel changed
-        if (current !== this.state.current && !this.state.loading) {
+        const mediaserver = await this.getMediaServer();
 
-            // Go back to loading mode
-            this.setState(prev => ({
-                ...prev,
-                innerLoading: true,
-                current,
-            }));
+        if (mediaserver != null) {
+            // Get current slug
+            const current = await this.getSlug(mediaserver);
 
-            // Fetch infos about the current channel
-            const result = await this.fetchCurrentChannelInfos(current, this.state.channels);
 
-            this.setState(prev => ({
-                ...prev,
-                innerLoading: false,
-                channels: result.channels,
-                videos: result.videos,
-                subchannelsSlugs: result.subchannelsSlugs,
-            }));
+            // Refresh if the current channel changed
+            if (current !== this.state.current && !this.state.loading) {
+
+                // Go back to loading mode
+                this.setState(prev => ({
+                    ...prev,
+                    innerLoading: true,
+                    current,
+                }));
+
+                // Fetch infos about the current channel
+                const result = await this.fetchCurrentChannelInfos(current, this.state.channels);
+
+                this.setState(prev => ({
+                    ...prev,
+                    innerLoading: false,
+                    channels: result.channels,
+                    videos: result.videos,
+                    subchannelsSlugs: result.subchannelsSlugs,
+                }));
+            }
         }
     }
 
@@ -473,7 +487,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
         // Take the data of the first video
         let thumbnail: string | undefined | null = selected[0].thumb;
         let currentTitle: string | undefined | null = selected[0].title;
-        let currentDescription: string | undefined | null = selected[0].description;
+        let currentDescription: string | undefined | null = selected[0].shortDescription;
 
         // Only keep default values for the fields if every field has identical values in it
         for (const video of selected) {
@@ -486,14 +500,14 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                 currentTitle = null;
             }
             // Check description
-            if (currentDescription && currentDescription !== video.description) {
+            if (currentDescription && currentDescription !== video.shortDescription) {
                 currentDescription = null;
             }
         }
 
         // If true, empty fields will be ignored
         // If false, the empty string will be sent
-        const omitEmpty = selected.length > 1 && (currentDescription === null || currentDescription === null);
+        const omitEmpty = selected.length > 1 && (currentDescription === null || currentTitle === null);
 
         this.setState(prev => ({
             ...prev,
@@ -508,8 +522,6 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                 },
                 // Handle new data submitted
                 onSubmit: async (data): Promise<void> => {
-                    console.log('save !');
-
                     // Build body
                     const params: MSVideoEditBody = {};
                     let empty = true;
@@ -532,7 +544,6 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                     }
 
                     if (!empty) {
-                        console.log(params);
 
                         const editedMedia: string[] = [];
 
@@ -554,8 +565,6 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                                 editedMedia.push(media.slug);
                             }
                         }
-
-                        console.log(editedMedia);
 
                         // close the dialog
                         this.setState(prev => ({
@@ -677,7 +686,6 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                         }));
                     } else {
 
-                        console.log(deletedItems);
 
                         this.setState(prev => ({
                             ...prev,
@@ -845,7 +853,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                 /* App bar */
                 <Scaffold
                     {...this.props}
-                    title={this.state.channels[this.state.current].title}
+                    title={this.state.channels[this.state.current]?.title}
                     showDrawerByDefault
                     drawerMenuItems={this.state.menuItems}
                     appBarActions={<>
@@ -862,6 +870,17 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                         <LanguageSwitcher
                             color='inherit'
                         />
+                        {/* My channel*/}
+                        <Button
+                            color='inherit'
+                            onClick={(): void => {
+                                // Redirect
+                                this.props.history.push('/channel/my');
+                            }}
+                        >
+                            {this.props.localization.Channel.myChannel}
+                        </Button >
+
                         {/* Disconnect button */}
                         <Button
                             color='inherit'
@@ -887,12 +906,16 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
 
                         {/* Content */}
 
-                        {this.state.innerLoading ? <div className='ChannelScaffold-innerLoadingWrapper'><LoadingScreen errorMessage={this.state.error} /></div> :
+                        {this.state.innerLoading || this.props.match.params.slug === 'my' ?
+                            <div className='ChannelScaffold-innerLoadingWrapper'>
+                                <LoadingScreen errorMessage={this.state.error} />
+                            </div> :
                             /* Subchannels */
                             <>
                                 <div className='padding-vertical'>
                                     <ChannelContentList
                                         {...this.props}
+                                        canAddItem={this.state.channels[this.state.current].canAddChannel}
                                         addItem={this.onAddChannel}
                                         editPermissionCheck={(slug): boolean => !!this.state.channels[slug]?.canEdit}
                                         deletePermissionCheck={(slug): boolean => !!this.state.channels[slug]?.canDelete}
@@ -929,6 +952,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                                     {/* Videos */}
                                     <ChannelContentList
                                         {...this.props}
+                                        canAddItem={this.state.channels[this.state.current].canAddVideo}
                                         editPermissionCheck={(slug): boolean => !!this.state.videos[slug]?.canEdit}
                                         deletePermissionCheck={(slug): boolean => !!this.state.videos[slug]?.canDelete}
                                         editItems={(items): void => this.onEdit(items.map(slug => this.state.videos[slug]))}

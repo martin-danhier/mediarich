@@ -54,6 +54,7 @@ export interface Localization {
         noRows: string;
         error: string;
         refresh: string;
+        myChannel: string;
         actionsNames: {
             delete: string;
             publish: string;
@@ -72,6 +73,7 @@ export interface Localization {
             duration: string;
         };
         dialogs: {
+            omittedFields: string;
             areYouSure: string;
             cancel: string;
             thisIsIrreversible: string;
@@ -84,6 +86,10 @@ export interface Localization {
             addVideoTitle: string;
             addChannelUnlistedWarning: string;
             noOptions: string;
+            dragNewVideo: string;
+            uploadComplete: string;
+            uploadInProgress: string;
+
         };
     };
     LanguageSwitcher: {

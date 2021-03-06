@@ -75,8 +75,6 @@ router.post('/login', async (req, res) => {
             const passwordOk = await UserRepository.checkUserPassword(user, body.password);
             if (passwordOk) {
 
-                console.log(req.session);
-
                 // Log in the user
                 req.session.user = user;
 

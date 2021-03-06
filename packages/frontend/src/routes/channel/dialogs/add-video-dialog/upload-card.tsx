@@ -1,6 +1,7 @@
-import { Card, CardContent, IconButton, LinearProgress, Typography } from '@material-ui/core';
+import { Card, CardContent, IconButton, LinearProgress, Tooltip, Typography } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';
 import EditableTypography from 'components/editable-typography';
+import { Localization } from 'components/localization-provider/types';
 import React from 'react';
 import VideoUpload from 'utils/mediaserver/classes/upload';
 
@@ -11,6 +12,7 @@ export interface UploadCardProps {
     defaultTitle: string;
     onDelete: () => void;
     onUploadComplete: (title: string) => void;
+    localization: Localization;
 }
 
 export interface UploadCardState {
@@ -101,13 +103,19 @@ class UploadCard extends React.Component<UploadCardProps, UploadCardState> {
                     />
                     <div className='expand' />
                     {/* Delete button */}
-                    <IconButton
-                        onClick={this.props.onDelete}
-                    >
-                        <Delete />
-                    </IconButton>
+                    <Tooltip title={this.props.localization.Channel.dialogs.cancel}>
+                        <IconButton
+                            onClick={this.props.onDelete}
+                        >
+                            <Delete />
+                        </IconButton>
+                    </Tooltip>
                 </div>
-                <Typography>{this.state.done ? 'Upload complete ! Press "Add" to confirm.' : 'Upload in progress...'}</Typography> {/* TODO*/}
+                <Typography>
+                    {this.state.done ?
+                        this.props.localization.Channel.dialogs.uploadComplete
+                        : this.props.localization.Channel.dialogs.uploadInProgress}
+                </Typography>
                 {/* Progress bar */}
                 <LinearProgress
                     className='margin-top'

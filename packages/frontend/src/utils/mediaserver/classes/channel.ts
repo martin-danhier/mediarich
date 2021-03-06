@@ -267,6 +267,6 @@ export default class MSChannel extends MSContent {
      * progress bars for instance.
      */
     public addVideo(file: File): VideoUpload {
-        return new VideoUpload(file, 3000000, this._mediaServerAPIHandler, this._oid);
+        return new VideoUpload(file, 5000000, this._mediaServerAPIHandler, this._oid);
     }
 }

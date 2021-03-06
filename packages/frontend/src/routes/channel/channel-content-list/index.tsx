@@ -18,6 +18,7 @@ export interface ChannelContentListProps extends RouteComponentProps {
     columns: GridColDef[];
     rows: GridRowsProp;
     localization: Localization;
+    canAddItem?: boolean;
     addItem?: () => void;
     editItems?: (items: string[]) => void;
     publishItems?: (items: string[]) => void;
@@ -67,7 +68,7 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
                         <span>
                             <IconButton
                                 className='ChannelContent-addButton'
-                                disabled={this.props.addItem === undefined}
+                                disabled={!this.props.canAddItem || this.props.addItem === undefined}
                                 onClick={(): void => {
                                     if (this.props.addItem) {
                                         this.props.addItem();
@@ -149,6 +150,8 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
                         }}
                         disableColumnReorder
                         disableSelectionOnClick
+                        disableMultipleColumnsFiltering
+                        disableColumnSelector
                         disableColumnMenu
                         className='ChannelContent-dataGrid margin-vertical'
                         disableMultipleColumnsSorting
@@ -263,10 +266,12 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
                             },
                             // String
                             string: {
+                                
                                 headerClassName: 'ChannelContent-header',
                             },
                             // Action column, that can contain icon buttons
                             action: {
+                                resizable: false,
                                 disableClickEventBubbling: true,
                                 filterable: false,
                                 sortable: false,

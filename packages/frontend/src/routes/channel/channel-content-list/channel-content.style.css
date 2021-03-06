@@ -20,6 +20,7 @@
 .ChannelContent-row {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
 }
@@ -29,5 +30,5 @@
 }
 
 .ChannelContent-wrapper {
-    min-width: 70rem;
+    width: 100%;
 }

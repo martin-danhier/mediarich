@@ -29,7 +29,7 @@
             "usernameTaken": "Username already taken.",
             "invalidApiKey": "Invalid API key",
             "wrongCredentials": "Username or password incorrect.",
-            "unknownError": "An unknown error occured.",
+            "unknownError": "An unknown error occured. Try to refresh the page.",
             "apiKeyNoLongerValid": "The API key linked with your account is no longer valid. Please contact your MediaServer administrator or create a new account with another key."
         }
     },
@@ -49,6 +49,7 @@
         "noRows": "No rows.",
         "error": "An error occured.",
         "refresh": "Refresh",
+        "myChannel": "My channel",
         "actionsNames": {
             "delete": "delete",
             "publish": "(Un)publish",
@@ -74,11 +75,15 @@
             "publishInfoSingular": "If it is private, it will become public, and vice versa.",
             "editDialogTitleSingular": "Edit a",
             "editDialogTitlePlural" : "Edit several",
-            "dragNewThumbnailImage": "Drag a new thumbnail image or click here",
+            "dragNewThumbnailImage": "Drag and drop a new thumbnail image here or click",
             "addChannelTitle": "Add a new channel",
             "addVideoTitle": "Add a new video",
             "addChannelUnlistedWarning": "The new channel will be unlisted. There is unfortunately no way to change this from Mediarich, so if you want a public channel, you must add it from the MediaServer website.",
-            "noOptions": "No options."
+            "noOptions": "No options.",
+            "dragNewVideo": "Drag and drop one or more videos here or click",
+            "uploadComplete": "Upload complete ! Press \"Add\" to confirm.",
+            "uploadInProgress": "Upload in progress, please wait...",
+            "omittedFields": "Omitted fields won't be updated."
         }
     },
     "LanguageSwitcher": {

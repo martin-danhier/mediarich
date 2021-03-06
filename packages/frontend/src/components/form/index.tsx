@@ -68,6 +68,7 @@ export interface FormProps<T extends FormValues<T>> extends Partial<RouteCompone
      * @returns a SubmitValidationCallback
      * */
     validateSubmit?: SubmitValidationCallback<T>;
+    requiredFieldsOverride?: (keyof T)[];
 }
 
 /** State of a Form component */
@@ -88,12 +89,14 @@ class FormContent<T extends FormValues<T>> extends React.Component<FormProps<T>,
 
         // Get required fields
         const required: (keyof T)[] = [];
-        for (const child of props.children) {
-            if (child.type === CustomTextField && React.isValidElement<CustomTextFieldProps>(child) && child.props.required) {
-                // Assert that the name is a key of the data
-                assert.ok(Object.keys(props.initialState).includes(child.props.name), `The field "${child.props.name}" should be defined in the initialState.`);
-                // Add its name to the list
-                required.push(child.props.name as keyof T);
+        if (!props.requiredFieldsOverride) {
+            for (const child of props.children) {
+                if (child.type === CustomTextField && React.isValidElement<CustomTextFieldProps>(child) && child.props.required) {
+                    // Assert that the name is a key of the data
+                    assert.ok(Object.keys(props.initialState).includes(child.props.name), `The field "${child.props.name}" should be defined in the initialState.`);
+                    // Add its name to the list
+                    required.push(child.props.name as keyof T);
+                }
             }
         }
 
@@ -101,7 +104,7 @@ class FormContent<T extends FormValues<T>> extends React.Component<FormProps<T>,
         this.state = {
             values: props.initialState,
             errors: {},
-            required,
+            required: props.requiredFieldsOverride ?? required,
         };
     }
 

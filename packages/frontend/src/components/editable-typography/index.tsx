@@ -50,17 +50,20 @@ class EditableTypography extends React.Component<EditableTypographyProps, Editab
 
     /** Exit edit mode and confirm changes */
     exitEditMode = (): void => {
-        // Only call the callback if the text actually changed
-        if (this.state.text !== this.state.previousText) {
-            // Call callback
-            this.props.onRename(this.state.text);
-        }
+        // Do nothing if the field is empty
+        if (this.state.text !== '') {
+            // Only call the callback if the text actually changed
+            if (this.state.text !== this.state.previousText) {
+                // Call callback
+                this.props.onRename(this.state.text);
+            }
 
-        // Exit edit mode
-        this.setState(prev => ({
-            ...prev,
-            inEditMode: false,
-        }));
+            // Exit edit mode
+            this.setState(prev => ({
+                ...prev,
+                inEditMode: false,
+            }));
+        }
     }
 
     /** Exit edit mode but don't keep changes */
