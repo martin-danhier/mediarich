@@ -2,7 +2,8 @@
  * @file Tests for the assert wrapper, to see if the assertions still work
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import * as assert from '.';
 

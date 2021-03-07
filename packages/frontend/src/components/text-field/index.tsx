@@ -2,7 +2,8 @@
  * @file Definition of an CustomTextField component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import './text-field.style.css';
 

@@ -1,7 +1,8 @@
 /**
  * @file Types used in an APIClient
  * @author Martin Danhier
- * @version 0.1
+ * @license Apache
+* @version 0.1
  */
 
 /** Valid JSON object. Can safely be stringified to JSON. */

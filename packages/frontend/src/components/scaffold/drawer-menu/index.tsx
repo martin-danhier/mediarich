@@ -2,7 +2,8 @@
  * @file Definition of a DrawerMenu component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import './drawer-menu.style.css';
 

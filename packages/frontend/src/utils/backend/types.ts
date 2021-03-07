@@ -2,7 +2,8 @@
  * @file Various types used in the MediarichAPIHandler
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import { JSONInnerObject } from 'utils/api-client';
 

@@ -2,7 +2,8 @@
  * @file Definition of an Error404 component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import { Typography } from '@material-ui/core';
 import LanguageSwitcher from 'components/language-switcher';

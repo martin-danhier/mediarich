@@ -1,7 +1,8 @@
 /**
  * @file Default values for response handling
  * @author Martin Danhier
- * @version 1.0
+ * @license Apache
+* @version 1.0
  */
 
 import './types';

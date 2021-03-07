@@ -2,7 +2,8 @@
  * @file Definition of the App component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import LazyRoute from 'components/lazy-route';
 import { LocalizationProvider } from 'components/localization-provider';

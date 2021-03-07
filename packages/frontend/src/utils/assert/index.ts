@@ -2,7 +2,8 @@
  * @file Wrapper around the node assert module. It enables to disable assert in production.
  *       In production, the code is minified and dead code is removed. That way, this code is only present in debug mode.
  * @author Martin Danhier
- * @version 1.0
+ * @license Apache
+* @version 1.0
  */
 
 

@@ -2,7 +2,8 @@
  * @file Miscellaneous functions that are used at various places
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import { Duration } from 'date-fns';
 

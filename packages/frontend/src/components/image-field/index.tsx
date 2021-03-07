@@ -2,7 +2,8 @@
  * @file Definition of an ImageField component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import './image-field.style.css';
 

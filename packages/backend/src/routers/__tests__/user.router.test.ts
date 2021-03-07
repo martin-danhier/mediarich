@@ -1,6 +1,7 @@
 /**
  * @file Tests for the user router
  * @author Martin Danhier
+ * @license Apache
  * @version 1.0
  */
 

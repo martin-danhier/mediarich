@@ -2,7 +2,8 @@
  * @file API routes of the Mediaserver API
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import { APIRoutesSpecification, APISpecification, ErrorHandlingSpecification, HTTPStatusCodes, MIMETypes } from 'utils/api-client';
 

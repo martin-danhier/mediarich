@@ -2,7 +2,8 @@
  * @file Definition of an EditDialog component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import Form from 'components/form';
 import ImageField from 'components/image-field';

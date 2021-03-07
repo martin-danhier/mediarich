@@ -2,7 +2,8 @@
  * @file Definition of a Register page
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import './register.style.css';
 

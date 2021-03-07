@@ -1,6 +1,7 @@
 /**
  * @file Run tests in both the backend and the front end
  * @author Martin Danhier
+ * @license Apache
  * @version 1.0
  */
 

@@ -2,7 +2,8 @@
  * @file definition of a LazyRoute component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import LoadingScreen from 'components/loading-screen';
 import React, { Suspense } from 'react';

@@ -1,6 +1,7 @@
 /**
  * @file Definition of the User table of the database
  * @author Martin Danhier
+ * @license Apache
  * @version 1.0
  */
 

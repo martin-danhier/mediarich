@@ -2,7 +2,8 @@
  * @file Definition of a content on mediaserver
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import { JSONInnerObject, JSONInnerObjectContent } from 'utils/api-client';
 

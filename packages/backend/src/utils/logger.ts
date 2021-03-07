@@ -1,7 +1,8 @@
 /**
  * @file Custom logger for the backend
  * @author Martin Danhier
- * @version 1.0
+ * @license Apache
+* @version 1.0
  */
 
 import { yellow, gray, blueBright, redBright, bold, green, Chalk } from 'chalk';

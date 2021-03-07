@@ -1,6 +1,7 @@
 /**
  * @file Definition of the Session table of the database, for use with Express session
  * @author Martin Danhier
+ * @license Apache
  * @version 1.0
  */
 

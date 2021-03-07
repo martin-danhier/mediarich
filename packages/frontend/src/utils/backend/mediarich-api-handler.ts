@@ -2,7 +2,8 @@
  * @file API handler for the Mediarich backend
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import APIClient, { HTTPRequestResult, MIMETypes } from 'utils/api-client';
 import { CallBodyParam } from 'utils/api-client/api-client';

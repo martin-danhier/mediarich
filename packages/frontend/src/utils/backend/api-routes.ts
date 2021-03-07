@@ -2,7 +2,8 @@
  * @file API routes of the Mediarich backend
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import { APIResponseHandlingSpecification, APIRoutesSpecification, APISpecification, HTTPStatusCodes, MIMETypes } from 'utils/api-client';
 

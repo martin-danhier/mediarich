@@ -2,7 +2,8 @@
  * @file Tests for the mediarich backend
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import fetch, { MockResponseInit } from 'jest-fetch-mock';
 import { JSONInnerObject } from 'utils/api-client';

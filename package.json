@@ -2,6 +2,7 @@
   "name": "mediarich",
   "version": "1.0.0",
   "description": "Creation tool for Ubicast",
+  "license": "Apache License 2.0",
   "workspaces": [
     "./packages/*"
   ],

@@ -2,7 +2,8 @@
  * @file Definition of an AddVideoDialog component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 
 import { Localization } from 'components/localization-provider/types';

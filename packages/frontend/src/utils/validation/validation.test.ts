@@ -2,7 +2,8 @@
  * @file Tests for the validations functions
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import { JSONInnerObject } from 'utils/api-client';
 import { as, asArray, asBool, asDate, asEnum } from '.';

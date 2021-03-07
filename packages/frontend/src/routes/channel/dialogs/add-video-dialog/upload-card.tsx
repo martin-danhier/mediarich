@@ -2,7 +2,8 @@
  * @file Definition of an UploadCard component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import { Card, CardContent, IconButton, LinearProgress, Tooltip, Typography } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';

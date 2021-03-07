@@ -3,7 +3,8 @@
  * @file Video upload handler. Contains all the logic for dynamic and flexibles uploads.
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import { MIMETypes } from 'utils/api-client';
 import { MediaServerError } from '..';

@@ -2,7 +2,8 @@
  * @file Definition of an AddChannelDialog component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import React from 'react';
 import { Localization } from 'components/localization-provider/types';

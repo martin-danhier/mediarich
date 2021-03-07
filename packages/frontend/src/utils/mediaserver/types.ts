@@ -2,7 +2,8 @@
  * @file Various types used by the classes of the Mediaserver API handler
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import { JSONInnerObject, JSONObject } from 'utils/api-client';
 import MSChannel, { MSChannelSorting } from './classes/channel';

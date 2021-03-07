@@ -1,7 +1,8 @@
 /**
  * @file Function to safely handle "any" objects an test if they have the expected values
  * @author Martin Danhier
- * @version 1.0
+ * @license Apache
+* @version 1.0
  */
 
 import { Request, Response } from 'express';

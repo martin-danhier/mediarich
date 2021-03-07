@@ -2,7 +2,8 @@
  * @file Definition of an APIClient
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import Cookies from 'js-cookie';
 import * as assert from 'utils/assert';

@@ -1,6 +1,7 @@
 /**
  * @file Router for user manipulation
  * @author Martin Danhier
+ * @license Apache
  * @version 1.0
  */
 

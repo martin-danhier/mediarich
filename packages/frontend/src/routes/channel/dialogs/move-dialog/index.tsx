@@ -2,7 +2,8 @@
  * @file Definition of an MoveDialog component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import './move-dialog.style.css';
 

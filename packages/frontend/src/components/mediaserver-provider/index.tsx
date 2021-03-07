@@ -2,7 +2,8 @@
  * @file Definition of the MediaServerProvider and MediaServerConsumer components
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import React from 'react';
 import { MediarichAPIHandler, UserTestResult } from 'utils/backend';

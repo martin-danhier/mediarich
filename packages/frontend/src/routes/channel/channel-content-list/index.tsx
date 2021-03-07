@@ -2,7 +2,8 @@
  * @file Definition of an ChannelContentList component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import './channel-content.style.css';
 

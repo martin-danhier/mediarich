@@ -2,7 +2,8 @@
  * @file Unit tests for the ApiClient
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import APIClient from './api-client';
 import fetch from 'jest-fetch-mock';

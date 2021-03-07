@@ -2,7 +2,8 @@
  * @file Definition of an EditableTypography component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import React from 'react';
 

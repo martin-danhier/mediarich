@@ -2,7 +2,8 @@
  * @file A MediaServer video
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import { format } from 'date-fns';
 import { JSONInnerObject } from 'utils/api-client';

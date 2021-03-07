@@ -2,7 +2,8 @@
  * @file Definition of a Form component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import assert from 'utils/assert';
 import ImageField, { ImageFieldProps } from 'components/image-field';

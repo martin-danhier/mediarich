@@ -1,6 +1,7 @@
 /**
  * @file User repository, contains handling logic for users
  * @author Martin Danhier
+ * @license Apache
  * @version 1.0
  */
 

@@ -1,6 +1,7 @@
 /**
  * @file Main file of the backend, launches the server
  * @author Martin Danhier
+ * @license Apache
  * @version 1.0
  */
 

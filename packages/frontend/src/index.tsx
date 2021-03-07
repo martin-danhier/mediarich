@@ -2,7 +2,8 @@
  * @file Main file of the app, starts the React application
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import './global.style.css';
 

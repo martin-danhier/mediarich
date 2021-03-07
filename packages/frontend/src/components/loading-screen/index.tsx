@@ -2,7 +2,8 @@
  * @file Definition of a LoadingScreen component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import { LocalizationConsumer } from 'components/localization-provider';
 import React from 'react';

@@ -2,7 +2,8 @@
  * @file Handler for the MediaServer API
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import assert from 'utils/assert';
 import APIClient, { HTTPRequestResult, JSONInnerObject, MIMETypes } from 'utils/api-client';

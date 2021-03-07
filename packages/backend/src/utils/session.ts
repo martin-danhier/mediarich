@@ -1,7 +1,8 @@
 /**
  * @file Various functions for the configuration of the session
  * @author Martin Danhier
- * @version 1.0
+ * @license Apache
+* @version 1.0
  */
 
 import { SessionOptions, Store } from 'express-session';

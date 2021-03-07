@@ -1,6 +1,7 @@
 /**
  * @file Defines the Server (main class of the backend)
  * @author Martin Danhier
+ * @license Apache
  * @version 1.0
  */
 

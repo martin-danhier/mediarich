@@ -2,7 +2,8 @@
  * @file Definition of a Scaffold component
  * @version 1.0
  * @author Martin Danhier
- */
+ * @license Apache
+*/
 
 import './scaffold.style.css';
 
