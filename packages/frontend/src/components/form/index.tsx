@@ -149,7 +149,7 @@ class FormContent<T extends FormValues<T>> extends React.Component<FormProps<T>,
             for (const child of props.children) {
                 if (child.type === CustomTextField && React.isValidElement<CustomTextFieldProps>(child) && child.props.required) {
                     // Assert that the name is a key of the data
-                    assert.ok(Object.keys(props.initialState).includes(child.props.name), `The field "${child.props.name}" should be defined in the initialState.`);
+                    assert(Object.keys(props.initialState).includes(child.props.name), `The field "${child.props.name}" should be defined in the initialState.`);
                     // Add its name to the list
                     required.push(child.props.name as keyof T);
                 }
@@ -219,8 +219,8 @@ class FormContent<T extends FormValues<T>> extends React.Component<FormProps<T>,
         const name = event.target.name;
 
         // Assert that the name is a key in the state
-        assert.ok(Object.keys(this.state.values).includes(name), `The field "${name}" should be present in the state object.`);
-        assert.ok(typeof this.state.values[name as keyof T] === 'string', `The field "${name}" should be a string.`);
+        assert(Object.keys(this.state.values).includes(name), `The field "${name}" should be present in the state object.`);
+        assert(typeof this.state.values[name as keyof T] === 'string', `The field "${name}" should be a string.`);
 
         // Validate the new input
         let keepChange = true;
@@ -375,7 +375,7 @@ class FormContent<T extends FormValues<T>> extends React.Component<FormProps<T>,
  * For the validation button, simply add a ``<Button type='submit' />`` and the submit event will be detected.
 */
 class Form<T extends FormValues<T>> extends React.Component<Omit<FormProps<T>, 'localization'>> {
-    // This wrapper component is used to reset the form and its errors whenever the localization is changed; 
+    // This wrapper component is used to reset the form and its errors whenever the localization is changed;
     /**
      * Main method of a React component. Called each time the component needs to render.
      * @returns a tree of react elements

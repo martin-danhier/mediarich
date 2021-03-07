@@ -10,4 +10,8 @@ import { Logger } from './utils';
 // Start server
 Server.initServer()
     .then(() => Logger.info('Server started successfully.'))
-    .catch(err => Logger.error(`Server failed to start: ${err}`));
+    .catch(err => {
+        // Print the full error with console to have the details
+        console.error(err);
+        Logger.error(`Server failed to start: ${err}`);
+    });

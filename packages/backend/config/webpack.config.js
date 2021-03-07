@@ -7,9 +7,32 @@ const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpack
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const resolve = require('resolve');
 const paths = require('./paths');
-const nodeExternals = require('webpack-node-externals');
+const webpackNodeExternals = require('webpack-node-externals');
+const TerserPlugin = require('terser-webpack-plugin');
+const webpack = require('webpack');
+const path = require('path');
+const GeneratePackageJsonPlugin = require('generate-package-json-webpack-plugin');
 
+const basePackage = {
+    'name': 'mediarich',
+    'version': '1.0.0',
+    'description': 'Enhanced media management platform for medias.unamur.be',
+    'author': 'Martin Danhier',
+    'main': './index.js',
+    'scripts': {
+        'start': 'node ./index.js'
+    },
+    'dependencies': {
+        'sqlite3': '^5.0.2'
+    }
+};
 
+/**
+ * 
+ * @param {string} webpackEnv
+ * @typedef {import('webpack').Configuration} WebpackConfiguration
+ * @returns {WebpackConfiguration}
+ */
 module.exports = function (webpackEnv) {
 
     const isEnvDevelopment = webpackEnv === 'development';
@@ -41,7 +64,17 @@ module.exports = function (webpackEnv) {
                 }
             ]
         },
-        externals: [nodeExternals({
+        optimization: {
+            minimize: isEnvProduction,
+            minimizer: [
+                new TerserPlugin({
+                    terserOptions: {
+                        keep_classnames: true,
+                    }
+                })
+            ]
+        },
+        externals: [webpackNodeExternals({
             modulesDir: paths.appNodeModules,
             additionalModuleDirs: [
                 paths.rootNodeModules,
@@ -49,7 +82,7 @@ module.exports = function (webpackEnv) {
         })],
         plugins: [
             new ForkTsCheckerWebpackPlugin({
-                
+
                 typescript: resolve.sync('typescript', {
                     basedir: paths.appNodeModules,
                 }),
@@ -78,6 +111,11 @@ module.exports = function (webpackEnv) {
                 // The formatter is invoked directly in WebpackDevServerUtils during development
                 formatter: typescriptFormatter,
             }),
-        ]
+            new webpack.ContextReplacementPlugin(
+                /Sequelize(\\|\/)/,
+                path.resolve(__dirname, '../src')
+            ),
+            isEnvProduction && new GeneratePackageJsonPlugin(basePackage),
+        ].filter(Boolean)
     };
 };

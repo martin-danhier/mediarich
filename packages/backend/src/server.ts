@@ -9,7 +9,9 @@ import { json as jsonParser } from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import session, { SessionOptions } from 'express-session';
+import helmet from 'helmet';
 import { Sequelize } from 'sequelize-typescript';
+import path from 'path';
 
 import {
     ContentTypeCheckMiddleware, ErrorHandlerMiddleware, LoggerMiddleware
@@ -45,23 +47,26 @@ export default class Server {
     private async init(): Promise<void> {
         // Assert that the server is not already initialized
         strictEqual(this.app, undefined, 'The server is already initialized');
-
+        
         // Init logger
         Logger.initLevel();
-
+        
         // Create new express app
         this.app = express();
         // Create database
         this.database = await initDatabase();
         // Create session options
         this.sessionOptions = getSessionOptions(this.database);
-
-        // Apply middlewares
-
+        
+        // Create api router
+        const api = express.Router();
+        
         // Logger: log each request
-        this.app.use(LoggerMiddleware);
+        api.use(LoggerMiddleware);
+        // Protect against common vulnerabilities
+        api.use(helmet());
         // Cors
-        this.app.use(cors({
+        api.use(cors({
             origin: [
                 'http://localhost:3000',
                 'http://localhost:5000',
@@ -75,27 +80,40 @@ export default class Server {
             methods: ['GET', 'POST'],
         }));
         // Session: used for authentication
-        this.app.use(session(this.sessionOptions));
+        api.use(session(this.sessionOptions));
         // Only accept JSON content types on post requests
-        this.app.use(ContentTypeCheckMiddleware([
+        api.use(ContentTypeCheckMiddleware([
             'application/json',
             'application/json; charset=utf-8'
         ]));
         // Json parser: parses the body
-        this.app.use(jsonParser());
+        api.use(jsonParser());
         // Error handler: catches errors thrown by other middlewares
-        this.app.use(ErrorHandlerMiddleware);
+        api.use(ErrorHandlerMiddleware);
 
         // Register routers
-        this.app.use('/user', UserRouter);
+        api.use('/user', UserRouter);
 
         // Register 404 route
-        this.app.use((req, res) => {
+        api.use((req, res) => {
             res.status(404).send({
                 error: true,
                 cause: 'Route not found'
             });
         });
+
+        // Apply middlewares
+        this.app.use('/api', api);
+        // Serve static file if in production
+        if (process.env.NODE_ENV === 'production') {
+            // Serve all public files
+            this.app.use('/', express.static('./public'));
+            // For all the other routes, fallback to index.html so that react router can work
+            this.app.use('/*', (req, res) => {
+                res.sendFile(path.resolve('./public/index.html'));
+            });
+        }
+
     }
 
     /** Starts the server instance to the port stored in the env variable `SERVER_PORT`

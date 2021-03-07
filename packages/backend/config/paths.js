@@ -39,7 +39,7 @@ const resolveModule = (resolveFn, filePath) => {
 module.exports = {
     appPath: resolveApp('.'),
     srcDir: resolveApp('src'),
-    buildDir: resolveApp('build'),
+    buildDir: resolveApp('../../build'),
     buildIndexModule: resolveModule(resolveApp, 'build/index'),
     serverIndex: resolveModule(resolveApp, 'src/index'),
     appTsConfig: resolveApp('tsconfig.json'),

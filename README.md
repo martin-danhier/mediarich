@@ -18,7 +18,11 @@ If there is a permission error during this action, try executing `npm install` a
 
 ## Build for production
 
-TODO
+1. Run `npm run build`
+2. Once it is finished, you can use the build directory and place it anywhere (on a VPS for instance).
+3. Then go in the build directory
+4. Run `npm install` to install the few dependancies remaining
+5. Run `npm start` to start the server. It will serve both the backend and the frontend.
 
 ## For Visual Studio Code : useful extensions
 

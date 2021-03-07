@@ -28,7 +28,7 @@ beforeAll(() => {
         const json = await req.json();
 
         // User add
-        if (req.url === 'http://localhost:8000/user/add') {
+        if (req.url === 'http://localhost:8000/api/user/add') {
             // Username taken
             if (json.username === 'existing') {
                 return mockUserResponse(409, {
@@ -44,7 +44,7 @@ beforeAll(() => {
             }
         }
         // User login
-        else if (req.url === 'http://localhost:8000/user/login') {
+        else if (req.url === 'http://localhost:8000/api/user/login') {
             // Invalid username or password
             if (json.username !== 'existing' || json.password !== 'password') {
                 return mockUserResponse(401, {

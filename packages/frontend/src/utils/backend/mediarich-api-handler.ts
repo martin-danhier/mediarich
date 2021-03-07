@@ -29,7 +29,7 @@ export class MediarichAPIHandler {
     private constructor() {
         // Create the client
         this._client = new APIClient<MediarichApiSpecification, MediarichRoutesSpec>(
-            new MediarichApiSpecification(process.env.REACT_APP_MEDIARICH_API_ROOT ?? 'http://localhost:8000')
+            new MediarichApiSpecification(process.env.REACT_APP_MEDIARICH_API_ROOT ?? 'http://localhost:8000/api')
         );
     }
 

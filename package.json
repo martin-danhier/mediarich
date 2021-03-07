@@ -7,6 +7,7 @@
   ],
   "scripts": {
     "test": "node ./scripts/tests.js",
+    "build": "cd ./packages/backend && node ./scripts/build.js && cd ../frontend && node ./scripts/build.js && cd ../..",
     "backend": "cd ./packages/backend && node ./scripts/start.js && cd ../..",
     "frontend": "cd ./packages/frontend && node ./scripts/start.js && cd ../..",
     "coverage": "node scripts/tests.js --watchAll=false --coverage"

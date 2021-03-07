@@ -33,7 +33,5 @@ export async function initDatabase(): Promise<Sequelize> {
     // Create the tables if they don't exist yet
     await sequelize.sync();
 
-    
-
     return sequelize;
 }
