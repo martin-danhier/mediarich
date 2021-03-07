@@ -1,5 +1,11 @@
+/**
+ * @file Tests for the validations functions
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
 import { JSONInnerObject } from 'utils/api-client';
-import { as, asArray, asDate, asEnum } from '.';
+import { as, asArray, asBool, asDate, asEnum } from '.';
 
 // Test the as function.
 test('As function', () => {
@@ -142,4 +148,25 @@ test('asArray function', () => {
     // Using as with another class type
     var4 = asArray(Date, [new Error()]);
     expect(var4).toBeUndefined();
+});
+
+test('asBool function', () => {
+    let var3: boolean | undefined;
+    // Using as with a parameter of the correct type returns that parameter
+
+    // when a boolean is passed
+    var3 = asBool(true);
+    expect(var3).toStrictEqual(true);
+    var3 = asBool(false);
+    expect(var3).toStrictEqual(false);
+
+    // when a number is passed
+    var3 = asBool(1);
+    expect(var3).toStrictEqual(true);
+    var3 = asBool(0);
+    expect(var3).toStrictEqual(false);
+
+    // Using as with a parameter of an invalid type returns undefined
+    var3 = asBool('hello');
+    expect(var3).toBeUndefined();
 });

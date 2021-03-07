@@ -1,7 +1,7 @@
 /**
  * @file Default values for response handling
  * @author Martin Danhier
- * @version 0.1
+ * @version 1.0
  */
 
 import './types';

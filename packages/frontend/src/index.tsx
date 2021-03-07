@@ -1,8 +1,16 @@
+/**
+ * @file Main file of the app, starts the React application
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
+import './global.style.css';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import App from './components/app';
 import * as serviceWorker from './utils/service-worker';
-import './global.style.css';
 
 ReactDOM.render(
     <React.StrictMode>

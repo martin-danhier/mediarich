@@ -1,9 +1,21 @@
+/**
+ * @file API handler for the Mediarich backend
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
 import APIClient, { HTTPRequestResult, MIMETypes } from 'utils/api-client';
 import { CallBodyParam } from 'utils/api-client/api-client';
 import { as } from 'utils/validation';
 import { MediarichApiSpecification, MediarichRoutesSpec } from './api-routes';
 import { MediarichResponseJSON, UserAddBody, UserAddResult, UserEditBody, UserEditResult, UserLoginResult, UserTestResult, UserLoginBody } from './types';
 
+/**
+ * API handler of the mediarich backend.
+ * It follows the singleton pattern, so each function is static.
+ *
+ * Uses the API client to make the requests, and provide simple functions returning enums results.
+ */
 export class MediarichAPIHandler {
 
     /**

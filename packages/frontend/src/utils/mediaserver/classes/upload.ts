@@ -1,3 +1,10 @@
+
+/**
+ * @file Video upload handler. Contains all the logic for dynamic and flexibles uploads.
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
 import { MIMETypes } from 'utils/api-client';
 import { MediaServerError } from '..';
 import SparkMd5 from 'spark-md5';
@@ -5,15 +12,36 @@ import MediaServerAPIHandler from '../mediaserver-api-hanler';
 import { getBlobArrayBuffer } from 'utils/useful-functions';
 import assert from 'utils/assert';
 
+/**
+ * Handler for a video upload.
+ *
+ * To upload, call the `continueUpload` method until it returns false.
+ * Then, if it worked, call the `saveVideo` method to save it in mediaserver.
+ *
+ * This structure allows an upload to be cancelled at any time.
+ * On MediaServer, uploads stay during 1 day after which they are deleted if not saved.
+ * To cancel an upload, simply stop calling the ``continueUpload`` function.
+ *
+ * The getters can also be used to get the progress of the upload, for instance for a progress bar.
+ */
 class VideoUpload {
+    /** oid of the channel to which this video should be added */
     private _parentOid: string;
+    /** the file uploading */
     private _file: File;
+    /** The starting byte of the last created chunk */
     private _start = 0;
+    /** The ending byte of the last created chunk */
     private _end = 0;
+    /** The size of the last created chunk */
     private _lastChunkSize = 0;
+    /** The maximum size of a slice */
     private _sliceSize: number;
+    /** The upload id returned by MediaServer. It should be null only for the first request. */
     private _uploadId: string | null = null;
+    /** The API handler */
     private _mediaServerAPIHandler: MediaServerAPIHandler;
+    /** The MD5 hash of the uploaded file, built at the same time */
     private _md5Hash = new SparkMd5.ArrayBuffer();
 
     /** Returns the start index of the last chunk */

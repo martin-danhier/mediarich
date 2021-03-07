@@ -1,24 +1,24 @@
+/**
+ * @file Definition of an APIClient
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
+import Cookies from 'js-cookie';
 import * as assert from 'utils/assert';
+
 import { defaultErrorHandling, DefaultResponseHandling } from './defaults';
 import {
-    APIResponseSpecification,
-    APIRouteSpecification,
-    APIRoutesSpecification,
-    APISpecification,
-    ErrorHandlingSpecification,
-    FetchInit,
-    HTTPRequestBody,
-    HTTPRequestResult,
-    HTTPStatusCodes,
-    JSONInnerObject,
-    JSONObject,
-    MIMETypes
+    APIResponseSpecification, APIRouteSpecification, APIRoutesSpecification, APISpecification,
+    ErrorHandlingSpecification, FetchInit, HTTPRequestBody, HTTPRequestResult, HTTPStatusCodes,
+    JSONInnerObject, JSONObject, MIMETypes
 } from './types';
-import Cookies from 'js-cookie';
 
-
-
-
+/**
+ * Type of the accepted body object, given the api specification and the route name.
+ * Sets constraints using Typescript types, which will cause invalid values to throw compilation errors.
+ * This allows us to avoid several assertions later.
+ */
 export type CallBodyParam<R extends APIRoutesSpecification<R>, K extends keyof R> = R[K]['requestContentType'] extends MIMETypes.None
     // Don't allow body on null content type
     ? never
@@ -33,11 +33,24 @@ export type CallBodyParam<R extends APIRoutesSpecification<R>, K extends keyof R
         // Else don't preprocess the body, only accept the definitive one
         HTTPRequestBody);
 
-
+/**
+ * An API Client is a way to abstract an API and avoid doing fetch requests all over the place.
+ *
+ * You initialize it with a specification of the API routes, then you just need to call it with the right parameters and
+ * the client handles the rest.
+ *
+ * This class is a structural experiment to see if this kind of abstraction can be useful in a big project.
+ *
+ * It is deliberatly too complete for the Mediarich project, because the aim is to be able to reuse it in other projects later
+ * if the experiment is concluant.
+ */
 class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<R>> {
+    /** API specification */
     private readonly _api: T;
+    /** Default ways to handle responses (used if not specifified in the api) */
     private readonly _defaultResponseHandling = new DefaultResponseHandling<R>();
 
+    /** Returns the API specification */
     public get api(): T {
         return this._api;
     }
@@ -267,6 +280,14 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
         }, fetchInit);
     }
 
+    /**
+     * Handles the given response according to the given response handling specification
+     * @param response The response to handle
+     * @param responseHandling The specification of the way to handle this kind of response
+     * @param onError Callback called if there is an error
+     * @param fetchInit Parameters that were sent with the request
+     * @returns A HttpRequestResult for this reponse
+     */
     async handleResponse(response: Response, responseHandling: APIResponseSpecification<R>, onError: (error: Error | string, response: Response) => HTTPRequestResult, fetchInit?: FetchInit): Promise<HTTPRequestResult> {
         // Check content type of the response if one is provided. Don't check if none is provided
         if (responseHandling.expectedContentTypes) {

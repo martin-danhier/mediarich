@@ -1,3 +1,9 @@
+/**
+ * @file API routes of the Mediaserver API
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
 import { APIRoutesSpecification, APISpecification, ErrorHandlingSpecification, HTTPStatusCodes, MIMETypes } from 'utils/api-client';
 
 /**
@@ -39,32 +45,15 @@ export class MSApiSpecification implements APISpecification<MSRoutesSpec> {
 
 /**
  * Specification of the different routes of the MediaServer API.
- * 
+ * We only define the ones that are actually useful for this project.
+ *
  * @see https://ubicast.tv/static/mediaserver/docs/api/api.html Official documentation
  */
 export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
-
     /** Ping the server */
     '/' = {
         requestContentType: MIMETypes.XWWWFormUrlencoded,
         url: '/',
-        method: 'GET',
-        mode: 'cors',
-    } as const;
-    /** Returns the list of media and sub channels matching the requested search words. */
-    '/search' = {
-        requestContentType: MIMETypes.XWWWFormUrlencoded,
-        url: '/search/',
-        method: 'GET',
-        mode: 'cors',
-    } as const;
-    /**
-     * Returns a list of medias and channels ordered by add date or creation date. Requests can take some time
-     * due to permissions checks. The API call is limited to date query in antichronological order for the moment.
-     */
-    '/latest' = {
-        requestContentType: MIMETypes.XWWWFormUrlencoded,
-        url: '/latest/',
         method: 'GET',
         mode: 'cors',
     } as const;
@@ -83,13 +72,6 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
     '/channels/tree' = {
         requestContentType: MIMETypes.XWWWFormUrlencoded,
         url: '/channels/tree/',
-        method: 'GET',
-        mode: 'cors',
-    } as const;
-    /** Returns the path to access a channel or a media. The first item in the result list have no parents. */
-    '/channels/path' = {
-        requestContentType: MIMETypes.XWWWFormUrlencoded,
-        url: '/channels/path/',
         method: 'GET',
         mode: 'cors',
     } as const;
@@ -143,18 +125,6 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         method: 'GET',
         mode: 'cors',
     } as const;
-    /** Returns the metadata zip for the requested media. The user making the request must have the community settings edition permission. */
-    '/medias/get/zip' = {
-        url: '/medias/get/zip/',
-        requestContentType: MIMETypes.XWWWFormUrlencoded,
-        method: 'GET',
-        mode: 'cors',
-        expectedResponses: {
-            [HTTPStatusCodes.OK]: {
-                expectedContentTypes: [MIMETypes.ZIP]
-            }
-        }
-    } as const;
     /** This url can be used to add a new media using a metadata zip package, a media file or an upload id code. */
     '/medias/add' = {
         url: '/medias/add/',
@@ -176,20 +146,6 @@ export class MSRoutesSpec implements APIRoutesSpecification<MSRoutesSpec> {
         method: 'POST',
         mode: 'cors',
         requestContentType: MIMETypes.XWWWFormUrlencoded,
-    } as const;
-    /** Set a thumbnail image to a media */
-    '/medias/add-thumb' = {
-        url: '/medias/add-thumb/',
-        method: 'POST',
-        mode: 'cors',
-        requestContentType: MIMETypes.XWWWFormUrlencoded,
-    } as const;
-    /** Returns a list of users. Requires the 'can_change_users' permission or the 'can_use_permissions_tab' permission. */
-    '/users' = {
-        url: '/users/',
-        method: 'GET',
-        requestContentType: MIMETypes.XWWWFormUrlencoded,
-        mode: 'cors',
     } as const;
     /** Uploads a chunk of a video */
     '/upload' = {

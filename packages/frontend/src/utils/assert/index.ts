@@ -2,12 +2,21 @@
  * @file Wrapper around the node assert module. It enables to disable assert in production.
  *       In production, the code is minified and dead code is removed. That way, this code is only present in debug mode.
  * @author Martin Danhier
- * @version 0.1.0
+ * @version 1.0
  */
+
 
 import assert from 'assert';
 // Re export assertion error which doesn't change
 export { AssertionError } from 'assert';
+
+// The vanilla 'assert' library is great, but they always stay enabled in production.
+// In this project, we often use asserts to test the types of the elements of a list, or other big calculations
+// To avoid impacting production performance, this module wraps each assert function in a "if" checking if the NODE_ENV
+// variable is not production.
+// When building, webpack is configured to remove dead code. Since these "if"s will always have a falsy guard (since the NODE_ENV is given to webpack),
+// the conditions are dead code and will be removed. Then, the functions themselves don't contain anything, so they are removed as well and the calls are ignored.
+// Even the import statement of this package is ignored since it is useless when all the functions are dead code.
 
 /**
  * A message for an ``AssertionError``.

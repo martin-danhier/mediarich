@@ -1,13 +1,30 @@
+/**
+ * @file Definition of a content on mediaserver
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
 import { JSONInnerObject, JSONInnerObjectContent } from 'utils/api-client';
+
+import { as, asBool, asDate } from '../../validation';
 import MediaServerAPIHandler from '../mediaserver-api-hanler';
 import { MSContentEditBody } from '../types';
-import { as, asBool, asDate } from '../../validation';
 import MSChannel from './channel';
+
+/** A content is an item on MediaServer that is stored in a channel.
+ *
+ * It can be either a channel (see MSChannel), a video (see MSVideo)
+ * or a live stream (not supported by Mediarich).
+ *
+ * This abstract class is used for the common methods and attributes between
+ * channels and videos.
+ */
 export default abstract class MSContent {
     // Ref to the mediaserver api handler object
     protected _mediaServerAPIHandler: MediaServerAPIHandler;
 
     // Data of the content
+    // Specifications are located on the getters (see below)
     protected _oid: string;
     protected _dbid?: number;
     protected _title?: string;

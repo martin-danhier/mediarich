@@ -1,10 +1,17 @@
+/**
+ * @file MediaServer channel
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
 import { JSONInnerObject } from 'utils/api-client';
+
+import { as, asBool, asEnum, asJsonObject, asJsonObjectArray } from '../../validation';
 import MediaServerAPIHandler from '../mediaserver-api-hanler';
 import { MediaServerError, MSChannelEditBody } from '../types';
-import { as, asBool, asEnum, asJsonObject, asJsonObjectArray } from '../../validation';
 import MSContent from './content';
-import { MSVideo } from './video';
 import VideoUpload from './upload';
+import { MSVideo } from './video';
 
 /** Possible ways to sort the content of a channel */
 export enum MSChannelSorting {
@@ -20,6 +27,10 @@ export enum MSChannelSorting {
     ViewsAsc = 'views-asc',
 }
 
+/**
+ * A channel object. Contains various channel properties, and provide
+ * methods to manage the content (add content, edit, move, etc.)
+ */
 export default class MSChannel extends MSContent {
 
     protected _sorting?: MSChannelSorting;
@@ -63,6 +74,7 @@ export default class MSChannel extends MSContent {
         }
     }
 
+    // Docs on MSContent
     protected updateFieldsFromJson(json: JSONInnerObject): void {
         // Add the base fields
         super.updateFieldsFromJson(json);
@@ -97,16 +109,23 @@ export default class MSChannel extends MSContent {
         }
     }
 
+    /** Fetches the content contained in this channel.
+     * @param includeSubchannels fetch subchannels or not
+     * @param includeVideos fetch videos or not
+     * @returns an object containing the list of subchannels and the list of videos
+     */
     public async content(includeSubchannels = true, includeVideos = true): Promise<{ channels: MSChannel[]; videos: MSVideo[] } | undefined> {
+        // Prepare filters for the request
         const filterChannel = includeSubchannels ? 'c' : '';
         const filterVideos = includeVideos ? 'v' : '';
 
-
+        // Do the request
         const result = await this._mediaServerAPIHandler.call('/channels/content', {
             'parent_oid': this._oid,
             'content': filterChannel + filterVideos,
         });
 
+        // If it worked
         if (result.success) {
             // Parse channels
             const channels = [];
@@ -193,6 +212,7 @@ export default class MSChannel extends MSContent {
         }
     }
 
+    // Docs are located on the parent definition in MSContent
     public async delete(): Promise<boolean> {
         // Call the API
         const result = await this._mediaServerAPIHandler.call('/channels/delete', {
@@ -265,8 +285,12 @@ export default class MSChannel extends MSContent {
     /** Add a new video to the server. Since a video can be big, this function returns a VideoUpload.
      * You need to call the `continueUpload()` function until it returns false. You can use the other properties for
      * progress bars for instance.
+     * @param file the file to upload
      */
     public addVideo(file: File): VideoUpload {
-        return new VideoUpload(file, 5000000, this._mediaServerAPIHandler, this._oid);
+        const chunkSize = 5000000; // use 5MB chunks
+
+        // Return a new video upload
+        return new VideoUpload(file, chunkSize, this._mediaServerAPIHandler, this._oid);
     }
 }

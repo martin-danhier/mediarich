@@ -1,3 +1,10 @@
+/**
+ * @file Various types and functions that can be used to safely handle "any" or "unknown" values and type them
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
+
 import { parse } from 'date-fns';
 import { JSONInnerObject, JSONInnerObjectContent } from 'utils/api-client';
 

@@ -1,4 +1,10 @@
-import { APIResponseHandlingSpecification,  APIRoutesSpecification, APISpecification, HTTPStatusCodes, MIMETypes } from 'utils/api-client';
+/**
+ * @file API routes of the Mediarich backend
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
+import { APIResponseHandlingSpecification, APIRoutesSpecification, APISpecification, HTTPStatusCodes, MIMETypes } from 'utils/api-client';
 
 /**
  * Specification of the Mediarich API

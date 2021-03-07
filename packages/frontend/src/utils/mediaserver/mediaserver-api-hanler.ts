@@ -1,11 +1,16 @@
+/**
+ * @file Handler for the MediaServer API
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
 import assert from 'utils/assert';
 import APIClient, { HTTPRequestResult, JSONInnerObject, MIMETypes } from 'utils/api-client';
 import { CallBodyParam } from 'utils/api-client/api-client';
 import { MSApiSpecification, MSRoutesSpec } from './api-routes';
 import MSChannel from './classes/channel';
-import { MediaServerError, MSResponseJson } from './types';
+import { MediaServerError, MSChannelTreeItem, MSResponseJson } from './types';
 import { as, asJsonObjectArray, } from '../validation';
-import { MSChannelTreeItem } from './classes/tree';
 
 /**
  *  MediaServer API handler.
@@ -19,8 +24,9 @@ import { MSChannelTreeItem } from './classes/tree';
  * ```
  */
 class MediaServerAPIHandler {
-
+    /** API key of the user */
     private _apiKey: string;
+    /** Base url of the API */
     private _baseUrl: string;
 
     /** APIClient handling the MediaServer API. The base URL can be set with the ``REACT_APP_MEDIASERVER_API_ROOT`` environment variable. */

@@ -1,3 +1,9 @@
+/**
+ * @file Various types used in the MediarichAPIHandler
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
 import { JSONInnerObject } from 'utils/api-client';
 
 export type MediarichResponseJSON = { error: boolean } & JSONInnerObject;

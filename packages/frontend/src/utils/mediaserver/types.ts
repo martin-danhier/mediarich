@@ -1,7 +1,18 @@
+/**
+ * @file Various types used by the classes of the Mediaserver API handler
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
 import { JSONInnerObject, JSONObject } from 'utils/api-client';
 import MSChannel, { MSChannelSorting } from './classes/channel';
 
+/**
+ * Error used when there is an error linked to MediaServer.
+ * Provides a json field if a bad json is the cause of the error.
+ */
 export class MediaServerError extends Error {
+    /** Optional json linked with the error */
     public json?: JSONObject;
 
     constructor(message?: string, json?: JSONObject) {
@@ -24,6 +35,9 @@ export class MediaServerError extends Error {
     }
 }
 
+/** Almost every MediaServer route returns a json that always has the "success" field.
+ * This type avoids the need to check if it is undefined or not.
+ */
 export type MSResponseJson = { success: boolean } & JSONInnerObject;
 
 /** Common parameters between /medias/edit and /channels/edit */
@@ -89,4 +103,14 @@ export interface MSVideoEditBody extends MSChannelEditBody {
     company_url?: string;
     /** License name. */
     license?: string;
+}
+
+/**
+ * Tree structure returned by the getChannelsTree method
+ */
+export interface MSChannelTreeItem {
+    channel: MSChannel;
+    title: string;
+    slug: string;
+    children?: MSChannelTreeItem[];
 }

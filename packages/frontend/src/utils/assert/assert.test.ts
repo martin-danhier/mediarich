@@ -1,3 +1,9 @@
+/**
+ * @file Tests for the assert wrapper, to see if the assertions still work
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
 import * as assert from '.';
 
 test('strictEqual throws exception', () => {

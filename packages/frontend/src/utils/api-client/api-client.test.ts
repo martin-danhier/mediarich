@@ -1,9 +1,14 @@
+/**
+ * @file Unit tests for the ApiClient
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
 import APIClient from './api-client';
 import fetch from 'jest-fetch-mock';
 import { APIRoutesSpecification, APISpecification, HTTPStatusCodes, MIMETypes } from './types';
 import { strictEqual } from 'assert';
 import Cookies from 'js-cookie';
-
 
 
 /** Routes of the test API. Use a 'implements , so the autocompletion will know the names of the routes*/
@@ -231,9 +236,11 @@ class TestAPISpecification implements APISpecification<TestApiRoutes> {
     routes = new TestApiRoutes();
 }
 
+
+/** Tested client */
 let client: APIClient<TestAPISpecification, TestApiRoutes>;
 
-
+// Before each test
 beforeEach(() => {
     // Reset the call count of fetch between each mock
     jest.clearAllMocks();
@@ -241,6 +248,7 @@ beforeEach(() => {
     Cookies.remove('token');
 });
 
+// Before the file
 beforeAll(() => {
     // Create API Client (the class we want to test)
     client = new APIClient(new TestAPISpecification());
@@ -444,6 +452,9 @@ function otherWrongSpecErrorCallback(e: Error | string): void {
     expect(e instanceof Error || typeof e === 'string').toBeTruthy();
 }
 
+/**
+ * Check if calling an existing route works
+ */
 test('can call existing routes', async () => {
     const result = await client.call('existing');
     // Check that the response is valid
@@ -474,6 +485,11 @@ test('API client fetch works', async () => {
     const result = await client.call('existing');
 
     // Check that the response is valid
+
+    // "expect" is a feature of jest. It works like an advanced assertion.
+    // So each "expect(value).toBe...()" is equivalent to an assert.
+    // This is used to check if the tested values behave as expected, hence the name
+
     expect(result.ok).toBeTruthy();
     expect(result.response).toBeDefined();
     expect(result.is200()).toBeTruthy();
@@ -506,7 +522,7 @@ test('API client fetch error handler works', async () => {
 });
 
 
-
+/** JSON works when sent */
 test('JSON in request', async () => {
     const result = await client.call('jsonInput', { number: 4 });
 
@@ -599,6 +615,7 @@ test('External specification', async () => {
     expect(result.response).toBeDefined();
 });
 
+/** Test when calling an external URL */
 test('External bad url', async () => {
     const result = await client.externalCall('https://www.google.com/', {
         method: 'GET',

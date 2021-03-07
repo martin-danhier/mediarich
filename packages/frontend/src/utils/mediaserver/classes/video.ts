@@ -1,9 +1,16 @@
+/**
+ * @file A MediaServer video
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
+import { format } from 'date-fns';
 import { JSONInnerObject } from 'utils/api-client';
+
+import { as, asDate, asEnum, asJsonObject } from '../../validation';
 import MediaServerAPIHandler from '../mediaserver-api-hanler';
 import { MediaServerError, MSVideoEditBody } from '../types';
-import { as, asDate, asEnum, asJsonObject } from '../../validation';
 import MSContent from './content';
-import { format } from 'date-fns';
 
 export enum VideoLayout {
     /** Regular video */
@@ -14,6 +21,9 @@ export enum VideoLayout {
     Composition = 'composition',
 }
 
+/** Video object. Contains properties of the video, and useful
+ * methods to do actions on edit (delete, edit, ...)
+ */
 export class MSVideo extends MSContent {
     protected _creationDate?: Date;
     protected _validated?: boolean;
@@ -88,6 +98,7 @@ export class MSVideo extends MSContent {
         }
     }
 
+    // Docs on MSContent
     protected updateFieldsFromJson(json: JSONInnerObject): void {
         // Add the base fields
         super.updateFieldsFromJson(json);
@@ -129,6 +140,7 @@ export class MSVideo extends MSContent {
         }
     }
 
+    // Docs on MSContent
     public async edit(params: MSVideoEditBody): Promise<boolean> {
 
         const formData = new FormData();
@@ -171,6 +183,7 @@ export class MSVideo extends MSContent {
         }
     }
 
+    // Docs on MSContent
     public async delete(): Promise<boolean> {
         // Call the API
         const result = await this._mediaServerAPIHandler.call('/medias/delete', {
