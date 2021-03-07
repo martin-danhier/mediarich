@@ -434,7 +434,7 @@ export interface APIRouteSpecification<R extends APIRoutesSpecification<R>> {
      * }
      * ```
      * This example will replace `#{token}` with the value of the Cookie named "token".
-     * If such cookie does not exist, it will be replaced by an empty string. //TODO handle that error correctly
+     * If such cookie does not exist, it will be replaced by an empty string.
      */
     readonly headers?: Record<string, string>;
 }

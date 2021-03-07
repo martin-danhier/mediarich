@@ -97,7 +97,7 @@ class UploadCard extends React.Component<UploadCardProps, UploadCardState> {
             }
 
         } catch (e) {
-            console.error(e); //TODO handle
+            console.error(e);
         }
     }
 

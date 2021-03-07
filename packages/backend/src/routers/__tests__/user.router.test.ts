@@ -1,3 +1,9 @@
+/**
+ * @file Tests for the user router
+ * @author Martin Danhier
+ * @version 1.0
+ */
+
 import request, { agent } from 'supertest';
 import { UserRepository } from '../../repositories';
 import Server from '../../server';

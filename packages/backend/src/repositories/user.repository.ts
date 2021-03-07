@@ -1,9 +1,25 @@
+/**
+ * @file User repository, contains handling logic for users
+ * @author Martin Danhier
+ * @version 1.0
+ */
+
 import { v4 as uuidV4 } from 'uuid';
 import { hash, compare } from 'bcrypt';
 import { User } from '../models';
 import { Logger } from '../utils';
 
+/**
+ * Contains the handling logic for users.
+ */
 export class UserRepository {
+    /**
+     * Tries to register the given user
+     * @param username Name of the new user
+     * @param password Password of the new user
+     * @param apiKey API key of the new user
+     * @returns The new user, or null if there is an error
+     */
     static async registerUser(username: string, password: string, apiKey: string): Promise<User | null> {
         // Generate an uuid for the user
         const id = uuidV4();

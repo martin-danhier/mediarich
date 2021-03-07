@@ -1,3 +1,8 @@
+/**
+ * @file Forked from Create React app: do the same thing as react, but for an express.js server
+ * @author Martin Danhier, Facebook
+ */
+
 const forkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const chalk = require('chalk');
@@ -123,9 +128,6 @@ function createCompiler({
 
         if (isSuccessful) {
             console.log(chalk.green('Compiled successfully!\n'));
-        }
-        if (isSuccessful && (isInteractive || isFirstCompile)) {
-
         }
 
         // If errors exist, only show errors.

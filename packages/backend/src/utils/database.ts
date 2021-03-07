@@ -1,3 +1,9 @@
+/**
+ * @file Utils functions used for the database configuratino
+ * @author Martin Danhier
+ * @version 1.0
+ */
+
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
 import { Session, User } from '../models';
 import { Logger } from './logger';

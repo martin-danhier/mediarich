@@ -1,3 +1,9 @@
+/**
+ * @file Various functions for the configuration of the session
+ * @author Martin Danhier
+ * @version 1.0
+ */
+
 import { SessionOptions, Store } from 'express-session';
 import SequelizeStoreInit from 'connect-session-sequelize';
 import { Sequelize } from 'sequelize-typescript';

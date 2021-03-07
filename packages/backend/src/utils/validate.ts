@@ -1,3 +1,9 @@
+/**
+ * @file Function to safely handle "any" objects an test if they have the expected values
+ * @author Martin Danhier
+ * @version 1.0
+ */
+
 import { Request, Response } from 'express';
 
 type Schema<T> = {
@@ -10,7 +16,10 @@ type Schema<T> = {
     : never;
 }
 
-
+/** Checks if the request body matches the given schema.
+ * @returns If so, it returns the body typed with the schema for easy use.
+ * Else, it send a response indicating the bad request and returns null.
+ */
 export function validate<T>(req: Request, res: Response, schema: Schema<T>): T | null {
     const body = req.body;
     const missingKeys = [];

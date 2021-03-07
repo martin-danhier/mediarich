@@ -1,3 +1,7 @@
+/**
+ * @file Forked from Create React app: do the same thing as react, but for an express.js server
+ * @author Martin Danhier, Facebook
+ */
 
 const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');

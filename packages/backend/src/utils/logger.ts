@@ -1,6 +1,15 @@
+/**
+ * @file Custom logger for the backend
+ * @author Martin Danhier
+ * @version 1.0
+ */
+
 import { yellow, gray, blueBright, redBright, bold, green, Chalk } from 'chalk';
 import { Request, Response } from 'express';
 
+/**
+ * Logs levels for the Logger
+ */
 export enum LogLevel {
     /** Show all logs */
     All = 6,
@@ -40,6 +49,12 @@ export class Logger {
         Logger.baseLog(message, 'LOG', LogLevel.Log);
     }
 
+    /**
+     * Logs an HTTP request
+     * @param req Request to log
+     * @param res Response to log
+     * @param message Custom message to put at the end
+     */
     static logRequest(req: Request, res: Response, message?: string): void {
         if (Logger.logLevel >= LogLevel.Requests) {
 

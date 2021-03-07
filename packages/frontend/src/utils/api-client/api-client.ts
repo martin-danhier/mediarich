@@ -470,7 +470,7 @@ class APIClient<T extends APISpecification<R>, R extends APIRoutesSpecification<
     /**
      * Replaces the occurences of the `#{cookie-name}` syntax in a string
      * with the value of the Cookie named `cookie-name`.
-     * If the Cookie is undefined, replace with empty string instead. // TODO maybe handle that case
+     * If the Cookie is undefined, replace with empty string instead.
      * @param raw The raw string to process
      * @return the processed string
      */

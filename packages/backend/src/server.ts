@@ -1,13 +1,21 @@
-import express from 'express';
-import { json as jsonParser } from 'body-parser';
-import { Logger, initDatabase } from './utils';
-import { UserRouter } from './routers';
-import { ContentTypeCheckMiddleware, ErrorHandlerMiddleware, LoggerMiddleware } from './middlewares';
-import session, { SessionOptions } from 'express-session';
-import { getSessionOptions } from './utils';
-import { Sequelize } from 'sequelize-typescript';
-import cors from 'cors';
+/**
+ * @file Defines the Server (main class of the backend)
+ * @author Martin Danhier
+ * @version 1.0
+ */
+
 import { ok, strictEqual } from 'assert';
+import { json as jsonParser } from 'body-parser';
+import cors from 'cors';
+import express from 'express';
+import session, { SessionOptions } from 'express-session';
+import { Sequelize } from 'sequelize-typescript';
+
+import {
+    ContentTypeCheckMiddleware, ErrorHandlerMiddleware, LoggerMiddleware
+} from './middlewares';
+import { UserRouter } from './routers';
+import { getSessionOptions, initDatabase, Logger } from './utils';
 
 /**
  * Singleton class containing various methods to init and handle the server.

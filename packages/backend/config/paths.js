@@ -1,3 +1,8 @@
+/**
+ * @file Forked from Create React app: do the same thing as react, but for an express.js server
+ * @author Martin Danhier, Facebook
+ */
+
 'use strict';
 
 const path = require('path');

@@ -1,3 +1,9 @@
+/**
+ * @file Router for user manipulation
+ * @author Martin Danhier
+ * @version 1.0
+ */
+
 import { Router } from 'express';
 import { AuthMiddleware } from '../middlewares';
 import { UserRepository } from '../repositories';
