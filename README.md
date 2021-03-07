@@ -1,4 +1,6 @@
-![](packages/frontend/public/logo.png)
+<div style='display: flex; flex-direction: row; width: 100%; justify-content: center; margin: 10px; margin-bottom: 25px;'>
+<img width='400px' src='packages/frontend/public/logo.png'>
+</div>
 
 > Enhanced media management platform for medias.unamur.be
 
