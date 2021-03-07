@@ -27,7 +27,7 @@ beforeEach(async () => {
 test('Login user with wrong username', async () => {
     // Try to connect to an unexisting account
     await request(app)
-        .post('/user/login')
+        .post('/api/user/login')
         .send({
             username: 'unexisting',
             password: 'azerty'
@@ -43,7 +43,7 @@ test('Login user with wrong username', async () => {
 test('Login user with wrong password', async () => {
     // Try to connect with a wrong password
     await request(app)
-        .post('/user/login')
+        .post('/api/user/login')
         .send({
             username: 'bob12',
             password: 'qwerty'
@@ -59,7 +59,7 @@ test('Login user with wrong password', async () => {
 test('Login user ok', async () => {
     // Try to connect with correct credentials
     await request(app)
-        .post('/user/login')
+        .post('/api/user/login')
         .send({
             username: 'bob12',
             password: 'azerty'
@@ -75,7 +75,7 @@ test('Login user ok', async () => {
 test('User add ok', async () => {
     // Try to add a new user
     await request(app)
-        .post('/user/add')
+        .post('/api/user/add')
         .send({
             username: 'new',
             password: 'password',
@@ -91,7 +91,7 @@ test('User add ok', async () => {
 test('User add conflict', async () => {
     // Try to add a new user with an existing name
     await request(app)
-        .post('/user/add')
+        .post('/api/user/add')
         .send({
             username: 'bob12',
             password: 'password',
@@ -108,7 +108,7 @@ test('User add conflict', async () => {
 test('User edit not connected', async () => {
     // Try to edit an user while not being connected
     await request(app)
-        .post('/user/edit')
+        .post('/api/user/edit')
         .send({
             username: 'bob12',
             newPassword: 'new_pwd',
@@ -128,7 +128,7 @@ test('User edit other user', async () => {
 
     // First connect
     await superagent
-        .post('/user/login')
+        .post('/api/user/login')
         .send({
             username: 'bob12',
             password: 'azerty'
@@ -137,7 +137,7 @@ test('User edit other user', async () => {
 
     // Try to edit an user while not being connected
     await superagent
-        .post('/user/edit')
+        .post('/api/user/edit')
         .send({
             username: 'other',
             newPassword: 'new_pwd',
@@ -157,7 +157,7 @@ test('User edit ok', async () => {
 
     // First connect
     await superagent
-        .post('/user/login')
+        .post('/api/user/login')
         .send({
             username: 'bob12',
             password: 'azerty'
@@ -166,7 +166,7 @@ test('User edit ok', async () => {
 
     // Try to edit an user while not being connected
     await superagent
-        .post('/user/edit')
+        .post('/api/user/edit')
         .send({
             username: 'bob12',
             newPassword: 'new_pwd',
@@ -186,7 +186,7 @@ test('User test ok', async () => {
 
     // First connect
     await superagent
-        .post('/user/login')
+        .post('/api/user/login')
         .send({
             username: 'bob12',
             password: 'azerty'
@@ -195,7 +195,7 @@ test('User test ok', async () => {
 
     // Then test if connected
     await superagent
-        .get('/user/test')
+        .get('/api/user/test')
         .expect(200)
         .expect({
             error: false,
@@ -208,7 +208,7 @@ test('User test not connected', async () => {
 
     // Test if connected
     await request(app)
-        .get('/user/test')
+        .get('/api/user/test')
         .expect(401)
         .expect({
             error: true,
@@ -222,7 +222,7 @@ test('User disconnect', async () => {
 
     // First connect
     await superagent
-        .post('/user/login')
+        .post('/api/user/login')
         .send({
             username: 'bob12',
             password: 'azerty'
@@ -231,7 +231,7 @@ test('User disconnect', async () => {
 
     // Then test if connected. It should be connected.
     await superagent
-        .get('/user/test')
+        .get('/api/user/test')
         .expect(200)
         .expect({
             error: false,
@@ -241,7 +241,7 @@ test('User disconnect', async () => {
 
     // Then disconnect
     await superagent
-        .get('/user/disconnect')
+        .get('/api/user/disconnect')
         .expect(200)
         .expect({
             error: false
@@ -249,7 +249,7 @@ test('User disconnect', async () => {
 
     // Then test again. It should be disconnected.
     await request(app)
-        .get('/user/test')
+        .get('/api/user/test')
         .expect(401)
         .expect({
             error: true,

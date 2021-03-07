@@ -24,6 +24,14 @@ If there is a permission error during this action, try executing `npm install` a
 4. Run `npm install` to install the few dependancies remaining
 5. Run `npm start` to start the server. It will serve both the backend and the frontend.
 
+## Run tests
+
+1. Run `npm test`
+
+## Run tests and collect coverage
+
+1. Run `npm run coverage`
+
 ## For Visual Studio Code : useful extensions
 
 You can install these extensions for an optimal IDE:
