@@ -4,15 +4,18 @@
  * @author Martin Danhier
  */
 
-import { AppBar,  Divider, Drawer, IconButton, Toolbar, Typography } from '@material-ui/core';
-import { ChevronLeft, Menu } from '@material-ui/icons';
-import React from 'react';
-import clsx from 'clsx';
-
 import './scaffold.style.css';
-import DrawerMenu, { DrawerMenuItem } from './drawer-menu';
+
+import clsx from 'clsx';
+import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
+import { AppBar, Divider, Drawer, IconButton, Toolbar, Typography } from '@material-ui/core';
+import { ChevronLeft, Menu } from '@material-ui/icons';
+
+import DrawerMenu, { DrawerMenuItem } from './drawer-menu';
+
+/** Props of a Scaffold component */
 export interface ScaffoldProps<T> extends RouteComponentProps {
     /** Title of the page */
     title?: string;
@@ -28,11 +31,16 @@ export interface ScaffoldProps<T> extends RouteComponentProps {
     children?: JSX.Element | JSX.Element[];
 }
 
+/** State of a Scaffold component */
 export interface ScaffoldState {
+    /** If true, the drawer is open */
     drawerOpen: boolean;
 }
 
-/** Scaffold of a page. Inspired by Flutter scaffold. */
+/** Scaffold of a page. Inspired by Flutter scaffold.
+ *
+ * Controls the app bar and the side menu.
+*/
 class Scaffold<T> extends React.Component<ScaffoldProps<T>, ScaffoldState> {
     /** The drawer width in rem, effectively used */
     private _drawerWidth: number;
@@ -50,11 +58,16 @@ class Scaffold<T> extends React.Component<ScaffoldProps<T>, ScaffoldState> {
         };
     }
 
-    setDrawer = (newValue: boolean): void => this.setState(prev => ({
+    /** Toggle the "open" state of the drawer */
+    toggleDrawer = (): void => this.setState(prev => ({
         ...prev,
         drawerOpen: !prev.drawerOpen,
     }));
 
+    /**
+     * Main method of a React component. Called each time the component needs to render.
+     * @returns a tree of react elements
+     */
     render(): JSX.Element {
         return (
             /* Provide the drawer width to the css via a variable */
@@ -72,7 +85,7 @@ class Scaffold<T> extends React.Component<ScaffoldProps<T>, ScaffoldState> {
                             <IconButton
                                 className={clsx('Scaffold-appBarMenuButton', this.state.drawerOpen && 'Scaffold-appBarMenuButton-hide')}
                                 color='inherit'
-                                onClick={(): void => this.setDrawer(true)}
+                                onClick={(): void => this.toggleDrawer()}
                             >
                                 <Menu />
                             </IconButton>}
@@ -96,7 +109,7 @@ class Scaffold<T> extends React.Component<ScaffoldProps<T>, ScaffoldState> {
                     }}
                 >
                     <div className={'Scaffold-drawerHeader'}>
-                        <IconButton onClick={(): void => this.setDrawer(false)} >
+                        <IconButton onClick={(): void => this.toggleDrawer()} >
                             <ChevronLeft />
                         </IconButton>
                     </div>

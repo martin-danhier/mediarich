@@ -1,11 +1,21 @@
-import React from 'react';
+/**
+ * @file Definition of an AddVideoDialog component
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
+
 import { Localization } from 'components/localization-provider/types';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
 import { DropzoneArea } from 'material-ui-dropzone';
+import React from 'react';
 import MSChannel from 'utils/mediaserver/classes/channel';
 import VideoUpload from 'utils/mediaserver/classes/upload';
+
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
+
 import UploadCard from './upload-card';
 
+/** Props of a AddVideoDialog component */
 export interface AddVideoDialogProps {
     /** Should the dialog be opened or not */
     open: boolean;
@@ -19,12 +29,15 @@ export interface AddVideoDialogProps {
     parentChannel: MSChannel;
 }
 
+/** State of a AddVideoDialog component */
 export interface AddVideoDialogState {
+    /** Current uploads */
     uploads: { upload: VideoUpload; id: number; done: boolean; title: string }[];
     /** Id used to identify uploads (incremented at each one) */
     uploadId: number;
 }
 
+/** Dialog to add one or more files for upload and add them when complete */
 export class AddVideoDialog extends React.Component<AddVideoDialogProps, AddVideoDialogState> {
 
     constructor(props: AddVideoDialogProps) {
@@ -119,6 +132,10 @@ export class AddVideoDialog extends React.Component<AddVideoDialogProps, AddVide
 
     }
 
+    /**
+     * Main method of a React component. Called each time the component needs to render.
+     * @returns a tree of react elements
+     */
     render(): JSX.Element {
         return <Dialog
             fullWidth
@@ -137,7 +154,7 @@ export class AddVideoDialog extends React.Component<AddVideoDialogProps, AddVide
                             defaultTitle={defaultTitle}
                             onUploadComplete={(): void => this.handleUploadComplete(id)}
                             onTitleChange={(title): void => this.handleTitleChange(id, title)}
-                            onDelete={(): void => this.handleUploadCancelled(id)}
+                            onUploadCancelled={(): void => this.handleUploadCancelled(id)}
                             key={id}
                             upload={upload}
                         />;
@@ -150,14 +167,11 @@ export class AddVideoDialog extends React.Component<AddVideoDialogProps, AddVide
                     onDrop={this.addUpload}
                     clearOnUnmount
                     dropzoneText={this.props.localization.Channel.dialogs.dragNewVideo}
-                    // We use key to refresh the dropzone after each upload, which clears it
-                    // This cause a warning because the dropzone package calls setState even when unmounted
-                    // To prevent this, the dropzone package should add a way to clear the dropzone programmatically
+                    filesLimit={1}
                     showPreviews={false}
                     showPreviewsInDropzone={false}
                     showFileNames={false}
                     showFileNamesInPreview={false}
-                    key={this.state.uploadId}
                     useChipsForPreview={false}
                     showAlerts={false}
                     inputProps={{

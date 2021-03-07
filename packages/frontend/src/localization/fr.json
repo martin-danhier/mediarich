@@ -4,16 +4,20 @@
         "loading": "Chargement ..."
     },
     "Auth": {
-        "username": "Nom d'utilisateur",
-        "password": "Mot de passe",
-        "newPassword": "Nouveau mot de passe",
-        "repeatPassword": "Répéter le mot de passe",
-        "login": "Se connecter",
-        "logout": "Se déconnecter",
-        "backToLogin": "Retour à la connexion",
-        "register": "S'inscrire",
-        "apiKey": "Clé d'API",
         "description": "Plateforme de gestion de médias pour medias.unamur.be",
+        "fieldsNames": {
+            "username": "Nom d'utilisateur",
+            "password": "Mot de passe",
+            "newPassword": "Nouveau mot de passe",
+            "repeatPassword": "Répéter le mot de passe",
+            "apiKey": "Clé d'API"
+        },
+        "buttonsNames": {
+            "login": "Se connecter",
+            "logout": "Se déconnecter",
+            "backToLogin": "Retour à la connexion",
+            "register": "S'inscrire"
+        },
         "apiKeyTutorial": {
             "title": "Où trouver ma clé d'API ?",
             "info": "La clé d'API permet de se connecter à votre compte MediaServer. Vous ne devrez l'entrer qu'une seule fois.",
@@ -48,9 +52,9 @@
         "videos": "Vidéos",
         "noRows": "Il n'y a aucune ligne à afficher.",
         "error": "Une erreur est survenue.",
-        "refresh": "Actualiser",
         "myChannel": "Ma chaîne",
         "actionsNames": {
+            "refresh": "Actualiser",
             "delete": "supprimer",
             "publish": "(Dé)publier",
             "edit": "modifier",

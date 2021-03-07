@@ -1,18 +1,37 @@
-import { Link, Typography } from '@material-ui/core';
-import { DropzoneArea } from 'material-ui-dropzone';
-import React from 'react';
+/**
+ * @file Definition of an ImageField component
+ * @version 1.0
+ * @author Martin Danhier
+ */
 
 import './image-field.style.css';
 
+import { DropzoneArea } from 'material-ui-dropzone';
+import React from 'react';
+
+import { Link, Typography } from '@material-ui/core';
+
+/**
+ * Props of an ImageField component
+ */
 export interface ImageFieldProps {
+    /** HTML name of the field. Used by Form to recognize the field */
     name: string;
+    /** Optional URL of the default image */
     defaultImageUrl?: string;
+    /** Text to displayed on the dropzone (e.g. "Drag and drop an image here") */
     dropzoneText: string;
+    /** Title of the field (displayed above the current thumbnail) */
     title: string;
+    /** Callback called when a new image is provided */
     onChange?: (file: File | null) => void;
 }
 
+/**
+ * State of an ImageField component
+ */
 export interface ImageFieldState {
+    /** URL of the displayed image on the left */
     currentImageURL: string | null;
 }
 
@@ -37,7 +56,7 @@ class ImageField extends React.Component<ImageFieldProps, ImageFieldState> {
             const reader = new FileReader();
             reader.readAsDataURL(file);
 
-            // // If loaded, display it
+            // If loaded, display it
             reader.onloadend = (e): void => {
                 if (!(reader.result instanceof ArrayBuffer)) {
                     this.setState({
@@ -66,6 +85,10 @@ class ImageField extends React.Component<ImageFieldProps, ImageFieldState> {
         }
     }
 
+    /**
+     * Main method of a React component. Called each time the component needs to render.
+     * @returns a tree of react elements
+     */
     render(): JSX.Element {
         return <div>
             <div className='ImageField-thumbnailRow'>
@@ -82,6 +105,7 @@ class ImageField extends React.Component<ImageFieldProps, ImageFieldState> {
                                 alt={this.props.title} />}
                     </div>
                 </div>
+
                 {/* Dropzone for new thumbnail */}
                 <DropzoneArea
                     dropzoneClass='ImageField-dropZone-root'
@@ -103,6 +127,7 @@ class ImageField extends React.Component<ImageFieldProps, ImageFieldState> {
                 />
             </div>
 
+            {/* Display reset link if the field is not empty */}
             {this.state.currentImageURL && <Typography className='padding-vertical'><Link className='ImageField-reset' onClick={this.handleReset}>Supprimer l image</Link></Typography>}
         </div>;
     }

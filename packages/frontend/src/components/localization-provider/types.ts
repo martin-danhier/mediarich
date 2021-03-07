@@ -10,25 +10,35 @@ export interface Localization {
 
     // Component-specific strings:
     LoadingScreen: {
+        /** Loading text */
         loading: string;
     };
     Auth: {
-        username: string;
-        password: string;
-        newPassword: string;
-        repeatPassword: string;
-        login: string;
-        logout: string;
-        backToLogin: string;
-        register: string;
+        /* Description text of Mediarich */
         description: string;
-        apiKey: string;
+        /** fields name */
+        fieldsNames: {
+            username: string;
+            password: string;
+            newPassword: string;
+            repeatPassword: string;
+            apiKey: string;
+        };
+        /** Buttons names */
+        buttonsNames: {
+            login: string;
+            logout: string;
+            backToLogin: string;
+            register: string;
+        };
+        /** Strings of the api key tutorial */
         apiKeyTutorial: {
             title: string;
             info: string;
             warning: string;
             steps: string[];
         };
+        /** Auth error messages */
         errors: {
             pwdMustMatch: string;
             usernameTaken: string;
@@ -38,24 +48,30 @@ export interface Localization {
             apiKeyNoLongerValid: string;
         };
     };
+    /** Strings of the Error404 page */
     Error404: {
         error404: string;
         pageNotFound: string;
     };
+    /** Strings of the Form component */
     Form: {
         required: string;
     };
+    /** Strings of the Channel component */
     Channel: {
         channel: string;
         channels: string;
         subchannels: string;
         video: string;
         videos: string;
-        noRows: string;
         error: string;
-        refresh: string;
+        /** No rows in the table message */
+        noRows: string;
+        /** Unknown error message */
         myChannel: string;
+        /** Name of the actions */
         actionsNames: {
+            refresh: string;
             delete: string;
             publish: string;
             edit: string;
@@ -63,6 +79,7 @@ export interface Localization {
             visit: string;
             add: string;
         };
+        /** Names of the fields */
         fieldsNames: {
             title: string;
             public: string;
@@ -72,6 +89,7 @@ export interface Localization {
             thumbnail: string;
             duration: string;
         };
+        /** Dialog related strings */
         dialogs: {
             omittedFields: string;
             areYouSure: string;
@@ -89,7 +107,6 @@ export interface Localization {
             dragNewVideo: string;
             uploadComplete: string;
             uploadInProgress: string;
-
         };
     };
     LanguageSwitcher: {
@@ -107,4 +124,8 @@ export const availableLocalisations = {
 
 // Helper types
 
+/**
+ * Set of keys in availableLocalisations.
+ * Any invalid language will then return a type error at compile time
+ */
 export type AvailableLanguage = keyof typeof availableLocalisations;

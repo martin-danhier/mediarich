@@ -1,39 +1,64 @@
-import { Breadcrumbs, Button, IconButton, Link, Tooltip, Typography } from '@material-ui/core';
+/**
+ * @file Definition of an ChannelScaffold component
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
+import './scaffold.style.css';
+
+import LanguageSwitcher from 'components/language-switcher';
 import LoadingScreen from 'components/loading-screen';
+import { Localization } from 'components/localization-provider/types';
 import { MediaServerProviderState } from 'components/mediaserver-provider';
 import Scaffold from 'components/scaffold';
 import { DrawerMenuItem } from 'components/scaffold/drawer-menu';
+import Cookies from 'js-cookie';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import assert from 'utils/assert';
 import { MSChannelTreeItem, MSVideo, MSVideoEditBody } from 'utils/mediaserver';
 import MSChannel from 'utils/mediaserver/classes/channel';
-
-import { Localization } from 'components/localization-provider/types';
-import { filterObject, stringToDuration, toUpperCaseFirstLetter } from 'utils/useful-functions';
-import ChannelContentList, { DataGridActionColumnParams, DataGridEditableColumnParams } from '../channel-content-list';
-import './scaffold.style.css';
-import AlertDialog from '../dialogs/alert-dialog';
-import { Delete, Edit, OpenInNew, Refresh } from '@material-ui/icons';
-import { GridRowsProp } from '@material-ui/data-grid';
 import MSContent from 'utils/mediaserver/classes/content';
-import EditDialog, { ChannelEditState } from '../dialogs/edit-dialog';
-import LanguageSwitcher from 'components/language-switcher';
-import AddChannelDialog from '../dialogs/add-channel-dialog';
-import MoveDialog from '../dialogs/move-dialog';
-import assert from 'utils/assert';
 import MediaServerAPIHandler from 'utils/mediaserver/mediaserver-api-hanler';
-import Cookies from 'js-cookie';
-import AddVideoDialog from '../dialogs/add-video-dialog';
+import { filterObject, stringToDuration, toUpperCaseFirstLetter } from 'utils/useful-functions';
 
+import { Breadcrumbs, Button, IconButton, Link, Tooltip, Typography } from '@material-ui/core';
+import { GridRowsProp } from '@material-ui/data-grid';
+import { Delete, Edit, OpenInNew, Refresh } from '@material-ui/icons';
+
+import ChannelContentList, {
+    DataGridActionColumnParams, DataGridEditableColumnParams
+} from '../channel-content-list';
+import AddChannelDialog from '../dialogs/add-channel-dialog';
+import AddVideoDialog from '../dialogs/add-video-dialog';
+import AlertDialog from '../dialogs/alert-dialog';
+import EditDialog, { ChannelEditState } from '../dialogs/edit-dialog';
+import MoveDialog from '../dialogs/move-dialog';
+
+/** URL props of a ChannelScaffold component.
+ *
+ * They are provided by the router and not by the parent component.
+ *
+ * Here, the url is ``/channel/:slug``
+ *
+ * This interface tells the router that ``slug`` is a string.
+*/
 export interface ChannelScaffoldRouterProps {
     slug: string;
 }
 
+/** Props of a ChannelScaffold component.
+ *
+ * Unlike `ChannelScaffoldRouterProps`, they are provided by the parent component.
+ */
 export interface ChannelScaffoldProps extends RouteComponentProps<ChannelScaffoldRouterProps> {
+    /** Current mediaserver context */
     mediaServerContext: MediaServerProviderState;
+    /** Current localization object */
     localization: Localization;
 }
 
+/** State of a ChannelScaffold component */
 export interface ChannelScaffoldState {
     /** Channels objects, indexed by slug (for easy access with the URL parameter) */
     channels: Record<string, MSChannel>;
@@ -55,42 +80,68 @@ export interface ChannelScaffoldState {
     hasAPersonalChannel: boolean;
     /** Data of the alert dialog */
     alertDialog: {
+        /** Is the dialog open ? */
         open: boolean;
+        /** Title of the dialog */
         title: string;
+        /** Description of the dialog */
         description: string;
+        /** Text of the submit button */
         submitText: string;
+        /** Callback called on submit */
         onSubmit?: () => void | Promise<void>;
     };
     /** Data of the edit dialog */
     editDialog: {
+        /** Is the dialog open ? */
+        open: boolean;
+        /** Default data for the Form */
         defaultData: {
             title?: string;
             description?: string;
             thumbnailURL?: string;
         };
+        /** If true, empty fields will be omitted */
         omitEmpty: boolean;
-        open: boolean;
+        /** Title of the dialog */
         title: string;
+        /** Callback called on submit */
         onSubmit?: (data: ChannelEditState) => void | Promise<void>;
     };
     /** Data of the add dialog */
     addChannelDialog: {
+        /** Is the dialog open ? */
         open: boolean;
     };
     /** Data of the add dialog */
     addVideoDialog: {
+        /** Is the dialog open ? */
         open: boolean;
     };
     /** Data of the move dialog */
     moveDialog: {
+        /** Is the dialog open ? */
         open: boolean;
+        /** Title of the dialog */
         title: string;
+        /** For each channels slug, its path representation.
+         *
+         * @example {"projet-individuel" : "/repository/informatique/projet-individuel"}
+         */
         paths: Record<string, string>;
+        /** Array of all the available destination slugs.
+         *
+         * You should remove the ones that are selected to prevent a channel to be moved to itself.
+         */
         potentialDestinationChannelsSlugs: string[];
+        /** Callback called on submit
+         * @param destination the slug of the new parent channel
+         */
         onSubmit?: (destination: string) => void | Promise<void>;
     };
 }
 
+/** Scaffold of a channel. */
 class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaffoldState> {
 
     constructor(props: ChannelScaffoldProps) {
@@ -138,9 +189,10 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
         };
     }
 
-    // Called when the component is mounted
+    /** Called when the component is mounted (rendered for the first time) */
     async componentDidMount(): Promise<void> {
 
+        // Try to get the API handler
         const mediaserver = await this.getMediaServer();
 
         // If there is a mediaserver
@@ -410,12 +462,15 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
         return this.state.subchannelsSlugs.map((slug) => {
             const channel = this.state.channels[slug];
             return {
+                // Use slug for id
                 id: slug,
+                // Title column
                 title: {
                     defaultText: channel.title,
                     disabled: !channel.canEdit,
                     onUpdate: (newText) => this.onRename(channel, newText),
                 } as DataGridEditableColumnParams,
+                // Delete button
                 delete: {
                     icon: <Delete />,
                     // Disable if the user doesn't have the permission
@@ -424,6 +479,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                         this.onDelete([channel], false);
                     }
                 } as DataGridActionColumnParams,
+                // Open channel button
                 visit: {
                     icon: <OpenInNew />,
                     onClick: () => {
@@ -435,20 +491,30 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
         });
     }
 
+    /** Generate the list of rows for the video content list. */
     generateVideoList(): GridRowsProp {
         return Object.keys(this.state.videos).map((slug) => {
             const video = this.state.videos[slug];
+
+            // For each video, define the row :
             return {
+                // Use slug for id
                 id: slug,
+                // Title column
                 title: {
                     defaultText: video.title,
                     disabled: !video.canEdit,
                     onUpdate: (newText) => this.onRename(video, newText),
                 } as DataGridEditableColumnParams,
+                // Add date column
                 addDate: video.addDate,
+                // Views number column
                 views: video.views,
+                // Duration column
                 duration: stringToDuration(video.duration ?? '0'),
+                // Is public column
                 public: !video.validated,
+                // Edit button
                 edit: {
                     icon: <Edit />,
                     disabled: !video.canEdit,
@@ -456,6 +522,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                         this.onEdit([video]);
                     },
                 } as DataGridActionColumnParams,
+                // Delete button
                 delete: {
                     icon: <Delete />,
                     disabled: !video.canDelete,
@@ -463,6 +530,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                         this.onDelete([video], true);
                     },
                 } as DataGridActionColumnParams,
+                // Open in new tab button
                 visit: {
                     icon: <OpenInNew />,
                     onClick: () => {
@@ -850,6 +918,10 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
         }
     }
 
+    /**
+     * Main method of a React component. Called each time the component needs to render.
+     * @returns a tree of react elements
+     */
     render(): JSX.Element {
         if (this.state.loading) {
             return <LoadingScreen
@@ -873,7 +945,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                     showDrawerByDefault
                     drawerMenuItems={this.state.menuItems}
                     appBarActions={<>
-                        <Tooltip title={this.props.localization.Channel.refresh}>
+                        <Tooltip title={this.props.localization.Channel.actionsNames.refresh}>
                             <IconButton color='inherit' onClick={(): void => {
                                 this.setState({
                                     innerLoading: true,
@@ -910,7 +982,7 @@ class ChannelScaffold extends React.Component<ChannelScaffoldProps, ChannelScaff
                                 this.props.history.push('/login');
                             }}
                         >
-                            {this.props.localization.Auth.logout}
+                            {this.props.localization.Auth.buttonsNames.logout}
                         </Button >
                     </>
                     }

@@ -4,18 +4,22 @@
         "loading": "Loading ..."
     },
     "Auth": {
-        "username": "Username",
-        "password": "Password",
-        "newPassword" : "New password",
-        "repeatPassword" : "Repeat password",
-        "login": "Log in",
-        "logout": "Sign out",
-        "backToLogin": "Go back to login",
-        "register": "Sign up",
-        "apiKey": "API key",
         "description": "Enhanced media management platform for medias.unamur.be",
+        "fieldsNames": {
+            "username": "Username",
+            "password": "Password",
+            "newPassword": "New password",
+            "repeatPassword": "Repeat password",
+            "apiKey": "API key"
+        },
+        "buttonsNames": {
+            "login": "Log in",
+            "logout": "Sign out",
+            "backToLogin": "Go back to login",
+            "register": "Sign up"
+        },
         "apiKeyTutorial": {
-            "title" : "Where can I find my API key ?",
+            "title": "Where can I find my API key ?",
             "info": "The API key allows you to log into MediaServer. You only have to give it once.",
             "warning": "Never send this key to anyone ! Whoever has this key can act on your behalf on MediaServer.",
             "steps": [
@@ -48,9 +52,9 @@
         "videos": "Videos",
         "noRows": "No rows.",
         "error": "An error occured.",
-        "refresh": "Refresh",
         "myChannel": "My channel",
         "actionsNames": {
+            "refresh": "Refresh",
             "delete": "delete",
             "publish": "(Un)publish",
             "edit": "edit",
@@ -74,7 +78,7 @@
             "publishInfoPlural": "The private videos will become public, and vice versa.",
             "publishInfoSingular": "If it is private, it will become public, and vice versa.",
             "editDialogTitleSingular": "Edit a",
-            "editDialogTitlePlural" : "Edit several",
+            "editDialogTitlePlural": "Edit several",
             "dragNewThumbnailImage": "Drag and drop a new thumbnail image here or click",
             "addChannelTitle": "Add a new channel",
             "addVideoTitle": "Add a new video",

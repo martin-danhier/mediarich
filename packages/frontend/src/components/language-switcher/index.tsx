@@ -4,25 +4,32 @@
  * @author Martin Danhier
  */
 
-import { Button, Tooltip } from '@material-ui/core';
+import assert from 'utils/assert';
 import { LocalizationConsumer, LocalizationContext } from 'components/localization-provider';
 import { AvailableLanguage, availableLocalisations } from 'components/localization-provider/types';
 import { addDays } from 'date-fns/esm';
 import Cookies from 'js-cookie';
 import React from 'react';
-import * as assert from 'assert';
 
+import { Button, Tooltip } from '@material-ui/core';
+
+/** Props of a LanguageSwitcher component */
 interface LanguageSwitcherProps {
+    /** if true, the button will be place on the top right absolutely */
     alignTopRight?: boolean;
+    /** Color of the button */
     color?: 'inherit' | 'primary' | 'secondary' | 'default';
 }
 
+/** State of a LanguageSwitcher component */
 interface LanguageSwitcherState {
+    /** Current language */
     current?: AvailableLanguage;
+    /** Next language */
     next?: AvailableLanguage;
 }
 
-/** Button to cycle through the available languages */
+/** Button to cycle through the available languages. */
 class LanguageSwitcher extends React.Component<LanguageSwitcherProps, LanguageSwitcherState> {
 
     constructor(props: LanguageSwitcherProps) {
@@ -39,15 +46,19 @@ class LanguageSwitcher extends React.Component<LanguageSwitcherProps, LanguageSw
     context!: React.ContextType<typeof LocalizationContext>
     static contextType = LocalizationContext;
 
+    /** Called when the component mounts (is rendered for the first time) */
     componentDidMount(): void {
-        // Assert that the context is defined
-        assert.ok(this.context !== undefined, 'Context is undefined');
-        assert.ok(this.context.strings !== undefined, 'context.strings is undefined');
-        assert.ok(Object.keys(availableLocalisations).includes(this.context.strings.name), `Invalid localization name: "${this.context.strings.name}"`);
 
+        // Assert that the context is defined
+        assert(this.context !== undefined, 'Context is undefined');
+        assert(this.context.strings !== undefined, 'context.strings is undefined');
+        assert(Object.keys(availableLocalisations).includes(this.context.strings.name), `Invalid localization name: "${this.context.strings.name}"`);
+
+        // Update the state
         this.setState(this.getNewStateData(this.context.strings.name as AvailableLanguage));
     }
 
+    /** Get the current and next language. */
     getNewStateData = (current: AvailableLanguage): LanguageSwitcherState => {
         // Get the list of languages
         const supportedLanguages = Object.keys(availableLocalisations);
@@ -65,28 +76,35 @@ class LanguageSwitcher extends React.Component<LanguageSwitcherProps, LanguageSw
         event.preventDefault();
 
         // Assert that the state is not undefined
-        assert.ok(this.state.current !== undefined, 'current is undefined');
-        assert.ok(this.state.next !== undefined, 'next is undefined');
+        assert(this.state.current !== undefined, 'current is undefined');
+        assert(this.state.next !== undefined, 'next is undefined');
 
         // Change the language to that new one
         this.context?.selectLanguage(this.state.next);
+
         // Save it in a cookie
         Cookies.set('lang', this.state.next, {
             expires: addDays(new Date(), 14),
         });
+
         // Update state
         this.setState(state => {
-            assert.ok(state.next !== undefined, 'next is undefined');
+            assert(state.next !== undefined, 'next is undefined');
             return this.getNewStateData(state.next);
         });
     }
 
+    /**
+     * Main method of a React component. Called each time the component needs to render.
+     * @returns a tree of react elements
+     */
     render(): JSX.Element {
         // Create the consumer
         const consumer = <LocalizationConsumer>
             {(localization): JSX.Element => {
                 return (
                     <Tooltip
+                        // tooltip displayed when the button is hovered
                         title={localization.LanguageSwitcher.tooltip}
                     >
                         <Button

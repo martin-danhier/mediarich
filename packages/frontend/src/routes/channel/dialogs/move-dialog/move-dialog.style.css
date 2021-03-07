@@ -1,7 +1,6 @@
 .MoveDialog-autocompleteItem {
     display: flex;
     flex-direction: column;
-
 }
 
 .MoveDialog-autocompleteItemTitle {

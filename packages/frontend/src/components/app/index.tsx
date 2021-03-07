@@ -5,14 +5,17 @@
  */
 
 import LazyRoute from 'components/lazy-route';
-import React from 'react';
-import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
-import { unstable_createMuiStrictModeTheme as createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
 import { LocalizationProvider } from 'components/localization-provider';
 import { AvailableLanguage, availableLocalisations } from 'components/localization-provider/types';
-import Cookies from 'js-cookie';
 import { MediaServerProvider } from 'components/mediaserver-provider';
+import Cookies from 'js-cookie';
+import React from 'react';
+import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 import Error404 from 'routes/error-404';
+
+import {
+    CssBaseline, ThemeProvider, unstable_createMuiStrictModeTheme as createMuiTheme
+} from '@material-ui/core';
 
 // Import pages in a lazy mode for code splitting
 // Code splitting = only download the code of the page you are visiting
@@ -46,6 +49,8 @@ const theme = createMuiTheme({
     },
     overrides: {
         MuiToolbar: {
+            // Make all toolbars use the size stored in a css variable so that when we
+            // use that variable in the css, it matches the height of the toolbars
             regular: {
                 '@media (min-width: 0px) and (orientation: landscape)': {
                     minHeight: 'var(--MuiToolbar-regular-minHeight)',
@@ -64,6 +69,11 @@ const theme = createMuiTheme({
  */
 class App extends React.Component {
 
+
+    /**
+     * Main method of a React component. Called each time the component needs to render.
+     * @returns a tree of react elements
+     */
     render(): JSX.Element {
         // Get preferred language from cookie
         let defaultLanguage = Cookies.get('lang');
@@ -80,6 +90,7 @@ class App extends React.Component {
                 {/* Apply common CSS fixes for modern apps */}
                 <CssBaseline />
 
+                {/* Create a mediaserver provider that will be use to access the mediaserver API in the tree */}
                 <MediaServerProvider>
                     {/* Give the localization manager to the provider */}
                     <LocalizationProvider
@@ -88,7 +99,7 @@ class App extends React.Component {
                         {/* Main router of the app */}
                         <BrowserRouter>
                             <Switch>
-                                {/* Home page */}
+                                {/* Home page: redirect to login */}
                                 <LazyRoute exact path='/' render={(p): JSX.Element => <Redirect to='/login' {...p} />} />
                                 {/* Register page */}
                                 <LazyRoute exact path='/register' render={(p): JSX.Element => <Register {...p} />} />

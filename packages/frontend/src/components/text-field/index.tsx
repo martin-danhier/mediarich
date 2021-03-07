@@ -1,9 +1,18 @@
-import { TextField } from '@material-ui/core';
+/**
+ * @file Definition of an CustomTextField component
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
+import './text-field.style.css';
+
 import clsx from 'clsx';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import './text-field.style.css';
 
+import { TextField } from '@material-ui/core';
+
+/** Props of a CustomTextField component */
 export interface CustomTextFieldProps extends Partial<RouteComponentProps> {
     /** Label of the field */
     label: string;
@@ -31,7 +40,14 @@ export interface CustomTextFieldProps extends Partial<RouteComponentProps> {
     autoFocus?: boolean;
 }
 
+/**
+ * Wrapper around TextField to default the values and give it a uniform style.
+ */
 class CustomTextField extends React.Component<CustomTextFieldProps> {
+    /**
+     * Main method of a React component. Called each time the component needs to render.
+     * @returns a tree of react elements
+     */
     render(): JSX.Element {
         return <TextField
             className={clsx(!this.props.noMargin && 'CustomTextField-field', this.props.className)}

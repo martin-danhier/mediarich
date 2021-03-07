@@ -19,12 +19,14 @@ import { MediaServerContext } from 'components/mediaserver-provider';
 import assert from 'utils/assert';
 import { StaticContext } from 'react-router';
 
+/** Login page */
 class Login extends React.Component<RouteComponentProps<{}, StaticContext, {} & { next?: string }>>{
 
     // Link to mediaserver context to be able to login with the api key
     context!: React.ContextType<typeof MediaServerContext>;
     static contextType = MediaServerContext;
 
+    /** Called when the components mount (is rendered for the first time) */
     componentDidMount(): void {
         assert(this.context !== null, 'There should be a MediaServerProvider in the tree.');
 
@@ -36,6 +38,10 @@ class Login extends React.Component<RouteComponentProps<{}, StaticContext, {} & 
         }
     }
 
+    /**
+     * Main method of a React component. Called each time the component needs to render.
+     * @returns a tree of react elements
+     */
     render(): JSX.Element {
         return (
             <>
@@ -89,15 +95,12 @@ class Login extends React.Component<RouteComponentProps<{}, StaticContext, {} & 
                                     else if (loginResult.apiKey) {
                                         // If it worked, we need to recreate the Mediaserver API handler with the API key
                                         assert(this.context !== null, 'There should be a MediaServerProvider in the tree.');
-                                        const mediaserver = this.context.changeApiKey(loginResult.apiKey);
+                                        const mediaserver = await this.context.changeApiKey(loginResult.apiKey);
 
                                         // Test a request to check if the key is valid
-                                        const keyValid = await mediaserver.test();
-                                        if (!keyValid) {
+                                        if (!mediaserver) {
                                             result.ok = false;
                                             result.errors.password = strings.errors.apiKeyNoLongerValid;
-                                            // Reset handler to avoid further requests
-                                            this.context.reset();
                                         }
                                     }
                                     // Server didn't return the api key for some reason
@@ -114,19 +117,19 @@ class Login extends React.Component<RouteComponentProps<{}, StaticContext, {} & 
                                 }}
                             >
                                 {/* Username */}
-                                <CustomTextField autoComplete='off' required name='username' label={strings.username} />
+                                <CustomTextField autoComplete='off' required name='username' label={strings.fieldsNames.username} />
 
                                 {/* Password */}
-                                <CustomTextField required name='password' password label={strings.password} />
+                                <CustomTextField required name='password' password label={strings.fieldsNames.password} />
 
                                 {/* Buttons */}
                                 <div className='buttonBar'>
-                                    <Button variant='contained' type='submit' color='primary'>{strings.login}</Button>
+                                    <Button variant='contained' type='submit' color='primary'>{strings.buttonsNames.login}</Button>
                                     <Button
                                         variant='outlined'
                                         // Redirect to /register if clicked
                                         onClick={(): void => this.props.history?.push('/register')}
-                                    >{strings.register}</Button>
+                                    >{strings.buttonsNames.register}</Button>
                                 </div>
                             </Form>
                         </Container>

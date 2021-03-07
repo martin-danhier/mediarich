@@ -6,25 +6,29 @@
 
 import './register.style.css';
 
+import Form, { FormErrors, SubmitValidationCallbackResult } from 'components/form';
+import LanguageSwitcher from 'components/language-switcher';
+import { LocalizationConsumer } from 'components/localization-provider';
+import { MediaServerContext } from 'components/mediaserver-provider';
 import CustomTextField from 'components/text-field';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-
-import { Button, Container, Link, Typography } from '@material-ui/core';
-import { LocalizationConsumer, } from 'components/localization-provider';
-import LanguageSwitcher from 'components/language-switcher';
-import * as assert from 'assert';
-import Form, { FormErrors, SubmitValidationCallbackResult } from 'components/form';
-import { MediaServerContext } from 'components/mediaserver-provider';
+import assert from 'utils/assert';
 import { MediarichAPIHandler, UserAddResult } from 'utils/backend';
 
+import { Button, Container, Link, Typography } from '@material-ui/core';
 
+/** Register page */
 class Register extends React.Component<RouteComponentProps> {
 
     // Link to mediaserver context to be able to login with the api key
     context!: React.ContextType<typeof MediaServerContext>;
     static contextType = MediaServerContext;
 
+    /**
+     * Main method of a React component. Called each time the component needs to render.
+     * @returns a tree of react elements
+     */
     render(): JSX.Element {
         return (
             <>
@@ -41,7 +45,7 @@ class Register extends React.Component<RouteComponentProps> {
 
                         return (<Container className='alignContent-center padding-vertical' maxWidth='sm'>
                             {/* Title */}
-                            <Typography variant="h4" className='margin-bottom' align='center'>{strings.register}</Typography>
+                            <Typography variant="h4" className='margin-bottom' align='center'>{strings.buttonsNames.register}</Typography>
 
 
                             <Form
@@ -73,18 +77,15 @@ class Register extends React.Component<RouteComponentProps> {
                                     }
                                     // Check the API Key on the MediaServer if there is no other error
                                     else if (result.ok) {
-                                        assert.ok(this.context !== null, 'MediaServerProvider should be in the tree.');
+                                        assert(this.context !== null, 'MediaServerProvider should be in the tree.');
 
-                                        const mediaserver = this.context.changeApiKey(values.apiKey);
+                                        // Try to change the api key
+                                        const mediaserver = await this.context.changeApiKey(values.apiKey);
 
-                                        // Test a request to check if the key is valid
-                                        const keyValid = await mediaserver.test();
-                                        if (!keyValid) {
+                                        if (!mediaserver) {
                                             // if it throws, then the api key is not valid
                                             result.ok = false;
                                             result.errors.apiKey = strings.errors.invalidApiKey;
-                                            // Reset the handler to avoid further requests
-                                            this.context.reset();
                                         }
 
                                     }
@@ -115,16 +116,16 @@ class Register extends React.Component<RouteComponentProps> {
                                 }}
                             >
                                 {/* Username */}
-                                <CustomTextField autoComplete='off' required name='username' label={strings.username} />
+                                <CustomTextField autoComplete='off' required name='username' label={strings.fieldsNames.username} />
 
                                 {/* Password */}
-                                <CustomTextField required name='password' password label={strings.newPassword} />
+                                <CustomTextField required name='password' password label={strings.fieldsNames.newPassword} />
 
                                 {/* Repeat Password */}
-                                <CustomTextField required name='confirmPassword' password label={strings.repeatPassword} />
+                                <CustomTextField required name='confirmPassword' password label={strings.fieldsNames.repeatPassword} />
 
                                 {/* Api Key */}
-                                <CustomTextField autoComplete='off' required name='apiKey' label={strings.apiKey} />
+                                <CustomTextField autoComplete='off' required name='apiKey' label={strings.fieldsNames.apiKey} />
 
                                 {/* Tutorial */}
                                 <div className="Register-apiKeyTutorial">
@@ -139,8 +140,8 @@ class Register extends React.Component<RouteComponentProps> {
                                             const match = /^(?<start>[^{}]*)(?:{(?<link>[^{}]+)})?(?<end>[^{}]*)$/.exec(step);
 
                                             // Assertions on the result
-                                            assert.ok(match !== null, 'The regex should match, or the localization is invalid');
-                                            assert.ok(match.groups !== undefined, 'The regex should always return groups');
+                                            assert(match !== null, 'The regex should match, or the localization is invalid');
+                                            assert(match.groups !== undefined, 'The regex should always return groups');
 
                                             return <Typography key={i}>
                                                 <li>
@@ -171,13 +172,13 @@ class Register extends React.Component<RouteComponentProps> {
                                         variant='contained'
                                         color='primary'
                                     >
-                                        {strings.register}
+                                        {strings.buttonsNames.register}
                                     </Button>
                                     <Button
                                         variant='outlined'
                                         onClick={(): void => this.props.history?.push('/login')}
                                     >
-                                        {strings.backToLogin}
+                                        {strings.buttonsNames.backToLogin}
                                     </Button>
                                 </div>
                             </Form>

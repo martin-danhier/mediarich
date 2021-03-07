@@ -1,3 +1,9 @@
+/**
+ * @file Definition of an AlertDialog component
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import React from 'react';
 
@@ -20,6 +26,10 @@ interface ConfirmationDialogProps {
 
 /** Dialog displaying a title, a message, and two buttons */
 class AlertDialog extends React.Component<ConfirmationDialogProps> {
+    /**
+     * Main method of a React component. Called each time the component needs to render.
+     * @returns a tree of react elements
+     */
     render(): JSX.Element {
         return <Dialog
             open={this.props.open}

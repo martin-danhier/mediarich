@@ -1,49 +1,100 @@
-import { Button, ButtonGroup, IconButton, Tooltip, Typography } from '@material-ui/core';
-import React from 'react';
-import { RouteComponentProps } from 'react-router';
-import { DataGrid, GridColDef, GridRowsProp } from '@material-ui/data-grid';
-import { Add, Check, Clear, Delete, Edit, Public } from '@material-ui/icons';
-import { Icon } from '@iconify/react';
-import moveFile from '@iconify/icons-ic/round-drive-file-move';
-import { formatDuration, toUpperCaseFirstLetter } from 'utils/useful-functions';
+/**
+ * @file Definition of an ChannelContentList component
+ * @version 1.0
+ * @author Martin Danhier
+ */
 
 import './channel-content.style.css';
-import assert from 'utils/assert';
-import EditableTypography from '../../../components/editable-typography';
-import { format } from 'date-fns';
-import { Localization } from 'components/localization-provider/types';
 
+import { Localization } from 'components/localization-provider/types';
+import { format } from 'date-fns';
+import React from 'react';
+import { RouteComponentProps } from 'react-router';
+import assert from 'utils/assert';
+import { formatDuration, toUpperCaseFirstLetter } from 'utils/useful-functions';
+
+import moveFile from '@iconify/icons-ic/round-drive-file-move';
+import { Icon } from '@iconify/react';
+import { Button, ButtonGroup, IconButton, Tooltip, Typography } from '@material-ui/core';
+import { DataGrid, GridColDef, GridRowsProp } from '@material-ui/data-grid';
+import { Add, Check, Clear, Delete, Edit, Public } from '@material-ui/icons';
+
+import EditableTypography from '../../../components/editable-typography';
+
+/**
+ * Value of a DataGrid "action" column row
+ */
+export interface DataGridActionColumnParams {
+    /** Icon to display on the button */
+    icon: JSX.Element;
+    /** Callback called when the button is clicked */
+    onClick?: () => void;
+    /** If true, the button will be disabled */
+    disabled?: boolean;
+}
+
+/**
+ * Value of a DataGrid "editable" column row
+ */
+export interface DataGridEditableColumnParams {
+    /** Current text of the typography */
+    defaultText: string;
+    /** Callback called when the text is modified */
+    onUpdate: (newText: string) => (void | Promise<void>);
+    /** If true, the EditableTypography will be disabled */
+    disabled?: boolean;
+}
+
+/** Props of a ChannelContentList component */
 export interface ChannelContentListProps extends RouteComponentProps {
+    /** Title of the list, displayed at the top left */
     title: string;
+    /** Column definitions for the table. It follows the same conventions as MaterialUI DataGrid.
+     *
+     * However, the following custom column types are allowed on top of the default ones:
+     * - ``editable``: EditableTypography that can be modified on click. The value type is ``DataGridEditableColumnParams``.
+     * - ``boolean``: renders a V or a X to display the value. The value type is ``boolean``.
+     * - ``action``: renders an icon button. The value type is ``DataGridActionColumnParams``.
+     * - ``duration``: renders a duration. The value type is date-fns's ``Duration``.
+     */
     columns: GridColDef[];
+    /** Rows of the list. It follows the same conventions as MaterialUI's DataGrid. */
     rows: GridRowsProp;
+    /** The current localization object */
     localization: Localization;
+    /** If false, the "add item" button will be disabled. */
     canAddItem?: boolean;
+    /** Callback called when the "add item" button is clicked */
     addItem?: () => void;
+    /** Callback called when the "edit selected items" button is clicked */
     editItems?: (items: string[]) => void;
+    /** Callback called when the "publish selected items" button is clicked */
     publishItems?: (items: string[]) => void;
+    /** Callback called when the "move selected items" button is clicked */
     moveItems?: (items: string[]) => void;
+    /** Callback called when the "delete selected items" button is clicked */
     deleteItems?: (items: string[]) => void;
+    /** Callback used to check whether or not the user has the right to delete the selected items.
+     * @returns true if they do
+     */
     deletePermissionCheck: (item: string) => boolean;
+    /**
+     * Callback used to check whether or not the user has the right to edit the selected items.
+     * @returns true if they do
+     */
     editPermissionCheck: (item: string) => boolean;
 }
 
-export interface DataGridActionColumnParams {
-    icon: JSX.Element;
-    onClick?: () => void;
-    disabled?: boolean;
-}
 
-export interface DataGridEditableColumnParams {
-    defaultText: string;
-    onUpdate: (newText: string) => (void | Promise<void>);
-    disabled?: boolean;
-}
-
+/** State of a ChannelContentList component */
 interface ChannelContentListState {
+    /** Ids of the currently selected lines */
     selectionModel: string[];
 }
 
+/**
+ * DataGrid with actions and permission support.
+ */
 class ChannelContentList extends React.Component<ChannelContentListProps, ChannelContentListState> {
     constructor(props: ChannelContentListProps) {
         super(props);
@@ -53,6 +104,10 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
         };
     }
 
+    /**
+     * Main method of a React component. Called each time the component needs to render.
+     * @returns a tree of react elements
+     */
     render(): JSX.Element {
         return (
             <div className='ChannelContent-wrapper'>
@@ -242,6 +297,19 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
                                     const dur1 = v1 as Duration;
                                     const dur2 = v2 as Duration;
 
+                                    // Assert that dur1 is a Duration
+                                    // We need to check each field because typescript types do not exist at runtime :c
+                                    assert(typeof dur1 === 'object', 'The value in a duration field must be a Duration');
+                                    assert(typeof dur1.hours === 'number' || dur1.hours === undefined, 'The value in a duration field must be a Duration');
+                                    assert(typeof dur1.minutes === 'number' || dur1.minutes === undefined, 'The value in a duration field must be a Duration');
+                                    assert(typeof dur1.seconds === 'number' || dur1.seconds === undefined, 'The value in a duration field must be a Duration');
+                                    // Assert that dur2 is a Duration
+                                    assert(typeof dur2 === 'object', 'The value in a duration field must be a Duration');
+                                    assert(typeof dur2.hours === 'number' || dur2.hours === undefined, 'The value in a duration field must be a Duration');
+                                    assert(typeof dur2.minutes === 'number' || dur2.minutes === undefined, 'The value in a duration field must be a Duration');
+                                    assert(typeof dur2.seconds === 'number' || dur2.seconds === undefined, 'The value in a duration field must be a Duration');
+
+
                                     // Get the total number of seconds of the two durations
                                     const a = (dur1.hours ?? 0) * 3600 + (dur1.minutes ?? 0) * 60 + (dur1.seconds ?? 0);
                                     const b = (dur2.hours ?? 0) * 3600 + (dur2.minutes ?? 0) * 60 + (dur2.seconds ?? 0);
@@ -255,6 +323,13 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
                                     // Get the date
                                     const data = params.value as Duration;
 
+                                    // Assert that data is a Duration
+                                    // We need to check each field because typescript types do not exist at runtime :c
+                                    assert(typeof data === 'object', 'The value in a duration field must be a Duration');
+                                    assert(typeof data.hours === 'number' || data.hours === undefined, 'The value in a duration field must be a Duration');
+                                    assert(typeof data.minutes === 'number' || data.minutes === undefined, 'The value in a duration field must be a Duration');
+                                    assert(typeof data.seconds === 'number' || data.seconds === undefined, 'The value in a duration field must be a Duration');
+
                                     return <Typography>{formatDuration(data)}</Typography>;
                                 }
                             },
@@ -266,7 +341,7 @@ class ChannelContentList extends React.Component<ChannelContentListProps, Channe
                             },
                             // String
                             string: {
-                                
+
                                 headerClassName: 'ChannelContent-header',
                             },
                             // Action column, that can contain icon buttons

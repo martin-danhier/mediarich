@@ -1,12 +1,22 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@material-ui/core';
-import { Localization } from 'components/localization-provider/types';
-import React, { ChangeEvent } from 'react';
-import MSChannel from 'utils/mediaserver/classes/channel';
-import { Autocomplete } from '@material-ui/lab';
-import assert from 'utils/assert';
+/**
+ * @file Definition of an MoveDialog component
+ * @version 1.0
+ * @author Martin Danhier
+ */
 
 import './move-dialog.style.css';
 
+import { Localization } from 'components/localization-provider/types';
+import React, { ChangeEvent } from 'react';
+import assert from 'utils/assert';
+import MSChannel from 'utils/mediaserver/classes/channel';
+
+import {
+    Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField
+} from '@material-ui/core';
+import { Autocomplete } from '@material-ui/lab';
+
+/** Props of a MoveDialog component */
 export interface MoveDialogProps {
     /** Should the dialog be opened or not */
     open: boolean;
@@ -28,10 +38,12 @@ export interface MoveDialogProps {
     channels: Record<string, MSChannel>;
 }
 
+/** State of a MoveDialog component */
 export interface MoveDialogState {
     selected: string;
 }
 
+/** Dialog with a field to get new parent channel for move */
 class MoveDialog extends React.Component<MoveDialogProps, MoveDialogState> {
 
     constructor(props: MoveDialogProps) {
@@ -52,6 +64,10 @@ class MoveDialog extends React.Component<MoveDialogProps, MoveDialogState> {
         });
     }
 
+    /**
+     * Main method of a React component. Called each time the component needs to render.
+     * @returns a tree of react elements
+     */
     render(): JSX.Element {
         return <Dialog
             fullWidth

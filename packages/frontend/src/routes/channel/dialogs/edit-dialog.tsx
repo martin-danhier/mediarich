@@ -1,10 +1,20 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@material-ui/core';
-import { Localization } from 'components/localization-provider/types';
+/**
+ * @file Definition of an EditDialog component
+ * @version 1.0
+ * @author Martin Danhier
+ */
+
 import Form from 'components/form';
 import ImageField from 'components/image-field';
+import { Localization } from 'components/localization-provider/types';
 import CustomTextField from 'components/text-field';
 import React from 'react';
 
+import {
+    Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography
+} from '@material-ui/core';
+
+/** Props of an EditDialog component */
 export interface EditDialogProps {
     /** Should the dialog be opened or not */
     open: boolean;
@@ -28,12 +38,21 @@ export interface EditDialogProps {
 
 /** State of a channel edit form */
 export interface ChannelEditState {
+    /** Title field */
     title: string;
+    /** Description field */
     description: string;
+    /** Thumbnail field (null = don't modify it) */
     thumbnail: File | null;
 }
 
+/** Dialog with video edition form */
 class EditDialog extends React.Component<EditDialogProps> {
+
+    /**
+     * Main method of a React component. Called each time the component needs to render.
+     * @returns a tree of react elements
+     */
     render(): JSX.Element {
         return <Dialog
             fullWidth
@@ -58,6 +77,7 @@ class EditDialog extends React.Component<EditDialogProps> {
 
                     {this.props.omitEmpty ? <Typography className='margin-bottom'>{this.props.localization.Channel.dialogs.omittedFields}</Typography> : <></>}
 
+                    {/* Fields */}
                     <CustomTextField
                         label={this.props.localization.Channel.fieldsNames.title}
                         name='title'
@@ -73,7 +93,6 @@ class EditDialog extends React.Component<EditDialogProps> {
                         autoComplete='off'
                         className='margin-vertical'
                     />
-
                     <ImageField
                         title={this.props.localization.Channel.fieldsNames.thumbnail}
                         name='thumbnail'
