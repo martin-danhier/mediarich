@@ -4,7 +4,7 @@
  * @version 1.0
  */
 
-import { ok, strictEqual } from 'assert';
+import assert from 'assert';
 import { json as jsonParser } from 'body-parser';
 import cors from 'cors';
 import express from 'express';
@@ -21,7 +21,7 @@ import { getSessionOptions, initDatabase, Logger } from './utils';
 
 /**
  * Singleton class containing various methods to init and handle the server.
- * 
+ *
  * Call either `initServer` or `initServerForTesting` before anything else.
  */
 export default class Server {
@@ -46,21 +46,21 @@ export default class Server {
      */
     private async init(): Promise<void> {
         // Assert that the server is not already initialized
-        strictEqual(this.app, undefined, 'The server is already initialized');
-        
+        assert(this.app === undefined, 'The server is already initialized');
+
         // Init logger
         Logger.initLevel();
-        
+
         // Create new express app
         this.app = express();
         // Create database
         this.database = await initDatabase();
         // Create session options
         this.sessionOptions = getSessionOptions(this.database);
-        
+
         // Create api router
         const api = express.Router();
-        
+
         // Logger: log each request
         api.use(LoggerMiddleware);
         // Protect against common vulnerabilities
@@ -121,7 +121,7 @@ export default class Server {
     */
     public listen(): void {
         // Assert that the app is inited
-        ok(this.app !== undefined, 'Server not initialized: the "init" function must be called before the "listen" function.');
+        assert(this.app !== undefined, 'Server not initialized: the "init" function must be called before the "listen" function.');
 
         // Get the port or set a default one if there isn't any
         const port = process.env.SERVER_PORT ?? '8000';
@@ -140,9 +140,9 @@ export default class Server {
         const instance = Server.instance;
 
         // Assert that the instance exists
-        ok(instance !== undefined, 'Server not initialized: the "init" function must be called before the "getApp" function.');
+        assert(instance !== undefined, 'Server not initialized: the "init" function must be called before the "getApp" function.');
         // Assert that the app is inited
-        ok(instance.app !== undefined, 'Server not initialized: the "init" function must be called before the "getApp" function.');
+        assert(instance.app !== undefined, 'Server not initialized: the "init" function must be called before the "getApp" function.');
 
         return instance.app;
     }
@@ -153,7 +153,7 @@ export default class Server {
     */
     public static async initServer(): Promise<Server> {
         // Assert that we are not in a testing environment
-        ok(process.env.NODE_ENV !== 'test', 'Use `initServerForTests` instead of `initServer` when testing.');
+        assert(process.env.NODE_ENV !== 'test', 'Use `initServerForTests` instead of `initServer` when testing.');
 
         Server.instance = new Server();
 
@@ -172,7 +172,7 @@ export default class Server {
      */
     public static async initServerForTests(): Promise<Server> {
         // Assert that we are in a testing environment
-        strictEqual(process.env.NODE_ENV, 'test', 'Use `initServer` instead of `initServerForTests` when not testing.');
+        assert(process.env.NODE_ENV === 'test', 'Use `initServer` instead of `initServerForTests` when not testing.');
 
         Server.instance = new Server();
 

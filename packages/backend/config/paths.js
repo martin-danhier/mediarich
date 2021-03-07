@@ -40,7 +40,7 @@ module.exports = {
     appPath: resolveApp('.'),
     srcDir: resolveApp('src'),
     buildDir: resolveApp('../../build'),
-    buildIndexModule: resolveModule(resolveApp, 'build/index'),
+    buildIndexModule: resolveModule(resolveApp, '../../build/index'),
     serverIndex: resolveModule(resolveApp, 'src/index'),
     appTsConfig: resolveApp('tsconfig.json'),
     appPackageJson: resolveApp('package.json'),
